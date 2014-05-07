@@ -1,0 +1,33 @@
+<html>
+<head>
+  <title>{{title}}</title>
+</head>
+<body>
+{{#myself}}
+{{^root}}
+<div>
+<p><strong>WARNING:</strong> If you are NOT
+<strong>{{name.givenName}} {{name.familyName}}</strong>
+you will NOT be able to place this order.
+If you are NOT <strong>{{name.givenName}} {{name.familyName}}</strong>, please contact us at
+<a href="mailto:sales@amazingcreditresults.com">sales@amazingcreditresults.com</a>
+and we will happily send you a personalized link to order!
+</p>
+</div>
+{{/root}}
+<p><a href="/auth/logout">Exit</a></p>
+{{/myself}}
+
+<div>
+  {{#flash}}
+    {{#error}} <div class="flash_error">{{error}}</div> {{/error}}
+    {{#success}} <div class="flash_success">{{success}}</div> {{/success}}
+    {{#info}} <div class="flash_info">{{info}}</div> {{/info}}
+  {{/flash}}
+</div>
+<div>
+  {{{ yield }}}
+</div>
+
+</body>
+</html>

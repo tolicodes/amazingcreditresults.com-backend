@@ -1,0 +1,12 @@
+<h1>Enter your password to authorize!</h1>
+
+<form action="/buyer/login" method="post">
+  <input type="hidden" name="_csrf" value="{{csrf}}"/>
+  <input type="hidden" name="apiKey" value="{{myself.apiKey}}"/>
+  <p>
+    <input type="password" name="password" value="">
+  </p>
+  <p>
+    <input type="submit" value="Sign in"/>
+  </p>
+</form>

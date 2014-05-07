@@ -1,0 +1,12 @@
+<h1>Set your password!</h1>
+
+<form action="/buyer/setPassword" method="post">
+  <input type="hidden" name="_csrf" value="{{csrf}}"/>
+  <input type="hidden" name="apiKey" value="{{myself.apiKey}}"/>
+  <p>
+    <input type="password" name="password" value="">
+  </p>
+  <p>
+    <input type="submit" value="Set password"/>
+  </p>
+</form>
