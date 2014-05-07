@@ -16,7 +16,7 @@ var hunt = require('hunt'),
       'signUpByEmail': false,
       'verifyEmail': false,
       'resetPassword': false,
-      'sessionExpireAfterSeconds': 5*60, //plan 1.4,
+      'sessionExpireAfterSeconds': 5*60, //plan 1.4
       'apiKeyOutdates': 5*24*60*60*1000 //ttl of api key for buyer to authorize - 5 dayes
     }
   });
@@ -89,6 +89,7 @@ Hunt.on('start', function(evnt){
   }
 });
 
+Hunt.on('httpSuccess', console.log);
 
 //starting
 if(Hunt.config.env === 'development'){
