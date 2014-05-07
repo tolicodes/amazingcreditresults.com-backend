@@ -37,11 +37,12 @@ Hunt.extendApp(function(core){
 //access control middleware
 Hunt.extendMiddleware(function(core){
   return function(request, response, next){
-    console.log(request.originalUrl);
     if(request.user){
       next();
     } else {
-      if( /^\/buyer\/welcome\/[0-9a-f]+$/.test(request.originalUrl) || /^\/auth\//.test(request.originalUrl) ) {
+      if(request.originalUrl === '/admin/login' ||
+          /^\/buyer\/welcome\/[0-9a-f]+$/.test(request.originalUrl) ||
+          /^\/auth\//.test(request.originalUrl) ) {
         next();
       } else {
         response.status(200);
@@ -50,15 +51,20 @@ Hunt.extendMiddleware(function(core){
     }
   };
 });
+/*/
 //access control for /admin/ path - this is only accessible by users
 //that are owners/staff - they had `root:true` in profile
 Hunt.extendMiddleware(function(request, response, next){
   return function(request, response, next){
     if(/^\/admin\//.test(request.originalUrl)) {
-      if(request.user && request.user.root === true){
+      if(request.originalUrl === '/admin/login'){
         next();
       } else {
-        response.send(403);
+        if(request.user && request.user.root === true){
+          next();
+        } else {
+          response.send(403);
+        }
       }
     } else {
       next();
