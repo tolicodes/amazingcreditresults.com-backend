@@ -1,0 +1,35 @@
+HOST: http://54.86.168.135
+
+--- Amazing Api V1 ---
+
+-- Buyer resourse --
+
+Authorize buyer by unique link. If link is valid, it responds with HTML page with form to set password,
+if link is invalid, it redirects to error page with message, that link is invalid or outdated
+GET /buyer/welcome/{apiKey}
+< 200
+< Content-Type: text/html
++++++
+< 302
+< Location: /buyer/error
+
+
+Set password for buyer when he authorizes first time, than redirects back to page, where s/he has to enter password
+POST /buyer/setPassword
+> Content-Type: application/x-www-form-urlencoded; charset=utf-8
+{ "apiKey": "someVeryLongApiKey", "password":"SomeNewPasswordToSet"}
+< 302
+< Location: /buyer/welcome/{apiKey}
++++++
+< 400
+< Content-Type: application/json; charset=utf-8
+< X-Rate-Limit-Remaining: 0
+{"message":"Too many requests, please try again later (see X-Rate-Limit-Remaining header)"}
+
+
+Set password for buyer when he authorizes first time, than redirects back to page, where s/he has to enter password
+POST /buyer/setPassword
+> Content-Type: application/x-www-form-urlencoded; charset=utf-8
+{ "apiKey": "someVeryLongApiKey", "password":"SomeNewPasswordToSet"}
+< 302
+< Location: /buyer/welcome/{apiKey}
