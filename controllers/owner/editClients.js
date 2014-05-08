@@ -109,8 +109,31 @@ var ensureAdmin = function(request, response, next){
   });
 
   core.app.put('/admin/clients/:id', ensureAdmin, function(request, response){
-
+    request.model.User.findOneAndUpdate(
+      {
+        '_id':request.params.id
+      },
+      {
+        "email": request.body.email,
+        "name": {
+          "familyName" : request.body.familyName,
+          "givenName" : request.body.givenName,
+          "middleName" : request.body.middleName,
+        }
+      },
+      {
+        'upsert':false // important!
+      }, function(error, userFound){
+        if(error){
+          throw error;
+        } else {
+          response.status(200);
+          response.json(userFound);
+        }
+      }
+    );
   });
+
 
   core.app.post('/admin/clients', ensureAdmin, function(request, response){
     var isOk,
@@ -174,7 +197,7 @@ var ensureAdmin = function(request, response, next){
           if(err) {
             throw err;
           } else {
-            response.json({'user':userFound, 'welcomeLink':welcomeLink});
+            response.json({'message':'sent','user':userFound, 'welcomeLink':welcomeLink});
           }
         });
       }
