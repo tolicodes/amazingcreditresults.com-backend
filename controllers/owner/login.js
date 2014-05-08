@@ -43,5 +43,19 @@ module.exports = exports = function(core){
       'title': 'Owners` login page'
     });
   });
+
+  core.app.get('/auth/success', function(request, response){
+    if(request.user && request.user.root){
+      request.flash('success', 'Welcome!');
+      response.redirect('/admin/clients');
+    } else {
+      response.send(404);
+    }
+  });
+
+  core.app.get('/auth/failure', function(request, response){
+    response.send(404);
+  });
+
 }
 

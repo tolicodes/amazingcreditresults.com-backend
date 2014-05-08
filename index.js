@@ -108,7 +108,7 @@ Hunt.extendRoutes(require('./controllers/owner/editClients.js'));
 Hunt.on('start', function(evnt){
 //creating test users in development environment!
   if(Hunt.config.env === 'development') {
-    //require('./lib/populateDatabase.js')(Hunt);
+//    require('./lib/populateDatabase.js')(Hunt);
   }
 });
 
