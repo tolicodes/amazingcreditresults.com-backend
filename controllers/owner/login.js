@@ -54,7 +54,8 @@ module.exports = exports = function(core){
   });
 
   core.app.get('/auth/failure', function(request, response){
-    response.send(404);
+    request.flash('error','Authentication failed!');
+    response.redirect('/admin/login');
   });
 
 }
