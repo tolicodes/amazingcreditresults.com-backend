@@ -113,7 +113,39 @@ var ensureAdmin = function(request, response, next){
   });
 
   core.app.post('/admin/clients', ensureAdmin, function(request, response){
-
+    var isOk,
+      missed;
+    ['email','familyName','givenName','middleName'].map(function(s){
+      if(request.body[s] && typeof request.body[s] === 'string') {
+        isOk = true;
+      } else {
+        isOk = false;
+        missed = s;
+      }
+    });
+    if(isOk) {
+      request.model.User.create({
+        'email': request.body.email,
+        'name':{
+          'givenName':request.body.givenName,
+          'middleName':request.body.middleName,
+          'familyName':request.body.familyName
+        },
+        'profile': {
+          'needQuestionare': request.body.Questionare ? true : false
+        },
+        'root': false
+      }, function(error, userCreated){
+        if(error) {
+          throw error;
+        } else {
+          response.status(201);
+          response.json(userCreated);
+        }
+      });
+    } else {
+      response.send(400, 'Value of '+s+' is missed!');
+    }
   });
 
 //send message with link to site
@@ -132,8 +164,8 @@ var ensureAdmin = function(request, response, next){
             userFound.notifyByEmail({
               'layout':false,
               'template':'emails/welcome',
-              'subject':'Site access hyperlink'
-              'name':userFound.name,
+              'subject':'Site access hyperlink',
+              'name': userFound.name,
               'welcomeUrl': welcomeLink
             });
             cb();
