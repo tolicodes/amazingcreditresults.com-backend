@@ -1,4 +1,5 @@
 var hunt = require('hunt'),
+  swagger = require('swagger-express'),
   Hunt = hunt({
 //    'hostUrl':'https://dev.amazingcreditresults.com/', //for example
 //    'redisUrl':'', //from environment or default values
@@ -33,6 +34,26 @@ Hunt.extendApp(function(core){
 //*/
 });
 
+//swagger middleware
+
+Hunt.extendMiddleware(function(core){
+  var mdlware = swagger.init(core.app, {
+        apiVersion: '1.0',
+        swaggerVersion: '1.0',
+        basePath: 'http://localhost:3000',
+        swaggerURL: '/swagger',
+        swaggerJSON: '/api-docs.json',
+        swaggerUI: './public/swagger/',
+        apis: [
+          './controllers/buyer/landing.js',
+          './controllers/buyer/login.js',
+          './controllers/owner/editClients.js',
+          './controllers/owner/login.js',
+        ]
+    });
+  return mdlware;
+});
+
 //*/
 //access control middleware
 Hunt.extendMiddleware(function(core){
@@ -42,6 +63,8 @@ Hunt.extendMiddleware(function(core){
     } else {
       if(request.originalUrl === '/admin/login' ||
           /^\/buyer\/welcome\/[0-9a-f]+$/.test(request.originalUrl) ||
+          /^\/api-docs\.json/.test(request.originalUrl) ||
+          /^\/swagger\//.test(request.originalUrl) ||
           /^\/auth\//.test(request.originalUrl) ) {
         next();
       } else {
