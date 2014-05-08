@@ -112,8 +112,40 @@ var ensureAdmin = function(request, response, next){
 
   });
 
-  core.app.post('/admin/clients', ensureAdmin, function(request, response){});
+  core.app.post('/admin/clients', ensureAdmin, function(request, response){
+
+  });
 
 //send message with link to site
-  core.app.post('/admin/clients/notify/:id', ensureAdmin,function(request, response){});
+  core.app.post('/admin/clients/notify/:id', ensureAdmin,function(request, response){
+    request.model.User.findById(request.params.id, function(error, userFound){
+      if(error) {
+        throw error;
+      } else {
+        var welcomeLink;
+        core.async.waterfall([
+          function(cb){
+            userFound.invalidateSession(cb);
+          },
+          function(newApiKey, cb){
+            welcomeLink = core.config.hostUrl+'/buyer/welcome/'+newApiKey;
+            userFound.notifyByEmail({
+              'layout':false,
+              'template':'emails/welcome',
+              'subject':'Site access hyperlink'
+              'name':userFound.name,
+              'welcomeUrl': welcomeLink
+            });
+            cb();
+          }
+        ], function(err){
+          if(err) {
+            throw err;
+          } else {
+            response.json({'user':userFound, 'welcomeLink':welcomeLink});
+          }
+        });
+      }
+    });
+  });
 };
