@@ -85,27 +85,29 @@
                 'familyName': this.userToBeCreated.familyName(),
                 'needQuestionare': true //temporary
             }, function (data) {
-                console.log(data);
+//                console.log(data);
                 var newClient = /*JSON.parse*/(data);
-                console.log(newClient);
+//                console.log(newClient);
                 newClient.root = false;
-                console.log(newClient);
-/*
+//                console.log(newClient);
                 that.userToBeCreated.email('');
                 that.userToBeCreated.givenName('');
                 that.userToBeCreated.middleName('');
                 that.userToBeCreated.familyName('');
                 that.userToBeCreated.accountVerified('');
                 that.userToBeCreated.needQuestionare('');
-*/
                 that.clients.push(newClient);
             });
         },
         'sendWelcomeEmail': function (client) {
             $.post('/admin/clients/notify/' + client.id, {}, function (data) {
-              console.log(data);
-              model.message('Message is send! Visit link below to verify that it works');
-              model.messageLink(data.welcomeLink);
+//              console.log(data);
+              if(data.error) {
+                model.message(data.error);
+              } else {
+                model.message('Message is send! Visit link below to verify that it works');
+                model.messageLink(data.welcomeLink);
+              }
             });
         }
     };

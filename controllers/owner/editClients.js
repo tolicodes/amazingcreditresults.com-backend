@@ -186,12 +186,13 @@ var ensureAdmin = function(request, response, next){
             'givenName':userCreated.name.givenName,
               'middleName':userCreated.name.middleName,
               'familyName':userCreated.name.familyName
-          },
-          'profile': {
-            'needQuestionare': userCreated.profile.needQuestionare
-          },
-          'root': false
-          });
+            },
+            'profile': {
+              'needQuestionare': userCreated.profile.needQuestionare
+            },
+            'root': false,
+            'accountVerified':true
+            });
         }
       });
     } else {
@@ -206,29 +207,34 @@ var ensureAdmin = function(request, response, next){
         throw error;
       } else {
         var welcomeLink;
-        core.async.waterfall([
-          function(cb){
-            userFound.invalidateSession(cb);
-          },
-          function(newApiKey, cb){
-            welcomeLink = core.config.hostUrl+'buyer/welcome/'+newApiKey;
-            userFound.notifyByEmail({
-              'layout':false,
-              'template':'emails/welcome',
-              'subject':'Site access hyperlink',
-              'name': userFound.name,
-              'welcomeLink': welcomeLink
-            });
-            cb();
-          }
-        ], function(err){
-          if(err) {
-            throw err;
-          } else {
-            response.status(202);
-            response.json({'message':'sent','user':userFound, 'welcomeLink':welcomeLink});
-          }
-        });
+        if(userFound.root){
+//          response.status(400);
+          response.json({'error':'Unable to send welcome link to owner!'});
+        } else {
+          core.async.waterfall([
+            function(cb){
+              userFound.invalidateSession(cb);
+            },
+            function(newApiKey, cb){
+              welcomeLink = core.config.hostUrl+'buyer/welcome/'+newApiKey;
+              userFound.notifyByEmail({
+                'layout':false,
+                'template':'emails/welcome',
+                'subject':'Site access hyperlink',
+                'name': userFound.name,
+                'welcomeLink': welcomeLink
+              });
+              cb();
+            }
+          ], function(err){
+            if(err) {
+              throw err;
+            } else {
+              response.status(202);
+              response.json({'message':'sent','user':userFound, 'welcomeLink':welcomeLink});
+            }
+          });
+        }
       }
     });
   });
