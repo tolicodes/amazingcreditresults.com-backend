@@ -1,0 +1,124 @@
+<h1>Edit users</h1>
+<div>
+    <p data-bind="text: message"></p>
+    <p data-bind="if: messageLink"><a target="_blank" data-bind="attr: {'href':messageLink}, text:messageLink"></a></p>
+</div>
+
+<table id="recentVisits" border="1">
+    <thead>
+    <tr>
+        <th>Role</th>
+        <th>Email</th>
+        <th>First (given) name</th>
+        <th>Middle name</th>
+        <th>Last (family) name</th>
+        <th>Account verified</th>
+        <th>Needs questionary?</th>
+        <th>Send welcome link</th>
+    </tr>
+    </thead>
+    <tbody data-bind="foreach: clients">
+    <tr>
+        <td>
+            <select disabled="disabled">
+                <option data-bind="attr: { 'selected' : root ? 'selected': '' }">Owner</option>
+                <option data-bind="attr: { 'selected' : root ? null : 'selected' }">Buyer</option>
+            </select>
+        </td>
+        <td><a data-bind="attr: { href: 'mailto://'+email }, text: email"></a></td>
+        <td data-bind="text: name.givenName"></td>
+        <td data-bind="text: name.middleName"></td>
+        <td data-bind="text: name.familyName"></td>
+        <td>
+            <span data-bind="if: accountVerified">Yes</span>
+            <span data-bind="ifnot: accountVerified">No</span>
+        </td>
+        <td>
+            <select disabled="disabled">
+                <option>Yes</option>
+            </select>
+        </td>
+        <td>
+            <button data-bind="click: $parent.sendWelcomeEmail">Send E-Mail</button>
+        </td>
+    </tr>
+    </tbody>
+    <tfoot>
+    <tr>
+        <td><select disabled="disabled">
+            <option>Buyer</option>
+        </select></td>
+        <td><input type="text" data-bind="value : userToBeCreated.email" placeholder="johndoe@example.org"></td>
+        <td><input type="text" data-bind="value : userToBeCreated.givenName" placeholder="John"></td>
+        <td><input type="text" data-bind="value : userToBeCreated.middleName" placeholder="Theodor"></td>
+        <td><input type="text" data-bind="value : userToBeCreated.familyName" placeholder="Doe"></td>
+        <td><input type="checkbox" value="1" data-bind="value : userToBeCreated.accountVerified"></td>
+        <td><input type="checkbox" value="1" data-bind="value : userToBeCreated.accountVerified"></td>
+        <td>
+            <button data-bind="click: createClient">Create</button>
+        </td>
+    </tr>
+    </tfoot>
+</table>
+
+<script type="text/javascript" src="//yandex.st/jquery/2.0.3/jquery.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js"></script>
+<script>
+    var model = {
+        'message': ko.observable(),
+        'messageLink': ko.observable(),
+        'clients': ko.observableArray(),
+        'userToBeCreated': {
+            'email':ko.observable(),
+            'givenName':ko.observable(),
+            'middleName':ko.observable(),
+            'familyName':ko.observable(),
+            'accountVerified':ko.observable(),
+            'needQuestionare':ko.observable()
+        },
+        'createClient': function () {
+            var that = this;
+            $.post('/admin/clients', {
+                'email': this.userToBeCreated.email(),
+                'givenName': this.userToBeCreated.givenName(),
+                'middleName': this.userToBeCreated.middleName(),
+                'familyName': this.userToBeCreated.familyName(),
+                'needQuestionare': true //temporary
+            }, function (data) {
+                console.log(data);
+                var newClient = /*JSON.parse*/(data);
+                console.log(newClient);
+                newClient.root = false;
+                console.log(newClient);
+/*
+                that.userToBeCreated.email('');
+                that.userToBeCreated.givenName('');
+                that.userToBeCreated.middleName('');
+                that.userToBeCreated.familyName('');
+                that.userToBeCreated.accountVerified('');
+                that.userToBeCreated.needQuestionare('');
+*/
+                that.clients.push(newClient);
+            });
+        },
+        'sendWelcomeEmail': function (client) {
+            $.post('/admin/clients/notify/' + client.id, {}, function (data) {
+              console.log(data);
+              model.message('Message is send! Visit link below to verify that it works');
+              model.messageLink(data.welcomeLink);
+            });
+        }
+    };
+    ko.applyBindings(model);
+
+    document.onreadystatechange = function () {
+        if (document.readyState == "complete") {
+            $.get('/admin/clients.json', function (data) {
+                console.log(data);
+                data.clients.map(function (client) {
+                    model.clients.push(client);
+                })
+            });
+        }
+    };
+</script>

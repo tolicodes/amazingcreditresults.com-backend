@@ -26,7 +26,7 @@ var ensureAdmin = function(request, response, next){
  *      nickname: Owner dashboard for editing clients
  */
   core.app.get('/admin/clients', ensureAdmin, function(request, response){
-    response.send('clients')
+    response.render('owner/editClientsDev', {'title':'Edit clients'})
   });
 
 /**
@@ -134,7 +134,18 @@ var ensureAdmin = function(request, response, next){
           throw error;
         } else {
           response.status(202);
-          response.json(userFound);
+          response.json({
+            'email': userFound.email,
+            'name':{
+              'givenName':userFound.name.givenName,
+              'middleName':userFound.name.middleName,
+              'familyName':userFound.name.familyName
+            },
+            'profile': {
+              'needQuestionare': userFound.profile.needQuestionare
+            },
+            'root': false
+          });
         }
       }
     );
@@ -169,7 +180,18 @@ var ensureAdmin = function(request, response, next){
           throw error;
         } else {
           response.status(201);
-          response.json(userCreated);
+          response.json({
+            'email': userCreated.email,
+            'name':{
+            'givenName':userCreated.name.givenName,
+              'middleName':userCreated.name.middleName,
+              'familyName':userCreated.name.familyName
+          },
+          'profile': {
+            'needQuestionare': userCreated.profile.needQuestionare
+          },
+          'root': false
+          });
         }
       });
     } else {
@@ -189,13 +211,13 @@ var ensureAdmin = function(request, response, next){
             userFound.invalidateSession(cb);
           },
           function(newApiKey, cb){
-            welcomeLink = core.config.hostUrl+'/buyer/welcome/'+newApiKey;
+            welcomeLink = core.config.hostUrl+'buyer/welcome/'+newApiKey;
             userFound.notifyByEmail({
               'layout':false,
               'template':'emails/welcome',
               'subject':'Site access hyperlink',
               'name': userFound.name,
-              'welcomeUrl': welcomeLink
+              'welcomeLink': welcomeLink
             });
             cb();
           }
