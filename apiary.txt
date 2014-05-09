@@ -156,7 +156,7 @@ Create new client
 POST /admin/clients
 > Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
 {"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org"}
-< 201
+< 202
 < Content-Type: application/json
 
 

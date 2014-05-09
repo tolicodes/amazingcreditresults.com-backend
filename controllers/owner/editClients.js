@@ -16,7 +16,7 @@ var ensureAdmin = function(request, response, next){
     request.flash('error','Authentication required!');
     response.redirect('/admin/login');
   }
-}
+};
 
 /**
  * @swagger
@@ -37,6 +37,11 @@ var ensureAdmin = function(request, response, next){
  *      nickname: Owners' json endpoing with data about clients
  */
   core.app.get('/admin/clients.json', ensureAdmin, function(request, response){
+    var page = request.query.page || 1,
+      order = request.query.order;
+
+    if(['familyName','givenName','middleName'])
+
     request.model.User
       .find({
          //todo - parameters for limiting output
@@ -52,9 +57,9 @@ var ensureAdmin = function(request, response, next){
               "id": user.id,
               "email": user.email,
               "name": {
-                "familyName" : user.name.familyName,
-                "givenName" : user.name.givenName,
-                "middleName" : user.name.middleName,
+                "familyName" : user.name.familyName, //http://schema.org/familyName
+                "givenName" : user.name.givenName, //http://schema.org/givenName
+                "middleName" : user.name.middleName //http://schema.org/middleName - at least the google oauth has this structure!
               },
               "gravatar": user.gravatar,
               "gravatar30": user.gravatar30,
@@ -84,13 +89,14 @@ var ensureAdmin = function(request, response, next){
         throw error;
       } else {
         if(user){
+          response.status(200);
           response.json({
               "id": user.id,
               "email": user.email,
               "name": {
                 "familyName" : user.name.familyName,
                 "givenName" : user.name.givenName,
-                "middleName" : user.name.middleName,
+                "middleName" : user.name.middleName
               },
               "gravatar": user.gravatar,
               "gravatar30": user.gravatar30,
@@ -118,7 +124,7 @@ var ensureAdmin = function(request, response, next){
         "name": {
           "familyName" : request.body.familyName,
           "givenName" : request.body.givenName,
-          "middleName" : request.body.middleName,
+          "middleName" : request.body.middleName
         }
       },
       {
@@ -127,7 +133,7 @@ var ensureAdmin = function(request, response, next){
         if(error){
           throw error;
         } else {
-          response.status(200);
+          response.status(202);
           response.json(userFound);
         }
       }
@@ -197,6 +203,7 @@ var ensureAdmin = function(request, response, next){
           if(err) {
             throw err;
           } else {
+            response.status(202);
             response.json({'message':'sent','user':userFound, 'welcomeLink':welcomeLink});
           }
         });
