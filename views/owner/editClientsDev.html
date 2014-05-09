@@ -15,6 +15,7 @@
         <th>Account verified</th>
         <th>Needs questionary?</th>
         <th>Send welcome link</th>
+        <th>Send reset link</th>
     </tr>
     </thead>
     <tbody data-bind="foreach: clients">
@@ -39,7 +40,10 @@
             </select>
         </td>
         <td>
-            <button data-bind="click: $parent.sendWelcomeEmail">Send E-Mail</button>
+            <button data-bind="click: $parent.sendWelcomeEmail">Welcome E-Mail</button>
+        </td>
+        <td>
+            <button data-bind="click: $parent.sendResetPasswordEail">Reset password</button>
         </td>
     </tr>
     </tbody>
@@ -54,12 +58,16 @@
         <td><input type="text" data-bind="value : userToBeCreated.familyName" placeholder="Doe"></td>
         <td><input type="checkbox" value="1" data-bind="value : userToBeCreated.accountVerified"></td>
         <td><input type="checkbox" value="1" data-bind="value : userToBeCreated.accountVerified"></td>
+        <td></td>
         <td>
             <button data-bind="click: createClient">Create</button>
         </td>
     </tr>
     </tfoot>
 </table>
+<h3>Description</h3>
+<p><b>Account verified</b> means buyer have followed the welcome link and setted up password</p>
+<p><b>Reset password</b> means welcome email is send to user, and he or she have to set up a new password </p>
 
 <script type="text/javascript" src="//yandex.st/jquery/2.0.3/jquery.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js"></script>
@@ -100,16 +108,27 @@
             });
         },
         'sendWelcomeEmail': function (client) {
-            $.post('/admin/clients/notify/' + client.id, {}, function (data) {
+            $.post('/admin/clients/welcome/' + client.id, {}, function (data) {
 //              console.log(data);
               if(data.error) {
                 model.message(data.error);
               } else {
-                model.message('Message is send! Visit link below to verify that it works');
+                model.message('Welcome message is send! Visit link below to verify that it works');
                 model.messageLink(data.welcomeLink);
               }
             });
-        }
+        },
+        'sendResetPasswordEail': function (client) {
+            $.post('/admin/clients/resetPassword/' + client.id, {}, function (data) {
+//              console.log(data);
+              if(data.error) {
+                model.message(data.error);
+              } else {
+                model.message('Reset message is send! Visit link below to verify that it works');
+                model.messageLink(data.welcomeLink);
+              }
+            });
+        },
     };
     ko.applyBindings(model);
 

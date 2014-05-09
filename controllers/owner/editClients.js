@@ -200,15 +200,15 @@ var ensureAdmin = function(request, response, next){
     }
   });
 
-//send message with link to site
-  core.app.post('/admin/clients/notify/:id', ensureAdmin,function(request, response){
+//send message with link to site, without reseting the password
+  core.app.post('/admin/clients/welcome/:id', ensureAdmin,function(request, response){
     request.model.User.findById(request.params.id, function(error, userFound){
       if(error) {
         throw error;
       } else {
         var welcomeLink;
         if(userFound.root){
-//          response.status(400);
+//          response.status(400); //not sure about js with it
           response.json({'error':'Unable to send welcome link to owner!'});
         } else {
           core.async.waterfall([
@@ -220,6 +220,45 @@ var ensureAdmin = function(request, response, next){
               userFound.notifyByEmail({
                 'layout':false,
                 'template':'emails/welcome',
+                'subject':'Site access hyperlink',
+                'name': userFound.name,
+                'welcomeLink': welcomeLink
+              });
+              cb();
+            }
+          ], function(err){
+            if(err) {
+              throw err;
+            } else {
+              response.status(202);
+              response.json({'message':'sent','user':userFound, 'welcomeLink':welcomeLink});
+            }
+          });
+        }
+      }
+    });
+  });
+
+    core.app.post('/admin/clients/resetPassword/:id', ensureAdmin,function(request, response){
+    request.model.User.findById(request.params.id, function(error, userFound){
+      if(error) {
+        throw error;
+      } else {
+        var welcomeLink;
+        if(userFound.root){
+//          response.status(400); //not sure about js with it
+          response.json({'error':'Unable to send welcome link to owner!'});
+        } else {
+          core.async.waterfall([
+            function(cb){
+              userFound.accountVerified = false;
+              userFound.invalidateSession(cb);
+            },
+            function(newApiKey, cb){
+              welcomeLink = core.config.hostUrl+'buyer/welcome/'+newApiKey;
+              userFound.notifyByEmail({
+                'layout':false,
+                'template':'emails/welcomeResetPassword',
                 'subject':'Site access hyperlink',
                 'name': userFound.name,
                 'welcomeLink': welcomeLink
