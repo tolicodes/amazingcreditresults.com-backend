@@ -23,8 +23,6 @@ POST /buyer/setPassword
 +++++
 < 400
 < Content-Type: application/json; charset=utf-8
-< X-Rate-Limit-Remaining: 0
-{"message":"Too many requests, please try again later (see X-Rate-Limit-Remaining header)"}
 
 
 Set password for buyer when he authorizes first time, than redirects back to page, where s/he has to enter password
@@ -33,3 +31,156 @@ POST /buyer/setPassword
 { "apiKey": "someVeryLongApiKey", "password":"SomeNewPasswordToSet"}
 < 302
 < Location: /buyer/welcome/{apiKey}
+
+
+-- Owner api for session based authorization
+Form to enter login and password
+GET /admin/login
+< 200
+< Content-Type: text/html
+
+
+Form action for owners to authorize
+POST /auth/login
+> Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
+{ "username":"owner@example.org", "password":"test123" }
+< 302
+< Location: /auth/success
+
+
+Route to process successefull authorization (flash message with success description is added)
+GET /auth/success
+< 302
+< Location: /
+
+
+Route to process failed authorization (flash message with error description is added)
+GET /auth/failure
+< 302
+< Location: /admin/login
+
+
+-- Owner resource to edit clients --
+
+List all clients
+GET /admin/clients
+< 200
+< Content-Type: text/html
+
+
+List all clients
+GET /admin/clients.json
+< 200
+< Content-Type: application/json
+{
+  "page": 1,
+  "clients": [
+    {
+      "id": "536cfc8a886fcbba14d07dd6",
+      "email": "johndoe@example.org",
+      "name": {
+        "familyName": "Doe",
+        "givenName": "John",
+        "middleName": ""
+      },
+      "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+      "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
+      "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
+      "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+      "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
+      "root": false,
+      "accountVerified": false
+    },
+    {
+      "id": "536cfc8a886fcbba14d07dd7",
+      "email": "janedoe@example.org",
+      "name": {
+        "familyName": "Doe",
+        "givenName": "Jane",
+        "middleName": ""
+      },
+      "gravatar": "https://secure.gravatar.com/avatar/b7fc86f9d03e399ccc5aeec8ebbba013.jpg?s=80&d=wavatar&r=g",
+      "gravatar30": "https://secure.gravatar.com/avatar/b7fc86f9d03e399ccc5aeec8ebbba013.jpg?s=30&d=wavatar&r=g",
+      "gravatar50": "https://secure.gravatar.com/avatar/b7fc86f9d03e399ccc5aeec8ebbba013.jpg?s=50&d=wavatar&r=g",
+      "gravatar80": "https://secure.gravatar.com/avatar/b7fc86f9d03e399ccc5aeec8ebbba013.jpg?s=80&d=wavatar&r=g",
+      "gravatar100": "https://secure.gravatar.com/avatar/b7fc86f9d03e399ccc5aeec8ebbba013.jpg?s=100&d=wavatar&r=g",
+      "root": false,
+      "accountVerified": true
+    },
+    {
+      "id": "536cfc8a886fcbba14d07dd5",
+      "email": "owner@example.org",
+      "name": {},
+      "gravatar": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
+      "gravatar30": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
+      "gravatar50": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
+      "gravatar80": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
+      "gravatar100": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=100&d=wavatar&r=g",
+      "root": true,
+      "accountVerified": false
+    }
+  ]
+}
+
+Get one client by id
+GET /admin/clients/{:id}
+< 200
+< Content-Type: application/json
+{
+  "id": "536cfc8a886fcbba14d07dd6",
+  "email": "johndoe@example.org",
+  "name": {
+    "familyName": "Doe",
+    "givenName": "John",
+    "middleName": ""
+  },
+  "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+  "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
+  "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
+  "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+  "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
+  "root": false,
+  "accountVerified": false
+}
+
+
+Update client
+PUT /admin/clients/{:id}
+> Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
+{"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org"}
+< 201
+< Content-Type: application/json
+
+
+Create new client
+POST /admin/clients
+> Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
+{"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org"}
+< 201
+< Content-Type: application/json
+
+
+Send client notification email with welcome link
+POST /admin/clients/notify/:id
+< 201
+< Content-Type: application/json
+{
+    'message':'sent',
+    'user': {
+      "id": "536cfc8a886fcbba14d07dd6",
+      "email": "johndoe@example.org",
+      "name": {
+        "familyName": "Doe",
+        "givenName": "John",
+        "middleName": ""
+      },
+      "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+      "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
+      "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
+      "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+      "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
+      "root": false,
+      "accountVerified": false
+    },
+    "welcomeLink": "http://localhost:3000/buyer/welcome/c87ad6d9054337007fc38c11b468facfa567b2534a2ca01608551cddf4aa69551b9aa3a4ec27f0bdeaa34b60a90233c86b951837338526612cc2a9075c272004"
+}
