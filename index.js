@@ -7,6 +7,7 @@ var hunt = require('hunt'),
     'io': {
       'loglevel': 0
     },
+    'disableCsrf': true, //strongly not recommended for production!!!
     'enableMongoose':true,
     'enableMongooseUsers':true,
     'public': __dirname+'/public/',
