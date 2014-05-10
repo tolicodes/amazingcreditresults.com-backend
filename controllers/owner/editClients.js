@@ -142,7 +142,7 @@ var ensureAdmin = function(request, response, next){
               'familyName':userFound.name.familyName
             },
             'profile': {
-              'needQuestionare': userFound.profile.needQuestionare
+              'needQuestionare': userFound.profile ? userFound.profile.needQuestionare : true
             },
             'root': false
           });

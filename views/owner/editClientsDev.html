@@ -26,10 +26,13 @@
                 <option data-bind="attr: { 'selected' : root ? null : 'selected' }">Buyer</option>
             </select>
         </td>
-        <td><a data-bind="attr: { href: 'mailto://'+email }, text: email"></a></td>
-        <td data-bind="text: name.givenName"></td>
-        <td data-bind="text: name.middleName"></td>
-        <td data-bind="text: name.familyName"></td>
+        <td><input type="email" data-bind="value: email"/>
+          <button data-bind="click: $parent.updateClient">S</button>
+          <a data-bind="attr: { href: 'mailto://'+email }">M</a>
+        </td>
+        <td><input type="text" data-bind="value: name.givenName"/><button data-bind="click: $parent.updateClient">S</button></td>
+        <td><input type="text" data-bind="value: name.middleName"/><button data-bind="click: $parent.updateClient">S</button></td>
+        <td><input type="text" data-bind="value: name.familyName"/><button data-bind="click: $parent.updateClient">S</button></td>
         <td>
             <span data-bind="if: accountVerified">Yes</span>
             <span data-bind="ifnot: accountVerified">No</span>
@@ -129,6 +132,22 @@
               }
             });
         },
+        'updateClient': function (client) {
+          console.log(client);
+          $.post('/admin/clients/'+client.id, {
+            '_method':'PUT',
+            'email': client.email,
+            'familyName' : client.name.familyName,
+            'givenName' : client.name.givenName,
+            'middleName': client.name.middleName
+          }, function(data){
+            if(data.errror) {
+              model.message(data.error);
+            } else {
+              model.message('Updated!');
+            }
+          });
+        }
     };
     ko.applyBindings(model);
 
