@@ -2,7 +2,7 @@ HOST: http://54.86.168.135
 
 --- Amazing Api V1 ---
 
--- Buyer resourse --
+-- Buyer authorization --
 
 Authorize buyer by unique link. If link is valid, it responds with HTML page with form to set password,
 if link is invalid, it redirects to error page with message, that link is invalid or outdated
@@ -33,7 +33,9 @@ POST /buyer/setPassword
 < Location: /buyer/welcome/{apiKey}
 
 
-Buyer dashboard (will be SPA application). On this page buyer is redirected after succesefull login. Questionary
+-- Buyer dashboard --
+
+Buyer dashboard with questionary, propositions, cart, etc. SPA application. On this page buyer is redirected after succesefull login.
 GET /buyer
 < 200
 < Content-Type: text/html
