@@ -97,6 +97,13 @@ Hunt.extendMiddleware(function(request, response, next){
 });
 //*/
 
+Hunt.extendMiddleware(function(core){
+  return function(error,request,response,next){
+    response.status(500);
+    response.json({'error':error.message});
+  };
+});
+
 //loading different controllers for byuers
 Hunt.extendRoutes(require('./controllers/buyer/login.js'));
 Hunt.extendRoutes(require('./controllers/buyer/landing.js'));
@@ -105,7 +112,11 @@ Hunt.extendRoutes(require('./controllers/buyer/landing.js'));
 Hunt.extendRoutes(require('./controllers/owner/login.js'));
 Hunt.extendRoutes(require('./controllers/owner/editClients.js'));
 
-
+Hunt.extendRoutes(function(core){
+  core.app.get('/testError', function(request,response){
+    throw new Error('Test error!');
+  });
+});
 Hunt.on('start', function(evnt){
 //creating test users in development environment!
   if(Hunt.config.env === 'development') {
