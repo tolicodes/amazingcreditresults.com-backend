@@ -282,7 +282,7 @@ var ensureAdmin = function(request, response, next){
   });
 //https://oselot.atlassian.net/browse/ACR-58
   core.app.post('/admin/createOwner', function(request, response){
-    if(request.username && request.password){
+    if(request.body.email && request.body.password){
       request.model.User.signUp(request.username, request.password, function(error, userCreated){
         if(error){
           throw error;

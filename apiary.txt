@@ -212,6 +212,8 @@ POST /admin/clients/welcome/:id
 
 Resets clients password and sensd client notification email with welcome link
 POST /admin/clients/resetPassword/:id
+> Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
+{"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org"}
 < 201
 < Content-Type: application/json
 {
@@ -233,4 +235,28 @@ POST /admin/clients/resetPassword/:id
       "accountVerified": false
     },
     "welcomeLink": "http://localhost:3000/buyer/welcome/c87ad6d9054337007fc38c11b468facfa567b2534a2ca01608551cddf4aa69551b9aa3a4ec27f0bdeaa34b60a90233c86b951837338526612cc2a9075c272004"
+}
+
+
+Owner can create other owners
+POST /admin/createOwner
+> Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
+{"email":"owner123@example.org", "password":"lalala"}
+< 201
+< Content-Type: application/json
+{
+  "id": "536cfc8a886fcbba14d07dd6",
+  "email":"owner123@example.org",
+  "name": {
+    "familyName": "",
+    "givenName": "",
+    "middleName": ""
+  },
+  "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+  "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
+  "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
+  "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+  "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
+  "root": true,
+  "accountVerified": true
 }
