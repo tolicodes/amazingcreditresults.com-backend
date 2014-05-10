@@ -280,4 +280,31 @@ var ensureAdmin = function(request, response, next){
       }
     });
   });
+//https://oselot.atlassian.net/browse/ACR-58
+  core.app.post('/admin/createOwner', function(request, response){
+    if(request.username && request.password){
+      request.model.User.signUp(request.username, request.password, function(error, userCreated){
+        if(error){
+          throw error;
+        } else {
+          userCreated.root = true;
+          userCreated.accountVerified = true;
+          userCreated.name = {'givenName': request.username};
+          userCreated.save(function(err){
+            if(err) {
+              throw err;
+            } else {
+              response.status(201);
+              response.json(userCreated);
+            }
+          });
+        }
+      });
+    } else {
+      response.status(400);
+      response.json({'error':'Fields of username or password are missed'});
+    }
+  });
 };
+
+
