@@ -16,7 +16,7 @@ GET /buyer/welcome/{apiKey}
 
 Set password for buyer when he authorizes first time, than redirects back to page, where s/he has to enter password
 POST /buyer/setPassword
-> Content-Type: application/x-www-form-urlencoded; charset=utf-8
+> Content-Type: application/x-www-form-urlencoded; charset=utf-8 | application/json; charset=utf-8
 { "apiKey": "someVeryLongApiKey", "password":"SomeNewPasswordToSet"}
 < 302
 < Location: /buyer/welcome/{apiKey}
@@ -27,10 +27,40 @@ POST /buyer/setPassword
 
 Set password for buyer when he authorizes first time, than redirects back to page, where s/he has to enter password
 POST /buyer/setPassword
-> Content-Type: application/x-www-form-urlencoded; charset=utf-8
+> Content-Type: application/x-www-form-urlencoded; charset=utf-8 | application/json; charset=utf-8
 { "apiKey": "someVeryLongApiKey", "password":"SomeNewPasswordToSet"}
 < 302
 < Location: /buyer/welcome/{apiKey}
+
+
+Buyer dashboard (will be SPA application). On this page buyer is redirected after succesefull login. Questionary
+GET /buyer
+< 200
+< Content-Type: text/html
+
+
+Saving Buyer answers to questions on dashboard
+POST /buyer/saveQuestionareAnswers
+> Content-Type: application/x-www-form-urlencoded; charset=utf-8 | application/json; charset=utf-8
+{ "answer1": "1", "answer2":"2","answer3":"3"}
+< 202
+< Content-Type: application/json
+{
+  "id": "536cfc8a886fcbba14d07dd6",
+  "email": "johndoe@example.org",
+  "name": {
+    "familyName": "Doe",
+    "givenName": "John",
+    "middleName": ""
+  },
+  "profile": {
+    "answer1": "1",
+    "answer2":"2",
+    "answer3":"3"
+  },
+  "root": false,
+  "accountVerified": true
+}
 
 
 -- Owner api for session based authorization
