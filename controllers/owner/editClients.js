@@ -136,7 +136,7 @@ var ensureAdmin = function(request, response, next){
         } else {
           response.status(202);
           response.json({
-            'id': user.id,
+            'id': userFound.id,
             'email': userFound.email,
             'name':{
               'givenName':userFound.name.givenName,
@@ -167,7 +167,6 @@ var ensureAdmin = function(request, response, next){
     });
     if(isOk) {
       request.model.User.create({
-        'id': user.id,
         'email': request.body.email,
         'name':{
           'givenName':request.body.givenName,
@@ -184,6 +183,7 @@ var ensureAdmin = function(request, response, next){
         } else {
           response.status(201);
           response.json({
+            'id': userCreated.id,
             'email': userCreated.email,
             'name':{
             'givenName':userCreated.name.givenName,
