@@ -151,6 +151,7 @@ PUT /admin/clients/{:id}
 < 201
 < Content-Type: application/json
 {
+  "id": "536cfc8a886fcbba14d07dd6",
   "email": "johndoe@example.org",
   "name":{
     "givenName": "John",
@@ -170,6 +171,7 @@ POST /admin/clients
 < 202
 < Content-Type: application/json
 {
+  "id": "536cfc8a886fcbba14d07dd6",
   "email": "johndoe@example.org",
   "name":{
     "givenName": "John",
