@@ -117,10 +117,11 @@ var ensureAdmin = function(request, response, next){
   core.app.put('/admin/clients/:id', ensureAdmin, function(request, response){
     request.model.User.findOneAndUpdate(
       {
-        '_id':request.params.id
+        '_id':request.params.id,
+        'root':false
       },
       {
-        "email": request.body.email,
+        "keychain.email": request.body.email,
         "name": {
           "familyName" : request.body.familyName,
           "givenName" : request.body.givenName,
@@ -135,6 +136,7 @@ var ensureAdmin = function(request, response, next){
         } else {
           response.status(202);
           response.json({
+            'id': user.id,
             'email': userFound.email,
             'name':{
               'givenName':userFound.name.givenName,
@@ -165,6 +167,7 @@ var ensureAdmin = function(request, response, next){
     });
     if(isOk) {
       request.model.User.create({
+        'id': user.id,
         'email': request.body.email,
         'name':{
           'givenName':request.body.givenName,
