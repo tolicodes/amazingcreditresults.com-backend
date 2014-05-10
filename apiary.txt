@@ -150,7 +150,18 @@ PUT /admin/clients/{:id}
 {"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org"}
 < 201
 < Content-Type: application/json
-
+{
+  "email": "johndoe@example.org",
+  "name":{
+    "givenName": "John",
+    "middleName": "Theodor"
+    "familyName": "Doe"
+  },
+  "profile": {
+    "needQuestionare": true
+  },
+  "root": false
+}
 
 Create new client
 POST /admin/clients
@@ -158,15 +169,26 @@ POST /admin/clients
 {"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org"}
 < 202
 < Content-Type: application/json
-
+{
+  "email": "johndoe@example.org",
+  "name":{
+    "givenName": "John",
+    "middleName": "Theodor"
+    "familyName": "Doe"
+  },
+  "profile": {
+    "needQuestionare": true
+  },
+  "root": false
+}
 
 Send client notification email with welcome link
 POST /admin/clients/welcome/:id
 < 201
 < Content-Type: application/json
 {
-    'message':'sent',
-    'user': {
+    "message":"sent",
+    "user": {
       "id": "536cfc8a886fcbba14d07dd6",
       "email": "johndoe@example.org",
       "name": {
@@ -191,8 +213,8 @@ POST /admin/clients/resetPassword/:id
 < 201
 < Content-Type: application/json
 {
-    'message':'sent',
-    'user': {
+    "message":"sent",
+    "user": {
       "id": "536cfc8a886fcbba14d07dd6",
       "email": "johndoe@example.org",
       "name": {
