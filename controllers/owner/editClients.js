@@ -40,8 +40,6 @@ var ensureAdmin = function(request, response, next){
     var page = request.query.page || 1,
       order = request.query.order;
 
-    if(['familyName','givenName','middleName'])
-
     request.model.User
       .find({
          //todo - parameters for limiting output
@@ -61,8 +59,10 @@ var ensureAdmin = function(request, response, next){
                 'givenName' : user.name.givenName, //http://schema.org/givenName
                 'middleName' : user.name.middleName //http://schema.org/middleName - at least the google oauth has this structure!
               },
-              'telefone': user.profile ? user.profile.telefone : '',
-              'localAddress': user.profile ? user.profile.localAddress: '',
+              'title': user.profile ? (user.profile.title || 'Mr.'): 'Mr.',
+              'telefone': user.profile ? (user.profile.telefone || '') : '',
+              'localAddress': user.profile ? (user.profile.localAddress || ''): '',
+              'needQuestionare': user.profile ? user.profile.needQuestionare : '',
               'gravatar': user.gravatar,
               'gravatar30': user.gravatar30,
               'gravatar50': user.gravatar50,
@@ -100,6 +100,7 @@ var ensureAdmin = function(request, response, next){
                 'givenName' : user.name.givenName,
                 'middleName' : user.name.middleName
               },
+              'title': user.profile ? user.profile.title : 'Mr.',
               'gravatar': user.gravatar,
               'gravatar30': user.gravatar30,
               'gravatar50': user.gravatar50,
@@ -108,6 +109,7 @@ var ensureAdmin = function(request, response, next){
               'online': user.online,
               'root': user.root,
               'accountVerified': user.accountVerified,
+              'needQuestionare': user.profile ? user.profile.needQuestionare : '',
               'telefone': user.profile ? user.profile.telefone : '',
               'localAddress': user.profile ? user.profile.localAddress  : ''
           });
@@ -130,7 +132,11 @@ var ensureAdmin = function(request, response, next){
           'familyName' : request.body.familyName,
           'givenName' : request.body.givenName,
           'middleName' : request.body.middleName
-        }
+        },
+        'profile.title': request.body.title,
+        'profile.localAddress': request.body.localAddress,
+        'profile.telefone': request.body.telefone,
+        'profile.needQuestionare': request.body.needQuestionare
       },
       {
         'upsert':false // important!
@@ -147,6 +153,7 @@ var ensureAdmin = function(request, response, next){
               'middleName':userFound.name.middleName,
               'familyName':userFound.name.familyName
             },
+            'title': userFound.profile ? userFound.profile.title : '',
             'telefone': userFound.profile ? userFound.profile.telefone:'',
             'localAddress': userFound.profile ? userFound.profile.localAddress:'',
             'profile': {
@@ -167,7 +174,7 @@ var ensureAdmin = function(request, response, next){
       'email',
       'familyName',
       'givenName',
-    //  'middleName'
+    //  'middleName' //not mandatory for now
     ].map(function(s){
       if(request.body[s] && typeof request.body[s] === 'string') {
         isOk = true;
@@ -187,7 +194,8 @@ var ensureAdmin = function(request, response, next){
         'profile': {
           'needQuestionare': request.body.Questionare ? true : false,
           'telefone': request.body.telefone,
-          'localAddress': request.body.localAddress
+          'localAddress': request.body.localAddress,
+          'title': request.body.title,
         },
         'root': false
       }, function(error, userCreated){
@@ -206,6 +214,7 @@ var ensureAdmin = function(request, response, next){
             'profile': {
               'needQuestionare': userCreated.profile.needQuestionare
             },
+            'title': userCreated.profile.title,
             'telefone': userCreated.profile.telefone,
             'localAddress': userCreated.profile.localAddress,
             'root': false,
@@ -226,7 +235,7 @@ var ensureAdmin = function(request, response, next){
       } else {
         var welcomeLink;
         if(userFound.root){
-//          response.status(400); //not sure about js with it
+          response.status(400); //not sure about js with it
           response.json({'error':'Unable to send welcome link to owner!'});
         } else {
           core.async.waterfall([
@@ -267,8 +276,8 @@ var ensureAdmin = function(request, response, next){
       } else {
         var welcomeLink;
         if(userFound.root){
-//          response.status(400); //not sure about js with it
-          response.json({'error':'Unable to send welcome link to owner!'});
+          response.status(400); //not sure about js with it
+          response.json({'error':'Unable to send password reset link to owner!'});
         } else {
           core.async.waterfall([
             function(cb){

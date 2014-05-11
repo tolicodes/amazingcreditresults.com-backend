@@ -8,14 +8,10 @@
     <thead>
     <tr>
         <th>Role</th>
-        <th>Email</th>
-        <th>First (given) name</th>
-        <th>Middle name</th>
-        <th>Last (family) name</th>
-        <th>Account verified</th>
-        <th>Needs questionary?</th>
-        <th>Send welcome link</th>
-        <th>Send reset link</th>
+        <th>Name</th>
+        <th>Contacts</th>
+        <th>Parameters</th>
+        <th>Actions</th>
     </tr>
     </thead>
     <tbody data-bind="foreach: clients">
@@ -26,27 +22,28 @@
                 <option data-bind="attr: { 'selected' : root ? null : 'selected' }">Buyer</option>
             </select>
         </td>
-        <td><input type="email" data-bind="value: email"/>
-          <button data-bind="click: $parent.updateClient">S</button>
-          <a data-bind="attr: { href: 'mailto://'+email }">M</a>
-        </td>
-        <td><input type="text" data-bind="value: name.givenName"/><button data-bind="click: $parent.updateClient">S</button></td>
-        <td><input type="text" data-bind="value: name.middleName"/><button data-bind="click: $parent.updateClient">S</button></td>
-        <td><input type="text" data-bind="value: name.familyName"/><button data-bind="click: $parent.updateClient">S</button></td>
         <td>
-            <span data-bind="if: accountVerified">Yes</span>
-            <span data-bind="ifnot: accountVerified">No</span>
+          <p>
+            <select data-bind="options: ['Mr.','Mrs.','Miss'], selectedOptions: title || 'Mr.'"></select>
+            <input type="text" data-bind="value: name.givenName"/></br>
+            <input type="text" data-bind="value: name.middleName"/></br>
+            <input type="text" data-bind="value: name.familyName"/></br>
+          </p>
         </td>
         <td>
-            <select disabled="disabled">
-                <option>Yes</option>
-            </select>
+          <input type="email" data-bind="value: email"/></br>
+          <a data-bind="attr: { href: 'mailto://'+email }">Send E-Mail</a></br>
+          <input type="tel" data-bind="value: telefone" placeholder="555-123-45-67"></br>
+          <input type="text" data-bind="value: localAddress" placeholder="White street, house 50"></br>
         </td>
         <td>
-            <button data-bind="click: $parent.sendWelcomeEmail">Welcome E-Mail</button>
+            <p>Verified: <input type="checkbox" data-bind="checked: accountVerified" /></p>
+            <p>Questionary: <input type="checkbox" data-bind="checked: needQuestionare" /></p>
         </td>
         <td>
-            <button data-bind="click: $parent.sendResetPasswordEail">Reset password</button>
+            <p><button data-bind="click: $parent.updateClient, enable: isChanged">Save changes</button></p>
+            <p><button data-bind="click: $parent.sendWelcomeEmail">Send welcome E-Mail</button></p>
+            <p><button data-bind="click: $parent.sendResetPasswordEail">Send reset password E-Mail</button></p>
         </td>
     </tr>
     </tbody>
@@ -55,13 +52,16 @@
         <td><select disabled="disabled">
             <option>Buyer</option>
         </select></td>
+        <td>
+          <input type="text" data-bind="value : userToBeCreated.givenName" placeholder="John">
+          <input type="text" data-bind="value : userToBeCreated.middleName" placeholder="Theodor">
+          <input type="text" data-bind="value : userToBeCreated.familyName" placeholder="Doe">
+        </td>
         <td><input type="text" data-bind="value : userToBeCreated.email" placeholder="johndoe@example.org"></td>
-        <td><input type="text" data-bind="value : userToBeCreated.givenName" placeholder="John"></td>
-        <td><input type="text" data-bind="value : userToBeCreated.middleName" placeholder="Theodor"></td>
-        <td><input type="text" data-bind="value : userToBeCreated.familyName" placeholder="Doe"></td>
-        <td><input type="checkbox" value="1" data-bind="value : userToBeCreated.accountVerified"></td>
-        <td><input type="checkbox" value="1" data-bind="value : userToBeCreated.accountVerified"></td>
-        <td></td>
+        <td>
+          <p>Verified: <input type="checkbox" value="1" data-bind="value : userToBeCreated.accountVerified"></p>
+          <p>Questionary: <input type="checkbox" value="1" data-bind="value : userToBeCreated.accountVerified"></p>
+        </td>
         <td>
             <button data-bind="click: createClient">Create</button>
         </td>
@@ -139,16 +139,23 @@
             'email': client.email,
             'familyName' : client.name.familyName,
             'givenName' : client.name.givenName,
-            'middleName': client.name.middleName
+            'middleName': client.name.middleName,
+            'localAddress': client.localAddress,
+            'telefone': client.telefone,
+            'title': client.title,
+            'needQuestionare':client.needQuestionare
           }, function(data){
-            if(data.errror) {
+            if(data.error) {
               model.message(data.error);
             } else {
               model.message('Updated!');
+              alert('Updated!');
             }
           });
         }
     };
+
+
     ko.applyBindings(model);
 
     document.onreadystatechange = function () {
@@ -156,7 +163,8 @@
             $.get('/admin/clients.json', function (data) {
                 console.log(data);
                 data.clients.map(function (client) {
-                    model.clients.push(client);
+                  client.isChanged = true;
+                  model.clients.push(client);
                 })
             });
         }
