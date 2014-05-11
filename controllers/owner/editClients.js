@@ -163,7 +163,12 @@ var ensureAdmin = function(request, response, next){
   core.app.post('/admin/clients', ensureAdmin, function(request, response){
     var isOk,
       missed;
-    ['email','familyName','givenName','middleName'].map(function(s){
+    [
+      'email',
+      'familyName',
+      'givenName',
+    //  'middleName'
+    ].map(function(s){
       if(request.body[s] && typeof request.body[s] === 'string') {
         isOk = true;
       } else {
@@ -209,7 +214,7 @@ var ensureAdmin = function(request, response, next){
         }
       });
     } else {
-      response.send(400, 'Value of '+s+' is missed!');
+      response.send(400, 'Value of '+missed+' is missed!');
     }
   });
 
