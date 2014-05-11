@@ -75,7 +75,9 @@ module.exports = exports = function(core){
         "gravatar100":  user.gravatar100,
         "online": user.online,
         "root": user.root,
-        "accountVerified": user.accountVerified
+        "accountVerified": user.accountVerified,
+        "telefone": user.profile ? user.profile.telefone : '',
+        "localAddress": user.profile ? user.profile.localAddress : ''
       });
     } else {
       response.status(400);

@@ -54,21 +54,23 @@ var ensureAdmin = function(request, response, next){
         } else {
           var usersPrepared = usersFound.map(function(user){
             return {
-              "id": user.id,
-              "email": user.email,
-              "name": {
-                "familyName" : user.name.familyName, //http://schema.org/familyName
-                "givenName" : user.name.givenName, //http://schema.org/givenName
-                "middleName" : user.name.middleName //http://schema.org/middleName - at least the google oauth has this structure!
+              'id': user.id,
+              'email': user.email,
+              'name': {
+                'familyName' : user.name.familyName, //http://schema.org/familyName
+                'givenName' : user.name.givenName, //http://schema.org/givenName
+                'middleName' : user.name.middleName //http://schema.org/middleName - at least the google oauth has this structure!
               },
-              "gravatar": user.gravatar,
-              "gravatar30": user.gravatar30,
-              "gravatar50": user.gravatar50,
-              "gravatar80": user.gravatar80,
-              "gravatar100":  user.gravatar100,
-              "online": user.online,
-              "root": user.root,
-              "accountVerified": user.accountVerified
+              'telefone': user.profile ? user.profile.telefone : '',
+              'localAddress': user.profile ? user.profile.localAddress: '',
+              'gravatar': user.gravatar,
+              'gravatar30': user.gravatar30,
+              'gravatar50': user.gravatar50,
+              'gravatar80': user.gravatar80,
+              'gravatar100':  user.gravatar100,
+              'online': user.online,
+              'root': user.root,
+              'accountVerified': user.accountVerified
             }
           });
           response.json({ 'page':1,'clients':usersPrepared});
@@ -91,22 +93,24 @@ var ensureAdmin = function(request, response, next){
         if(user){
           response.status(200);
           response.json({
-              "id": user.id,
-              "email": user.email,
-              "name": {
-                "familyName" : user.name.familyName,
-                "givenName" : user.name.givenName,
-                "middleName" : user.name.middleName
+              'id': user.id,
+              'email': user.email,
+              'name': {
+                'familyName' : user.name.familyName,
+                'givenName' : user.name.givenName,
+                'middleName' : user.name.middleName
               },
-              "gravatar": user.gravatar,
-              "gravatar30": user.gravatar30,
-              "gravatar50": user.gravatar50,
-              "gravatar80": user.gravatar80,
-              "gravatar100":  user.gravatar100,
-              "online": user.online,
-              "root": user.root,
-              "accountVerified": user.accountVerified
-            });
+              'gravatar': user.gravatar,
+              'gravatar30': user.gravatar30,
+              'gravatar50': user.gravatar50,
+              'gravatar80': user.gravatar80,
+              'gravatar100':  user.gravatar100,
+              'online': user.online,
+              'root': user.root,
+              'accountVerified': user.accountVerified,
+              'telefone': user.profile ? user.profile.telefone : '',
+              'localAddress': user.profile ? user.profile.localAddress  : ''
+          });
         } else {
           response.send(404);
         }
@@ -121,11 +125,11 @@ var ensureAdmin = function(request, response, next){
         'root':false
       },
       {
-        "keychain.email": request.body.email,
-        "name": {
-          "familyName" : request.body.familyName,
-          "givenName" : request.body.givenName,
-          "middleName" : request.body.middleName
+        'keychain.email': request.body.email,
+        'name': {
+          'familyName' : request.body.familyName,
+          'givenName' : request.body.givenName,
+          'middleName' : request.body.middleName
         }
       },
       {
@@ -143,6 +147,8 @@ var ensureAdmin = function(request, response, next){
               'middleName':userFound.name.middleName,
               'familyName':userFound.name.familyName
             },
+            'telefone': userFound.profile ? userFound.profile.telefone:'',
+            'localAddress': userFound.profile ? userFound.profile.localAddress:'',
             'profile': {
               'needQuestionare': userFound.profile ? userFound.profile.needQuestionare : true
             },
@@ -174,7 +180,9 @@ var ensureAdmin = function(request, response, next){
           'familyName':request.body.familyName
         },
         'profile': {
-          'needQuestionare': request.body.Questionare ? true : false
+          'needQuestionare': request.body.Questionare ? true : false,
+          'telefone': request.body.telefone,
+          'localAddress': request.body.localAddress
         },
         'root': false
       }, function(error, userCreated){
@@ -193,6 +201,8 @@ var ensureAdmin = function(request, response, next){
             'profile': {
               'needQuestionare': userCreated.profile.needQuestionare
             },
+            'telefone': userCreated.profile.telefone,
+            'localAddress': userCreated.profile.localAddress,
             'root': false,
             'accountVerified':true
             });
@@ -225,7 +235,9 @@ var ensureAdmin = function(request, response, next){
                 'template':'emails/welcome',
                 'subject':'Site access hyperlink',
                 'name': userFound.name,
-                'welcomeLink': welcomeLink
+                'welcomeLink': welcomeLink,
+                'telefone': userCreated.profile.telefone,
+                'localAddress': userCreated.profile.localAddress
               });
               cb();
             }
@@ -264,7 +276,9 @@ var ensureAdmin = function(request, response, next){
                 'template':'emails/welcomeResetPassword',
                 'subject':'Site access hyperlink',
                 'name': userFound.name,
-                'welcomeLink': welcomeLink
+                'welcomeLink': welcomeLink,
+                'telefone': userCreated.profile.telefone,
+                'localAddress': userCreated.profile.localAddress,
               });
               cb();
             }

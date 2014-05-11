@@ -51,7 +51,9 @@ GET /auth/myself
   "gravatar80": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
   "gravatar100": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=100&d=wavatar&r=g",
   "root": true,
-  "accountVerified": false
+  "accountVerified": false,
+  "telefone":"555-339-69-72",
+  "localAddress":"Gothem city"
 }
 +++++
 < 400
@@ -85,8 +87,8 @@ POST /buyer/saveQuestionareAnswers
   },
   "profile": {
     "answer1": "1",
-    "answer2":"2",
-    "answer3":"3"
+    "answer2": "2",
+    "answer3": "3"
   },
   "root": false,
   "accountVerified": true
@@ -149,7 +151,9 @@ GET /admin/clients.json
       "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
       "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
       "root": false,
-      "accountVerified": false
+      "accountVerified": false,
+      "telefone":"555-339-69-72",
+      "localAddress":"Gothem city"
     },
     {
       "id": "536cfc8a886fcbba14d07dd7",
@@ -165,7 +169,9 @@ GET /admin/clients.json
       "gravatar80": "https://secure.gravatar.com/avatar/b7fc86f9d03e399ccc5aeec8ebbba013.jpg?s=80&d=wavatar&r=g",
       "gravatar100": "https://secure.gravatar.com/avatar/b7fc86f9d03e399ccc5aeec8ebbba013.jpg?s=100&d=wavatar&r=g",
       "root": false,
-      "accountVerified": true
+      "accountVerified": true,
+      "telefone":"555-339-69-72",
+      "localAddress":"Gothem city"
     },
     {
       "id": "536cfc8a886fcbba14d07dd5",
@@ -177,7 +183,9 @@ GET /admin/clients.json
       "gravatar80": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
       "gravatar100": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=100&d=wavatar&r=g",
       "root": true,
-      "accountVerified": false
+      "accountVerified": false,
+      "telefone":"555-339-69-72",
+      "localAddress":"Gothem city"
     }
   ]
 }
@@ -200,14 +208,16 @@ GET /admin/clients/{:id}
   "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
   "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
   "root": false,
-  "accountVerified": false
+  "accountVerified": false,
+  "telefone":"555-339-69-72",
+  "localAddress":"Gothem city"
 }
 
 
 Update client
 PUT /admin/clients/{:id}
 > Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
-{"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org"}
+{"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org","telefone":"555-339-69-72","localAddress":"Gothem city"}
 < 201
 < Content-Type: application/json
 {
@@ -221,13 +231,15 @@ PUT /admin/clients/{:id}
   "profile": {
     "needQuestionare": true
   },
+  "telefone":"555-339-69-72",
+  "localAddress":"Gothem city",
   "root": false
 }
 
 Create new client
 POST /admin/clients
 > Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
-{"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org"}
+{"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org","telefone":"555-339-69-72","localAddress":"Gothem city"}
 < 202
 < Content-Type: application/json
 {
@@ -241,6 +253,8 @@ POST /admin/clients
   "profile": {
     "needQuestionare": true
   },
+  "telefone":"555-339-69-72",
+  "localAddress":"Gothem city"
   "root": false
 }
 
