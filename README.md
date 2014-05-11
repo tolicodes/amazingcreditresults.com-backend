@@ -1,10 +1,24 @@
 Backend
 =============================
 
-
 Access for owners - `/admin/login`
 Access for anybody - by link in email address
 [Apiary documentation](http://docs.amazing.apiary.io/)
+
+
+Development environment
+=============================
+
+I suggest installing nginx, to act as static http server for frontend code, and proxy for api on staging server
+So, both the backend, and frontend (from local folder) are served from the localhost!
+This eliminates a lot cross origin issues and allows session based authorization
+Nginx config is published [here](https://bitbucket.org/nycitt/amazingcreditresults.com-backend/src/56a3bb3f036f38d20102b9af03ff17c304138c4e/nginx.conf)
+Some usefull info:
+
+[http://learnaholic.me/2012/10/10/installing-nginx-in-mac-os-x-mountain-lion/](http://learnaholic.me/2012/10/10/installing-nginx-in-mac-os-x-mountain-lion/)
+[http://nginx.org/en/docs/windows.html](http://nginx.org/en/docs/windows.html)
+[http://wiki.nginx.org/Install](http://wiki.nginx.org/Install)
+
 
 
 Sessionless authorization
