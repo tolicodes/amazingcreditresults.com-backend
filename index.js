@@ -61,10 +61,13 @@ Hunt.extendMiddleware(function(core){
 //access control middleware
 Hunt.extendMiddleware(function(core){
   return function(request, response, next){
+    console.log(request.originalUrl);
     if(request.user){
       next();
     } else {
-      if(request.originalUrl === '/admin/login' ||
+      if(
+          request.originalUrl === '/admin/login' ||
+          request.originalUrl === '/admin/login/' || //for express 4.0.0
           /^\/buyer\/welcome\/[0-9a-f]+$/.test(request.originalUrl) ||
           /^\/api-docs\.json/.test(request.originalUrl) ||
           /^\/swagger\//.test(request.originalUrl) ||

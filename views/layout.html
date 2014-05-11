@@ -15,10 +15,18 @@ and we will happily send you a personalized link to order!
 </p>
 </div>
 {{/root}}
-<p><a href="/auth/logout">Exit</a></p>
 {{/myself}}
 <p><a href="/swagger/">Swagger documentation</a></p>
+{{^myself}}
 <p><a href="/admin/login/">Owner login</a></p>
+{{/myself}}
+{{#myself}}
+    {{#root}}
+        <p><a href="/admin/clients">Edit clients</a></p>
+    {{/root}}
+<p><a href="/auth/logout">Exit</a></p>
+{{/myself}}
+
 <div>
   {{#flash}}
     {{#error}} <div class="flash_error">{{error}}</div> {{/error}}
