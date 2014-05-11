@@ -236,8 +236,9 @@ var ensureAdmin = function(request, response, next){
                 'subject':'Site access hyperlink',
                 'name': userFound.name,
                 'welcomeLink': welcomeLink,
-                'telefone': userCreated.profile.telefone,
-                'localAddress': userCreated.profile.localAddress
+                'telefone': userFound.profile.telefone,
+                'localAddress': userFound.profile.localAddress,
+                'date': (new Date()).toUTCString()
               });
               cb();
             }
@@ -277,8 +278,9 @@ var ensureAdmin = function(request, response, next){
                 'subject':'Site access hyperlink',
                 'name': userFound.name,
                 'welcomeLink': welcomeLink,
-                'telefone': userCreated.profile.telefone,
-                'localAddress': userCreated.profile.localAddress,
+                'telefone': userFound.profile.telefone,
+                'localAddress': userFound.profile.localAddress,
+                'date': (new Date()).toUTCString()
               });
               cb();
             }
