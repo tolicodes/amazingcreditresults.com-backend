@@ -87,8 +87,8 @@ POST /buyer/saveQuestionareAnswers
   },
   "profile": {
     "answer1": "1",
-    "answer2": "2",
-    "answer3": "3"
+    "answer2":"2",
+    "answer3":"3"
   },
   "root": false,
   "accountVerified": true
@@ -217,7 +217,7 @@ GET /admin/clients/{:id}
 Update client
 PUT /admin/clients/{:id}
 > Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
-{"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org","telefone":"555-339-69-72","localAddress":"Gothem city"}
+{"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org","telefone":"555-339-69-72","localAddress":"Gothem city","needQuestionare":true}
 < 201
 < Content-Type: application/json
 {
@@ -239,7 +239,7 @@ PUT /admin/clients/{:id}
 Create new client
 POST /admin/clients
 > Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
-{"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org","telefone":"555-339-69-72","localAddress":"Gothem city"}
+{"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org","telefone":"555-339-69-72","localAddress":"Gothem city","needQuestionare":true}
 < 202
 < Content-Type: application/json
 {
