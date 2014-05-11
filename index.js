@@ -7,6 +7,7 @@ var hunt = require('hunt'),
     'io': {
       'loglevel': 0
     },
+    'huntKey':true, //hunt key authorization, just in case
     'disableCsrf': true, //strongly not recommended for production!!!
     'enableMongoose':true,
     'enableMongooseUsers':true,

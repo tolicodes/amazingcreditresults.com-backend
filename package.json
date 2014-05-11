@@ -15,7 +15,7 @@
   "author": "Anatolij Ostroumov",
   "license": "MIT",
   "dependencies":{
-    "hunt":"latest",
+    "hunt":"0.0.22",
     "swagger-express":"latest"
   }
 }
