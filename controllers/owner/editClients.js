@@ -188,8 +188,8 @@ var ensureAdmin = function(request, response, next){
           } else {
             response.status(404);
             response.json({'error':'User with this ID do not exists!'});
-        }
-      }
+         }
+      }}
     );
   });
 
