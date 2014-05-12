@@ -121,7 +121,7 @@ module.exports = exports = function(core){
     }
   });
 
-//POST request for authorizing user when s\he enters password
+//POST request for authorizing Buyer when s\he enters password
   core.app.post('/buyer/login', function(request, response){
     if(request.user){
       request.flash('error','You are already authorized as '+request.user.displayName+'!'); //todo - change to more clear
