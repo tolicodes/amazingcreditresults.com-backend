@@ -60,7 +60,7 @@
         <td><input type="text" data-bind="value : userToBeCreated.email" placeholder="johndoe@example.org"></td>
         <td>
           <p>Verified: <input type="checkbox" value="1" data-bind="value : userToBeCreated.accountVerified"></p>
-          <p>Questionnaire: <input type="checkbox" value="1" data-bind="value : userToBeCreated.accountVerified"></p>
+          <p>Questionnaire: <input type="checkbox" value="1" data-bind="value : userToBeCreated.needQuestionnaire"></p>
         </td>
         <td>
             <button data-bind="click: createClient">Create</button>
@@ -169,6 +169,7 @@
                 console.log(data);
                 data.clients.map(function (client) {
                   client.isChanged = true;
+                  client.needQuestionnaire = client.needQuestionnaire || true;
                   model.clients.push(client);
                 })
             });
