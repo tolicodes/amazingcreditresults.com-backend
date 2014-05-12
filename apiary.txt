@@ -131,7 +131,7 @@ GET /admin/clients
 
 
 List all clients
-GET /admin/clients.json
+GET /api/v1/admin/clients
 < 200
 < Content-Type: application/json
 {
@@ -197,7 +197,7 @@ GET /admin/clients.json
 }
 
 Owner gets one client by id
-GET /admin/clients/{:id}
+GET /api/v1/admin/clients/{:id}
 < 200
 < Content-Type: application/json
 {
@@ -222,7 +222,7 @@ GET /admin/clients/{:id}
 
 
 Owner updates buyer. The behavior is actually patch - the fields mentioned in accepted request are only updated. https://oselot.atlassian.net/browse/ACR-108
-PUT /admin/clients/{:id}
+PUT /api/v1/admin/clients/{:id}
 > Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
 {"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org","telefone":"555-339-69-72","localAddress":"Gothem city","needQuestionnaire":true, "title":"Mr."}
 < 201
@@ -245,7 +245,7 @@ PUT /admin/clients/{:id}
 }
 
 Create new client
-POST /admin/clients
+POST /api/v1/admin/clients
 > Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
 {"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org","telefone":"555-339-69-72","localAddress":"Gothem city","title":"Mr.","needQuestionnaire":true}
 < 202
@@ -268,7 +268,7 @@ POST /admin/clients
 }
 
 Send client notification email with welcome link
-POST /admin/clients/welcome/:id
+POST /api/v1/admin/clients/welcome/:id
 < 201
 < Content-Type: application/json
 {
@@ -294,7 +294,7 @@ POST /admin/clients/welcome/:id
 
 
 Owner resets clients password and sends notification email with welcome link
-POST /admin/clients/resetPassword/:id
+POST /api/v1/admin/clients/resetPassword/:id
 > Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
 < 201
 < Content-Type: application/json
@@ -321,7 +321,7 @@ POST /admin/clients/resetPassword/:id
 
 
 Owner can create other owners
-POST /admin/createOwner
+POST /api/v1/admin/createOwner
 > Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
 {"email":"owner123@example.org", "password":"lalala"}
 < 201
