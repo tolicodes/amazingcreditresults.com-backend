@@ -78,7 +78,7 @@ Hunt.extendRoutes(function(core){
 Hunt.extendMiddleware(function(core){
   return function(error,request,response,next){
     response.status(500);
-    response.json({'code':500,'Message':'Internal server error','error':error.message});
+    response.json({'code':500,'Message':'Internal server error','error':error.message, 'stack':error.stack});
   };
 });
 
