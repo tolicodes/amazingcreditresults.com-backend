@@ -61,13 +61,6 @@ Hunt.extendMiddleware(function(core){
   };
 });
 
-Hunt.extendMiddleware(function(core){
-  return function(error,request,response,next){
-    response.status(500);
-    response.json({'code':500,'Message':'Interal server error','error':error.message});
-  };
-});
-
 //loading different controllers for byuers
 Hunt.extendRoutes(require('./controllers/buyer/login.js'));
 Hunt.extendRoutes(require('./controllers/buyer/landing.js'));
@@ -81,6 +74,14 @@ Hunt.extendRoutes(function(core){
     throw new Error('Test error!');
   });
 });
+
+Hunt.extendMiddleware(function(core){
+  return function(error,request,response,next){
+    response.status(500);
+    response.json({'code':500,'Message':'Internal server error','error':error.message});
+  };
+});
+
 Hunt.on('start', function(evnt){
 //creating test users in development environment!
   if(Hunt.config.env === 'development') {
