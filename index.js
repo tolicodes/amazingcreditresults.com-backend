@@ -55,7 +55,7 @@ Hunt.extendMiddleware(function(core){
         next();
       } else {
         response.status(200);
-        response.render('landing');
+        response.render('landing',{'title':'Landing page'});
       }
     }
   };
