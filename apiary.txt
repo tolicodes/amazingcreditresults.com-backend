@@ -214,8 +214,8 @@ GET /admin/clients
 < Content-Type: text/html
 
 
-List all clients
-GET /api/v1/admin/clients
+List all clients in JSON format
+GET /api/v1/admin/clients?page={:pageNumber}
 < 200
 < Content-Type: application/json
 {
