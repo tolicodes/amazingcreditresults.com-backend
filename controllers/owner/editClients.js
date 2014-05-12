@@ -62,7 +62,7 @@ var ensureAdmin = function(request, response, next){
               'title': user.profile ? (user.profile.title || 'Mr.'): 'Mr.',
               'telefone': user.profile ? (user.profile.telefone || '') : '',
               'localAddress': user.profile ? (user.profile.localAddress || ''): '',
-              'needQuestionare': user.profile ? user.profile.needQuestionare : '',
+              'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : '',
               'gravatar': user.gravatar,
               'gravatar30': user.gravatar30,
               'gravatar50': user.gravatar50,
@@ -109,7 +109,7 @@ var ensureAdmin = function(request, response, next){
               'online': user.online,
               'root': user.root,
               'accountVerified': user.accountVerified,
-              'needQuestionare': user.profile ? user.profile.needQuestionare : '',
+              'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : '',
               'telefone': user.profile ? user.profile.telefone : '',
               'localAddress': user.profile ? user.profile.localAddress  : ''
           });
@@ -136,7 +136,7 @@ var ensureAdmin = function(request, response, next){
         'profile.title': request.body.title,
         'profile.localAddress': request.body.localAddress,
         'profile.telefone': request.body.telefone,
-        'profile.needQuestionare': request.body.needQuestionare
+        'profile.needQuestionnaire': request.body.needQuestionnaire
       },
       {
         'upsert':false // important!
@@ -157,7 +157,7 @@ var ensureAdmin = function(request, response, next){
             'telefone': userFound.profile ? userFound.profile.telefone:'',
             'localAddress': userFound.profile ? userFound.profile.localAddress:'',
             'profile': {
-              'needQuestionare': userFound.profile ? userFound.profile.needQuestionare : true
+              'needQuestionnaire': userFound.profile ? userFound.profile.needQuestionnaire : true
             },
             'root': false
           });
@@ -192,7 +192,7 @@ var ensureAdmin = function(request, response, next){
           'familyName':request.body.familyName
         },
         'profile': {
-          'needQuestionare': request.body.Questionare ? true : false,
+          'needQuestionnaire': request.body.Questionnaire ? true : false,
           'telefone': request.body.telefone,
           'localAddress': request.body.localAddress,
           'title': request.body.title,
@@ -212,7 +212,7 @@ var ensureAdmin = function(request, response, next){
               'familyName':userCreated.name.familyName
             },
             'profile': {
-              'needQuestionare': userCreated.profile.needQuestionare
+              'needQuestionnaire': userCreated.profile.needQuestionnaire
             },
             'title': userCreated.profile.title,
             'telefone': userCreated.profile.telefone,

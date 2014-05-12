@@ -38,7 +38,7 @@
         </td>
         <td>
             <p>Verified: <input type="checkbox" data-bind="checked: accountVerified" /></p>
-            <p>Questionary: <input type="checkbox" data-bind="checked: needQuestionare" /></p>
+            <p>Questionary: <input type="checkbox" data-bind="checked: needQuestionnaire" /></p>
         </td>
         <td>
             <p><button data-bind="click: $parent.updateClient, enable: isChanged">Save changes</button></p>
@@ -90,7 +90,7 @@
             'middleName':ko.observable(),
             'familyName':ko.observable(),
             'accountVerified':ko.observable(),
-            'needQuestionare':ko.observable()
+            'needQuestionnaire':ko.observable()
         },
         'createClient': function () {
             var that = this;
@@ -99,7 +99,7 @@
                 'givenName': this.userToBeCreated.givenName(),
                 'middleName': this.userToBeCreated.middleName(),
                 'familyName': this.userToBeCreated.familyName(),
-                'needQuestionare': true //temporary
+                'needQuestionnaire': true //temporary
             }, function (data) {
 //                console.log(data);
                 var newClient = /*JSON.parse*/(data);
@@ -111,7 +111,7 @@
                 that.userToBeCreated.middleName('');
                 that.userToBeCreated.familyName('');
                 that.userToBeCreated.accountVerified('');
-                that.userToBeCreated.needQuestionare('');
+                that.userToBeCreated.needQuestionnaire('');
                 that.clients.push(newClient);
             });
         },
@@ -148,7 +148,7 @@
             'localAddress': client.localAddress,
             'telefone': client.telefone,
             'title': client.title,
-            'needQuestionare':client.needQuestionare
+            'needQuestionnaire':client.needQuestionnaire
           }, function(data){
             if(data.error) {
               model.message(data.error);
