@@ -41,13 +41,23 @@ module.exports = exports = function(core){
               }
             } else {
 //key is outdated
-              request.flash('error','Wrong or outdated welcome link! Please, contact support for a new one!'); //todo - change to more clear
-              response.redirect('/buyer/error');
+              response.render('buyer/stage2', {
+                  'title':'Enter password!',
+                  'myself': userFound,
+                  'flash': {
+                    'error': 'Your welcome link is outdated! Please, contact support to recieve a new one!'
+                  }
+                });
             }
           } else {
 //there is nobody, who has this key!
-            request.flash('error','Wrong or outdated welcome link! Please, contact support for a new one!'); //todo - change to more clear
-            response.redirect('/buyer/error');
+            response.render('buyer/stage2', {
+                'title':'Enter password!',
+                'myself': userFound,
+                'flash': {
+                  'error': 'Your welcome link is not accepted!  Please, contact support to recieve a new one!'
+                }
+              });
           }
         }
       }
