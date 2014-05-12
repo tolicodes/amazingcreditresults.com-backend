@@ -4,6 +4,7 @@ module.exports = exports = function(core){
     response.render('landing', {'title':'Welcome!'});
   });
 
+//session based authorization.
   core.app.get('/admin/login', function(request, response){
     response.render('owner/login', {
       'title': 'Owners` login page'
@@ -24,7 +25,7 @@ module.exports = exports = function(core){
     response.redirect('/admin/login');
   });
 
-
+//header based authorization
   core.app.post('/api/v1/owner/login', function(request, response){
     if(request.body.username && request.body.password){
       request.model.User.findOneByEmail(request.body.username, function(error, userFound){
