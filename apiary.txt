@@ -2,7 +2,7 @@ HOST: http://54.86.168.135
 
 --- Amazing Api V1 ---
 
--- Buyer authorization --
+-- Buyer authorization with cookie based sessions --
 
 Authorize buyer by unique link. If link is valid, it responds with HTML page with form to set password,
 if link is invalid, it redirects to error page with message, that link is invalid or outdated
@@ -31,6 +31,9 @@ POST /buyer/login
 { "apiKey": "someVeryLongApiKey", "password":"SomeNewPasswordToSet"}
 < 302
 < Location: /buyer/welcome/{apiKey}
+
+
+-- Buyer authorization with http header based session --
 
 
 -- Buyer/Owner profile json --
@@ -95,7 +98,24 @@ POST /buyer/saveQuestionareAnswers
 }
 
 
+-- Owner api for header based authorization
+
+Endpoint to retrieve huntKey
+POST /api/v1/owner/login
+> Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
+{ "username":"owner@example.org", "password":"test123" }
+< 200
+{ "Code":200, "huntKey":"someRealyLongString" }
++++++
+< 403
+{ "Code":403, "Error":"Unable to authorize Owner with this credentials!" }
++++++
+< 400
+{ "Code":400, "Error":"The values of `username` or `password` are not provided!" }
+
+
 -- Owner api for session based authorization
+
 Form to enter login and password
 GET /admin/login
 < 200
@@ -243,6 +263,14 @@ PUT /api/v1/admin/clients/{:id}
   "localAddress":"Gothem city",
   "root": false
 }
++++++
+< 404
+< Content-Type: application/json
+{
+    "error":"User with this ID do not exists!"
+}
+
+
 
 Create new client
 POST /api/v1/admin/clients
