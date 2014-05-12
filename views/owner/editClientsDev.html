@@ -38,7 +38,7 @@
         </td>
         <td>
             <p>Verified: <input type="checkbox" data-bind="checked: accountVerified" /></p>
-            <p>Questionary: <input type="checkbox" data-bind="checked: needQuestionnaire" /></p>
+            <p>Questionnaire: <input type="checkbox" data-bind="checked: needQuestionnaire" /></p>
         </td>
         <td>
             <p><button data-bind="click: $parent.updateClient, enable: isChanged">Save changes</button></p>
@@ -60,7 +60,7 @@
         <td><input type="text" data-bind="value : userToBeCreated.email" placeholder="johndoe@example.org"></td>
         <td>
           <p>Verified: <input type="checkbox" value="1" data-bind="value : userToBeCreated.accountVerified"></p>
-          <p>Questionary: <input type="checkbox" value="1" data-bind="value : userToBeCreated.accountVerified"></p>
+          <p>Questionnaire: <input type="checkbox" value="1" data-bind="value : userToBeCreated.accountVerified"></p>
         </td>
         <td>
             <button data-bind="click: createClient">Create</button>
@@ -79,7 +79,7 @@
         'flash':{
             'error': ko.observableArray(),
             'success': ko.observableArray(),
-            'info': ko.observableArray(),
+            'info': ko.observableArray()
         },
         'message': ko.observable(),
         'messageLink': ko.observable(),
