@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.5",
   "description": "Nodejs powered backend for application",
   "main": "index.js",
   "scripts": {
