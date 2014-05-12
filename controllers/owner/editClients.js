@@ -121,11 +121,33 @@ var ensureAdmin = function(request, response, next){
   });
 
   core.app.put('/admin/clients/:id', ensureAdmin, function(request, response){
+//https://oselot.atlassian.net/browse/ACR-108
+    var patch = {};
+    if(request.body.email){
+      patch['keychain.email'] = request.body.email;
+    }
+
+    ['familyName','givenName','middleName'].map(function(a){
+      if(request.body[a]){
+        patch['name.'+a] = request.body[a];
+      }
+    });
+    ['title','localAddress','telefone','needQuestionnaire'].map(function(b){
+      if(request.body[b]){
+        patch['profile.'+b] = request.body[b];
+      }
+    });
+
+
     request.model.User.findOneAndUpdate(
       {
         '_id':request.params.id,
         'root':false
       },
+      patch,
+/*/
+//uncomment if https://oselot.atlassian.net/browse/ACR-108
+//accepted
       {
         'keychain.email': request.body.email,
         'name': {
@@ -138,6 +160,7 @@ var ensureAdmin = function(request, response, next){
         'profile.telefone': request.body.telefone,
         'profile.needQuestionnaire': request.body.needQuestionnaire
       },
+//*/
       {
         'upsert':false // important!
       }, function(error, userFound){
