@@ -36,7 +36,7 @@ var ensureAdmin = function(request, response, next){
  *   -  httpMethod: GET
  *      nickname: Owners' json endpoing with data about clients
  */
-  core.app.get('/admin/clients.json', ensureAdmin, function(request, response){
+  core.app.get('/api/v1/admin/clients', ensureAdmin, function(request, response){
     var page = request.query.page || 1,
       order = request.query.order;
 
@@ -85,7 +85,7 @@ var ensureAdmin = function(request, response, next){
  *   -  httpMethod: GET
  *      nickname: Owners json with data about clients
  */
-  core.app.get('/admin/clients/:id', ensureAdmin, function(request, response){
+  core.app.get('/api/v1/admin/clients/:id', ensureAdmin, function(request, response){
     request.model.User.findById(request.params.id, function(error, user){
       if(error) {
         throw error;
@@ -120,7 +120,7 @@ var ensureAdmin = function(request, response, next){
     });
   });
 
-  core.app.put('/admin/clients/:id', ensureAdmin, function(request, response){
+  core.app.put('/api/v1/admin/clients/:id', ensureAdmin, function(request, response){
 //https://oselot.atlassian.net/browse/ACR-108
     var patch = {};
     if(request.body.email){
@@ -167,36 +167,40 @@ var ensureAdmin = function(request, response, next){
         if(error){
           throw error;
         } else {
-          response.status(202);
-          response.json({
-            'id': userFound.id,
-            'email': userFound.email,
-            'name':{
-              'givenName':userFound.name.givenName,
-              'middleName':userFound.name.middleName,
-              'familyName':userFound.name.familyName
-            },
-            'title': userFound.profile ? userFound.profile.title : '',
-            'telefone': userFound.profile ? userFound.profile.telefone:'',
-            'localAddress': userFound.profile ? userFound.profile.localAddress:'',
-            'profile': {
-              'needQuestionnaire': userFound.profile ? userFound.profile.needQuestionnaire : true
-            },
-            'root': false
-          });
+          if(userFound) {
+            response.status(202);
+            response.json({
+              'id': userFound.id,
+              'email': userFound.email,
+              'name': {
+                'givenName': userFound.name.givenName,
+                'middleName': userFound.name.middleName,
+                'familyName': userFound.name.familyName
+              },
+              'title': userFound.profile ? userFound.profile.title : '',
+              'telefone': userFound.profile ? userFound.profile.telefone : '',
+              'localAddress': userFound.profile ? userFound.profile.localAddress : '',
+              'profile': {
+                'needQuestionnaire': userFound.profile ? userFound.profile.needQuestionnaire : true
+              },
+              'root': false
+            });
+          } else {
+            response.status(404);
+            response.json({'error':'User with this ID do not exists!'});
         }
       }
     );
   });
 
 
-  core.app.post('/admin/clients', ensureAdmin, function(request, response){
+  core.app.post('/api/v1/admin/clients', ensureAdmin, function(request, response){
     var isOk,
       missed;
     [
       'email',
       'familyName',
-      'givenName',
+      'givenName'
     //  'middleName' //not mandatory for now
     ].map(function(s){
       if(request.body[s] && typeof request.body[s] === 'string') {
@@ -218,7 +222,7 @@ var ensureAdmin = function(request, response, next){
           'needQuestionnaire': request.body.Questionnaire ? true : false,
           'telefone': request.body.telefone,
           'localAddress': request.body.localAddress,
-          'title': request.body.title,
+          'title': request.body.title
         },
         'root': false
       }, function(error, userCreated){
@@ -251,7 +255,7 @@ var ensureAdmin = function(request, response, next){
   });
 
 //send message with link to site, without reseting the password
-  core.app.post('/admin/clients/welcome/:id', ensureAdmin,function(request, response){
+  core.app.post('/api/v1/admin/clients/welcome/:id', ensureAdmin,function(request, response){
     request.model.User.findById(request.params.id, function(error, userFound){
       if(error) {
         throw error;
@@ -292,7 +296,7 @@ var ensureAdmin = function(request, response, next){
     });
   });
 
-    core.app.post('/admin/clients/resetPassword/:id', ensureAdmin,function(request, response){
+    core.app.post('/api/v1/admin/clients/resetPassword/:id', ensureAdmin,function(request, response){
     request.model.User.findById(request.params.id, function(error, userFound){
       if(error) {
         throw error;
@@ -334,7 +338,7 @@ var ensureAdmin = function(request, response, next){
     });
   });
 //https://oselot.atlassian.net/browse/ACR-58
-  core.app.post('/admin/createOwner', function(request, response){
+  core.app.post('/api/v1/admin/createOwner', function(request, response){
     if(request.body.email && request.body.password){
       request.model.User.signUp(request.username, request.password, function(error, userCreated){
         if(error){
