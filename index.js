@@ -90,6 +90,7 @@ Hunt.on('start', function(evnt){
 });
 
 Hunt.on('httpSuccess', console.log);
+Hunt.on('httpError', console.error);
 
 //starting
 if(Hunt.config.env === 'development'){
