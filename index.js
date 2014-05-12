@@ -37,31 +37,10 @@ Hunt.extendApp(function(core){
 //*/
 });
 
-//swagger middleware
-
-Hunt.extendMiddleware(function(core){
-  var mdlware = swagger.init(core.app, {
-        apiVersion: '1.0',
-        swaggerVersion: '1.0',
-        basePath: 'http://localhost:3000',
-        swaggerURL: '/swagger',
-        swaggerJSON: '/api-docs.json',
-        swaggerUI: './public/swagger/',
-        apis: [
-          './controllers/buyer/landing.js',
-          './controllers/buyer/login.js',
-          './controllers/owner/editClients.js',
-          './controllers/owner/login.js',
-        ]
-    });
-  return mdlware;
-});
-
-//*/
 //access control middleware
 Hunt.extendMiddleware(function(core){
   return function(request, response, next){
-    console.log(request.originalUrl);
+//    console.log(request.originalUrl);
     if(request.user){
       next();
     } else {
@@ -70,7 +49,8 @@ Hunt.extendMiddleware(function(core){
           request.originalUrl === '/admin/login/' || //for express 4.0.0
           /^\/buyer\/welcome\/[0-9a-f]+$/.test(request.originalUrl) ||
           /^\/api-docs\.json/.test(request.originalUrl) ||
-          /^\/swagger\//.test(request.originalUrl) ||
+          request.originalUrl === '/buyer/login' ||
+//          /^\/swagger\//.test(request.originalUrl) ||
           /^\/auth\//.test(request.originalUrl) ) {
         next();
       } else {
@@ -80,32 +60,11 @@ Hunt.extendMiddleware(function(core){
     }
   };
 });
-/*/
-//access control for /admin/ path - this is only accessible by users
-//that are owners/staff - they had `root:true` in profile
-Hunt.extendMiddleware(function(request, response, next){
-  return function(request, response, next){
-    if(/^\/admin\//.test(request.originalUrl)) {
-      if(request.originalUrl === '/admin/login'){
-        next();
-      } else {
-        if(request.user && request.user.root === true){
-          next();
-        } else {
-          response.send(403);
-        }
-      }
-    } else {
-      next();
-    }
-  }
-});
-//*/
 
 Hunt.extendMiddleware(function(core){
   return function(error,request,response,next){
     response.status(500);
-    response.json({'error':error.message});
+    response.json({'code':500,'Message':'Interal server error','error':error.message});
   };
 });
 
@@ -125,7 +84,7 @@ Hunt.extendRoutes(function(core){
 Hunt.on('start', function(evnt){
 //creating test users in development environment!
   if(Hunt.config.env === 'development') {
-//    require('./lib/populateDatabase.js')(Hunt);
+//    require('./lib/populateDatabase.js')(Hunt); //uncomment to repopulate database on every start
   }
 });
 

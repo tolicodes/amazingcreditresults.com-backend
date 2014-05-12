@@ -31,7 +31,9 @@
                 {{/myself}}
                 {{#myself}}
                 {{#root}}<li><a href="/admin/clients">Edit clients</a></li>{{/root}}
-                <li><a href="/profile"><img width="10" height="10" src="{{gravatar}}"/>{{displayName}} {{email}}</a></li>
+                {{^root}}<li><a href="//buyer">Dashboard</a></li>{{/root}}
+
+                <li><a href="/auth/myself"><img width="10" height="10" src="{{gravatar}}"/>{{displayName}} {{email}}</a></li>
                 <li><a href="/auth/logout">LogOut</a></li>
                 {{/myself}}
             </ul>
