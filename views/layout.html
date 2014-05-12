@@ -1,42 +1,122 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>{{title}}</title>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>{{title}}</title>
+    <meta name="description" content="{{description}}"/>
+    <meta name="keywords" content="{{keywords}}"/>
+    <meta name="author" content="vodolaz095"/>
+    {{#css}}
+    <link rel="stylesheet" href="{{href}}" type="text/css" media="{{media}}"/>
+    {{/css}}
+    <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
 </head>
 <body>
+<div class="jumbotron">
+    <h1>{{title}}</h1>
+    <h2>{{description}}</h2>
+
+    <nav class="navbar navbar-inverse" role="navigation">
+        <div class="container-fluid">
+            <ul class="nav navbar-nav">
+                <li><a class="navbar-brand" href="/">Home</a></li>
+                {{#menu}}
+                <li><a href="{{url}}">{{name}}</a></li>
+                {{/menu}}
+                <li><a target="_blank" href="http://docs.amazing.apiary.io/">Api Documentation</a></li>
+                {{^myself}}
+                <li><a href="/admin/login">Owner login</a></li>
+                {{/myself}}
+                {{#myself}}
+                {{#root}}<li><a href="/admin/clients">Edit clients</a></li>{{/root}}
+                <li><a href="/profile"><img width="10" height="10" src="{{gravatar}}"/>{{displayName}} {{email}}</a></li>
+                <li><a href="/auth/logout">LogOut</a></li>
+                {{/myself}}
+            </ul>
+        </div>
+    </nav>
+</div>
+
 {{#myself}}
 {{^root}}
-<div>
-<p><strong>WARNING:</strong> If you are NOT
-<strong>{{name.givenName}} {{name.familyName}}</strong>
-you will NOT be able to place this order.
-If you are NOT <strong>{{name.givenName}} {{name.familyName}}</strong>, please contact us at
-<a href="mailto:sales@amazingcreditresults.com">sales@amazingcreditresults.com</a>
-and we will happily send you a personalized link to order!
-</p>
+<div class="alert alert-danger"><strong>WARNING:</strong>
+    If you are NOT <strong>{{name.givenName}} {{name.familyName}}</strong>, please contact us at
+    <a href="mailto:sales@amazingcreditresults.com">sales@amazingcreditresults.com</a>
+    and we will happily send you a personalized link to order!
 </div>
 {{/root}}
 {{/myself}}
-<p><a href="/swagger/">Swagger documentation</a></p>
-{{^myself}}
-<p><a href="/admin/login/">Owner login</a></p>
-{{/myself}}
-{{#myself}}
-    {{#root}}
-        <p><a href="/admin/clients">Edit clients</a></p>
-    {{/root}}
-<p><a href="/auth/logout">Exit</a></p>
-{{/myself}}
 
-<div>
-  {{#flash}}
-    {{#error}} <div class="flash_error">{{error}}</div> {{/error}}
-    {{#success}} <div class="flash_success">{{success}}</div> {{/success}}
-    {{#info}} <div class="flash_info">{{info}}</div> {{/info}}
-  {{/flash}}
+{{#flash}}
+
+{{#error}}
+<div class="alert alert-danger alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    {{error}}
 </div>
-<div>
-  {{{ yield }}}
+{{/error}}
+
+{{#success}}
+<div class="alert alert-success alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    {{success}}
+</div>
+{{/success}}
+
+{{#info}}
+<div class="alert alert-info alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    {{info}}
+</div>
+{{/info}}
+
+{{/flash}}
+<div data-bind="visible: flash" style="display:none">
+    <div data-bind="foreach: flash.error">
+        <div class="alert alert-danger alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <span data-bind="text: $data"></span>
+        </div>
+    </div>
+
+    <div data-bind="foreach: flash.success">
+        <div class="alert alert-success alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <span data-bind="text: $data"></span>
+        </div>
+    </div>
+
+    <div data-bind="foreach: flash.info">
+        <div class="alert alert-info alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <span data-bind="text: $data"></span>
+        </div>
+    </div>
 </div>
 
+<article class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- YIELD START -->
+            {{{ yield }}}
+            <!-- YIELD STOP -->
+        </div>
+    </div>
+</article>
+
+<footer id="footer">
+    <div class="container">
+        <p>&copy; 2013 <a href="//github.com/vodolaz095">vodolaz095</a></p>
+    </div>
+</footer>
+{{#javascripts}}
+<script type="text/javascript" src="{{url}}"></script>
+{{/javascripts}}
+<!--[if lt IE 9]>
+<script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
 </body>
 </html>
