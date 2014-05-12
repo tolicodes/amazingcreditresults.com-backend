@@ -1,6 +1,9 @@
 //controller for buyer login process
 module.exports = exports = function(core){
 
+//session based authorization
+
+
 //universal error reporter page for login process
 //buyer is redirected to this page when any of errors occurs
 //for example, when s/he used outdated welcome link
@@ -63,38 +66,6 @@ module.exports = exports = function(core){
       }
     );
   });
-
-//GET request to get current authorized users parameters in form of json
-
-  core.app.get('/auth/myself', function(request, response){
-    if(request.user){
-      var user = request.user;
-      response.json({
-        "id": user.id,
-        "huntKey":user.apiKey,//used for sessionless authorization
-        "email": user.email,
-        "name": {
-          "familyName" : user.name.familyName, //http://schema.org/familyName
-          "givenName" : user.name.givenName, //http://schema.org/givenName
-          "middleName" : user.name.middleName //http://schema.org/middleName - at least the google oauth has this structure!
-        },
-        "gravatar": user.gravatar,
-        "gravatar30": user.gravatar30,
-        "gravatar50": user.gravatar50,
-        "gravatar80": user.gravatar80,
-        "gravatar100":  user.gravatar100,
-        "online": user.online,
-        "root": user.root,
-        "accountVerified": user.accountVerified,
-        "telefone": user.profile ? user.profile.telefone : '',
-        "localAddress": user.profile ? user.profile.localAddress : ''
-      });
-    } else {
-      response.status(400);
-      response.json({'error':'Authorization required!'})
-    }
-  });
-
 
 //POST request for setting the password for first time!
   core.app.post('/buyer/setPassword', function(request, response){
@@ -167,4 +138,108 @@ module.exports = exports = function(core){
       }
     }
   });
-}
+
+//header based authorization
+
+//setting password - first step
+  core.app.post('/api/v1/buyer/setPassword', function(request, response){
+    if(request.body.apiKey && request.body.password){
+      request.model.User.findOneByApiKey(request.body.apiKey,
+        function(error, userFound){
+          if(error) {
+            throw error;
+          } else {
+            if(userFound && !userFound.accountVerified &&!userFound.root) { //just in case
+              var apiKeyAge = Date.now() - userFound.apiKeyCreatedAt.getTime();
+              if(apiKeyAge < core.config.passport.apiKeyOutdates) {
+//key is fresh
+                userFound.accountVerified = true;
+                userFound.setPassword(request.body.password, function(error){
+                  if(error){
+                    throw error;
+                  } else {
+                    response.status(201);
+                    response.json({
+                      'Code':201,
+                      'Success':'Password is set!'
+                    });
+                  }
+                });
+              } else {
+//key is outdated
+                response.status(400);
+                response.json({
+                  'Code':400,
+                  'Error':'Wrong or outdated welcome link! Please, contact support for a new one!'
+                });
+              }
+            } else {
+//user is do not exists, or set his/her password already, or is owner
+              response.status(400);
+              response.json({
+                'Code':400,
+                'Error':'Wrong or outdated welcome link! Please, contact support for a new one!'
+              });
+            }
+          }
+        });
+    } else {
+//no apiKey and password in post request body
+      response.status(400);
+      response.json({
+        'Code':400,
+        'Error':'Missed parameter - `apiKey` or `password`!'
+      });
+    }
+  });
+
+
+//authorizing (aka getting huntKey) by apiKey and password - second
+  core.app.post('/api/v1/buyer/login', function(request, response){
+    if(request.user){
+      response.status(400);
+      response.json({
+        'Code':400,
+        'Error':'You are already authorized as '+request.user.displayName+'!'
+      });
+    } else {
+      if(request.body.apiKey && request.body.password){
+        request.model.User.findOneByApiKey(request.body.apiKey, function(error, userFound){
+          if(error){
+            throw error;
+          } else {
+            if(userFound){
+              if(userFound.verifyPassword(request.body.password)){
+                response.status(201);
+                response.json({
+                  'Code':201,
+                  'Success':'Welcome!',
+                  'huntKey': userFound.apiKey
+                });
+              } else {
+                response.status(403);
+                response.json({
+                  'Code':403,
+                  'Error':'Unable to authorize - wrong password!'
+                });
+              }
+            } else {
+              response.status(403);
+              response.json({
+                'Code':403,
+                'Error':'Unable to authorize - wrong welcome link!'
+              });
+            }
+          }
+        });
+      } else {
+        //no apiKey and password in post request body
+        response.status(400);
+        response.json({
+          'Code':400,
+          'Error':'Missed parameter - `apiKey` or `password`!'
+        });
+      }
+    }
+  });
+};

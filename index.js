@@ -48,7 +48,7 @@ Hunt.extendMiddleware(function(core){
           request.originalUrl === '/admin/login' ||
           request.originalUrl === '/admin/login/' || //for express 4.0.0
           /^\/buyer\/welcome\/[0-9a-f]+$/.test(request.originalUrl) ||
-          /^\/api-docs\.json/.test(request.originalUrl) ||
+          /^\/api\/v1\//.test(request.originalUrl) ||
           request.originalUrl === '/buyer/login' ||
           request.originalUrl === '/buyer/setPassword' ||
 //          /^\/swagger\//.test(request.originalUrl) ||
@@ -62,13 +62,17 @@ Hunt.extendMiddleware(function(core){
   };
 });
 
-//loading different controllers for byuers
+//loading different controllers for buyers
 Hunt.extendRoutes(require('./controllers/buyer/login.js'));
 Hunt.extendRoutes(require('./controllers/buyer/landing.js'));
 
 //loading different controllers for owners
 Hunt.extendRoutes(require('./controllers/owner/login.js'));
 Hunt.extendRoutes(require('./controllers/owner/editClients.js'));
+
+//loading controller shared by owners and buyers
+Hunt.extendRoutes(require('./controllers/shared.js'));
+
 
 Hunt.extendRoutes(function(core){
   core.app.get('/testError', function(request,response){

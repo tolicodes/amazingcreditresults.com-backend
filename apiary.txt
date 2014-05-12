@@ -35,12 +35,76 @@ POST /buyer/login
 
 -- Buyer authorization with http header based session --
 
+Set password on first time, when new Buyer follows the link in email message
+POST /api/v1/buyer/setPassword
+> Content-Type: application/x-www-form-urlencoded; charset=utf-8 | application/json; charset=utf-8
+{ "apiKey": "someVeryLongApiKey", "password":"SomeNewPasswordToSet"}
+< 201
+< Content-Type: application/json; charset=utf-8
+{ "Code":201, "Success":"Password is set!" }
++++++
+< 400
+< Content-Type: application/json; charset=utf-8
+{ "Code":400, "Error":"Wrong or outdated welcome link! Please, contact support for a new one!" }
++++++
+< 400
+< Content-Type: application/json; charset=utf-8
+{ "Code":400, "Error":"Missed parameter - `apiKey` or `password`!" }
+
+Authorize Buyer with password
+POST /api/v1/buyer/login
+> Content-Type: application/x-www-form-urlencoded; charset=utf-8 | application/json; charset=utf-8
+{ "apiKey": "someVeryLongApiKey", "password":"SomeNewPasswordToSet"}
+< 201
+< Content-Type: application/json; charset=utf-8
+{ "Code":201, "Success":"Welcome!", "huntKey": "someVeryLongHuntKey" }
++++++
+< 403
+< Content-Type: application/json; charset=utf-8
+{ "Code":403, "Error":"Unable to authorize - wrong password!"}
++++++
+< 403
+< Content-Type: application/json; charset=utf-8
+{ "Code":403, "Error":"Unable to authorize - wrong welcome link!"}
++++++
+< 400
+< Content-Type: application/json; charset=utf-8
+{ "Code":400, "Error":"Missed parameter - `apiKey` or `password`!"}
+
 
 -- Buyer/Owner profile json --
 
 Get information about currently authenticated (by cookie based session) user
-Additional info about sessionless authorization is published here https://bitbucket.org/nycitt/amazingcreditresults.com-backend
+Additional info about sessionless authorization is published here https://bitbucket.org/ocelot/amazingcreditresults.com-backend
 GET /auth/myself
+< 200
+< Content-Type: application/json; charset=utf-8
+{
+  "id": "536cfc8a886fcbba14d07dd5",
+  "huntKey": "1fcfaecdc53ce05ac5aa0658a977931b77d28861799c9b0261af1d83d713d2ea910b7f110d8f76fe02748040903cd70cef7107357395125c9a2888100f0634a9",
+  "email": "owner@example.org",
+  "name": {},
+  "gravatar": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
+  "gravatar30": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
+  "gravatar50": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
+  "gravatar80": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
+  "gravatar100": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=100&d=wavatar&r=g",
+  "root": true,
+  "accountVerified": false,
+  "telefone":"555-339-69-72",
+  "localAddress":"Gothem city"
+}
++++++
+< 400
+< Content-Type: application/json; charset=utf-8
+{
+  "error":"Authorization required!"
+}
+
+
+Get information about currently authenticated (by cookie based session) user
+Additional info about sessionless authorization is published here https://bitbucket.org/ocelot/amazingcreditresults.com-backend
+GET /api/v1/myself
 < 200
 < Content-Type: application/json; charset=utf-8
 {
@@ -75,7 +139,7 @@ GET /buyer
 
 
 Saving Buyer answers to questions on dashboard
-POST /buyer/saveQuestionareAnswers
+POST /api/v1/buyer/saveQuestionnaireAnswers
 > Content-Type: application/x-www-form-urlencoded; charset=utf-8 | application/json; charset=utf-8
 { "answer1": "1", "answer2":"2","answer3":"3"}
 < 202

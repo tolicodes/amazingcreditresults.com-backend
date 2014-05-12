@@ -7,7 +7,7 @@ module.exports = exports = function(core){
   });
 
 //save buyer answers to Questionnaire - we recieve POST, we respond with JSON
-  core.app.post('/buyer/saveQuestionnaireAnswers', function(request, response){
+  core.app.post('/api/v1/buyer/saveQuestionnaireAnswers', function(request, response){
     if(request.user){
       request.user.profile = request.user.profile || {};
       request.user.profile.answer1 = request.body.answer1;
