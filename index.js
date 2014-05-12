@@ -50,6 +50,7 @@ Hunt.extendMiddleware(function(core){
           /^\/buyer\/welcome\/[0-9a-f]+$/.test(request.originalUrl) ||
           /^\/api-docs\.json/.test(request.originalUrl) ||
           request.originalUrl === '/buyer/login' ||
+          request.originalUrl === '/buyer/setPassword' ||
 //          /^\/swagger\//.test(request.originalUrl) ||
           /^\/auth\//.test(request.originalUrl) ) {
         next();
