@@ -13,10 +13,10 @@ function verifyClient(client){
     if(client.name.familyName){
       client.name.familyName.should.be.a.String;
     }
-    if(client.name.familyName){
+    if(client.name.givenName){
       client.name.givenName.should.be.a.String;
     }
-    if(client.name.familyName){
+    if(client.name.middleName){
       client.name.middleName.should.be.a.String;
     }
     client.gravatar.should.be.a.String;
@@ -147,8 +147,6 @@ describe('/api/v1/owner/clients API resource test', function(){
     });
   });
 
-  it('updates client', function(done){
-    done();
-  });
+  it('updates client');
   it('sends welcome link')
 });
