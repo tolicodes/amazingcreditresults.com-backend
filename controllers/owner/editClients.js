@@ -43,7 +43,7 @@ var ensureAdmin = function(request, response, next){
               'title': user.profile ? (user.profile.title || 'Mr.'): 'Mr.',
               'telefone': user.profile ? (user.profile.telefone || '') : '',
               'localAddress': user.profile ? (user.profile.localAddress || ''): '',
-              'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : '',
+              'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : true,
               'gravatar': user.gravatar,
               'gravatar30': user.gravatar30,
               'gravatar50': user.gravatar50,
@@ -83,7 +83,7 @@ var ensureAdmin = function(request, response, next){
               'online': user.online,
               'root': user.root,
               'accountVerified': user.accountVerified,
-              'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : '',
+              'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : true,
               'telefone': user.profile ? user.profile.telefone : '',
               'localAddress': user.profile ? user.profile.localAddress  : ''
           });
