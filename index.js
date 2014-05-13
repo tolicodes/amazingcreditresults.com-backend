@@ -46,7 +46,7 @@ Hunt.extendMiddleware(function(core){
       if(
           request.originalUrl === '/admin/login' ||
           request.originalUrl === '/admin/login/' || //for express 4.0.0
-          /^\/buyer\/welcome\/[0-9a-f]+$/.test(request.originalUrl) ||
+          /^\/buyer\/welcome\/[a-z]+$/.test(request.originalUrl) ||
           /^\/api\/v1\//.test(request.originalUrl) ||
           request.originalUrl === '/buyer/login' ||
           request.originalUrl === '/buyer/setPassword' ||
