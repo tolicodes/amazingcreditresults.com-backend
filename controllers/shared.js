@@ -29,6 +29,6 @@ module.exports = exports = function (core) {
     }
   }
 
-  core.app.get('/api/v1/myself', f4myself);
-  core.app.get('/auth/myself', f4myself);
+  core.app.all('/api/v1/myself', f4myself);
+  core.app.all('/auth/myself', f4myself);
 };

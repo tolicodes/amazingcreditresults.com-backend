@@ -99,8 +99,8 @@ Hunt.on('start', function(evnt){
   console.log(welcomeLinkGenerator());
 });
 
-Hunt.on('httpSuccess', console.log);
-Hunt.on('httpError', console.error);
+//Hunt.on('httpSuccess', console.log);
+//Hunt.on('httpError', console.error);
 
 //starting
 if(Hunt.config.env === 'development'){

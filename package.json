@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node index.js & sleep 3; ./node_modules/.bin/mocha --reporter spec; killall node"
   },
   "repository": {
     "type": "git",
@@ -16,5 +16,10 @@
   "license": "MIT",
   "dependencies":{
     "hunt":"0.1.1"
+  },
+  "devDependencies": {
+    "request":"latest",
+    "mocha":"latest",
+    "should":"latest"
   }
 }

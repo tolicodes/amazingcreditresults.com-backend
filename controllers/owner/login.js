@@ -32,7 +32,7 @@ module.exports = exports = function(core){
         if(error){
           throw error;
         } else {
-          if(userFound && userFound.root){
+          if(userFound && userFound.root && userFound.verifyPassword(request.body.password)){
             response.status(200);
             response.json({'Code':200, 'huntKey':userFound.apiKey})
           } else {
