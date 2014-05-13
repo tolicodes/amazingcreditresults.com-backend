@@ -1,5 +1,4 @@
 var hunt = require('hunt'),
-  swagger = require('swagger-express'),
   Hunt = hunt({
 //    'hostUrl':'https://dev.amazingcreditresults.com/', //for example
 //    'redisUrl':'', //from environment or default values
@@ -92,6 +91,12 @@ Hunt.on('start', function(evnt){
   if(Hunt.config.env === 'development') {
 //    require('./lib/populateDatabase.js')(Hunt); //uncomment to repopulate database on every start
   }
+
+  var welcomeLinkGenerator = require('./lib/welcome.js');
+  console.log('Testing welcome link generator:');
+  console.log(welcomeLinkGenerator());
+  console.log(welcomeLinkGenerator());
+  console.log(welcomeLinkGenerator());
 });
 
 Hunt.on('httpSuccess', console.log);
@@ -103,3 +108,4 @@ if(Hunt.config.env === 'development'){
 } else {
   Hunt.startWebCluster();
 }
+

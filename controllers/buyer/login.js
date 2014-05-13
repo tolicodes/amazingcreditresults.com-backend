@@ -20,7 +20,7 @@ module.exports = exports = function(core){
 //links have ttl of 5 days
 //see Development Plan # Buyer 1
   core.app.get('/buyer/welcome/:apiKey', function(request, response){
-    request.model.User.findOneByApiKey(request.params.apiKey,
+    request.model.User.findOneByKeychain('welcomeLink',request.params.apiKey,
       function(error, userFound){
         if(error) {
           throw error;
@@ -70,7 +70,7 @@ module.exports = exports = function(core){
 //POST request for setting the password for first time!
   core.app.post('/buyer/setPassword', function(request, response){
     if(request.body.apiKey && request.body.password){
-    request.model.User.findOneByApiKey(request.body.apiKey,
+    request.model.User.findOneByKeychain('welcomeLink',request.body.apiKey,
       function(error, userFound){
         if(error) {
           throw error;
@@ -109,7 +109,7 @@ module.exports = exports = function(core){
       response.redirect('/buyer/error');
     } else {
       if(request.body.apiKey && request.body.password){
-        request.model.User.findOneByApiKey(request.body.apiKey, function(error, userFound){
+        request.model.User.findOneByKeychain('welcomeLink',request.body.apiKey, function(error, userFound){
           if(error){
             throw error;
           } else {
@@ -144,7 +144,7 @@ module.exports = exports = function(core){
 //setting password - first step
   core.app.post('/api/v1/buyer/setPassword', function(request, response){
     if(request.body.apiKey && request.body.password){
-      request.model.User.findOneByApiKey(request.body.apiKey,
+      request.model.User.findOneByKeychain('welcomeLink',request.body.apiKey,
         function(error, userFound){
           if(error) {
             throw error;
@@ -204,7 +204,7 @@ module.exports = exports = function(core){
       });
     } else {
       if(request.body.apiKey && request.body.password){
-        request.model.User.findOneByApiKey(request.body.apiKey, function(error, userFound){
+        request.model.User.findOneByKeychain('welcomeLink',request.body.apiKey, function(error, userFound){
           if(error){
             throw error;
           } else {

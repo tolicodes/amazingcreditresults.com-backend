@@ -1,12 +1,7 @@
 //controller for owner users to edit the clients list
+var welcomeLinkGenerator = require('./../../lib/welcome.js');
 
-/**
- * @swagger
- * resourcePath: /admin/
- * description: Owners API for editing clients
- */
-
-
+console.log(welcomeLinkGenerator());
 module.exports = exports = function(core){
 
 var ensureAdmin = function(request, response, next){
@@ -18,24 +13,10 @@ var ensureAdmin = function(request, response, next){
   }
 };
 
-/**
- * @swagger
- * path: /admin/clients
- * operations:
- *   -  httpMethod: GET
- *      nickname: Owner dashboard for editing clients
- */
   core.app.get('/admin/clients', ensureAdmin, function(request, response){
     response.render('owner/editClientsDev', {'title':'Edit clients'})
   });
 
-/**
- * @swagger
- * path: /admin/clients.json
- * operations:
- *   -  httpMethod: GET
- *      nickname: Owners' json endpoing with data about clients
- */
   core.app.get('/api/v1/admin/clients', ensureAdmin, function(request, response){
     var page = request.query.page || 1,
       order = request.query.order;
@@ -78,13 +59,6 @@ var ensureAdmin = function(request, response, next){
       });
   });
 
-/**
- * @swagger
- * path: /admin/clients/:id
- * operations:
- *   -  httpMethod: GET
- *      nickname: Owners json with data about clients
- */
   core.app.get('/api/v1/admin/clients/:id', ensureAdmin, function(request, response){
     request.model.User.findById(request.params.id, function(error, user){
       if(error) {
@@ -234,7 +208,7 @@ var ensureAdmin = function(request, response, next){
             'id': userCreated.id,
             'email': userCreated.email,
             'name':{
-            'givenName':userCreated.name.givenName,
+              'givenName':userCreated.name.givenName,
               'middleName':userCreated.name.middleName,
               'familyName':userCreated.name.familyName
             },
@@ -260,21 +234,23 @@ var ensureAdmin = function(request, response, next){
       if(error) {
         throw error;
       } else {
-        var welcomeLink;
+        var welcomeLink  = welcomeLinkGenerator();
         if(userFound.root){
           response.status(400); //not sure about js with it
           response.json({'error':'Unable to send welcome link to owner!'});
         } else {
           core.async.waterfall([
             function(cb){
+              userFound.keychain.welcomeLink = welcomeLink;
+              userFound.markModified('keychain');
               userFound.invalidateSession(cb);
             },
             function(newApiKey, cb){
-              welcomeLink = core.config.hostUrl+'buyer/welcome/'+newApiKey;
+              welcomeLink = core.config.hostUrl+'buyer/welcome/'+welcomeLink;
               userFound.notifyByEmail({
                 'layout':false,
                 'template':'emails/welcome',
-                'subject':'Site access hyperlink',
+                'subject':'Site access hyperlink',//todo - change to something more meaningfull
                 'name': userFound.name,
                 'welcomeLink': welcomeLink,
                 'telefone': userFound.profile.telefone,
@@ -301,18 +277,20 @@ var ensureAdmin = function(request, response, next){
       if(error) {
         throw error;
       } else {
-        var welcomeLink;
+        var welcomeLink = welcomeLinkGenerator();
         if(userFound.root){
           response.status(400); //not sure about js with it
           response.json({'error':'Unable to send password reset link to owner!'});
         } else {
           core.async.waterfall([
             function(cb){
+              userFound.keychain.welcomeLink = welcomeLink;
+              userFound.markModified('keychain');
               userFound.accountVerified = false;
               userFound.invalidateSession(cb);
             },
             function(newApiKey, cb){
-              welcomeLink = core.config.hostUrl+'buyer/welcome/'+newApiKey;
+              welcomeLink = core.config.hostUrl+'buyer/welcome/'+welcomeLink;
               userFound.notifyByEmail({
                 'layout':false,
                 'template':'emails/welcomeResetPassword',
