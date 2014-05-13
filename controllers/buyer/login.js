@@ -80,9 +80,13 @@ module.exports = exports = function(core){
             if(apiKeyAge < core.config.passport.apiKeyOutdates) {
 //key is fresh
               userFound.accountVerified = true;
-              userFound.setPassword(request.body.password, function(error){
-                request.flash('success','Password is set!');
-                response.redirect('/buyer/welcome/'+userFound.apiKey);
+              userFound.setPassword(request.body.password, function(err){
+                if(err){
+                  throw err;
+                } else {
+                  request.flash('success','Password is set!');
+                  response.redirect('/buyer/welcome/'+userFound.keychain.welcomeLink);
+                }
               });
             } else {
 //key is outdated
@@ -125,7 +129,7 @@ module.exports = exports = function(core){
                 });
               } else {
                 request.flash('error','Unable to authorize - wrong password!'); //todo - change to more clear
-                response.redirect('/buyer/welcome/'+userFound.apiKey);
+                response.redirect('/buyer/welcome/'+userFound.keychain.welcomeLink);
               }
             } else {
               request.flash('error','Unable to authorize - wrong welcome link!'); //todo - change to more clear
