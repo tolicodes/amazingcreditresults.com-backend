@@ -103,6 +103,11 @@
             }, function (data) {
 //                console.log(data);
                 var newClient = /*JSON.parse*/(data);
+                newClient.title = 'Mr.';
+                newClient.telefone='';
+                newClient.localAddress = '';
+                newClient.needQuestionnaire = true;
+                newClient.isChanged = true;
 //                console.log(newClient);
                 newClient.root = false;
 //                console.log(newClient);
