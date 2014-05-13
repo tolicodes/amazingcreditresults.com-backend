@@ -1,6 +1,7 @@
 var request = require('request'),
   should = require('should'),
   port = process.env.PORT || 3000,
+  testId = Math.floor(Math.random()*10000),
   huntKey,
   clientId;
 
@@ -50,14 +51,81 @@ describe('/api/v1/owner/clients API resource test', function(){
         var bodyParsed = JSON.parse(body);
         bodyParsed.Code.should.be.equal(200);
         bodyParsed.huntKey.should.be.a.String;
-        huntKey=bodyParsed.huntKey;
+        huntKey = bodyParsed.huntKey;
         done();
       }
     });
   });
 
   it('creates new client', function(done){
-    done();
+    request({
+      'method':'POST',
+      'url':'http://localhost:'+port+'/api/v1/admin/clients',
+      'headers': {'huntKey':huntKey},
+      'form':{
+        'email': 'unitTestUser'+testId+'@mail.ru',
+        'givenName': 'John'+testId,
+        'middleName': 'Teodor'+testId,
+        'familyName': 'Doe'+testId,
+        'needQuestionnaire': true,
+        'telefone': '555-339'+testId,
+        'localAddress': 'Some Address',
+        'title': 'Mr.'
+      }
+    }, function(error, response, body){
+      if(error) {
+        done(error);
+      } else {
+        response.statusCode.should.be.equal(201);
+        var bodyParsed = JSON.parse(body);
+        bodyParsed.id.should.be.a.String;
+        bodyParsed.id.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
+
+        clientId = bodyParsed.id;
+
+        bodyParsed.email.should.be.equal('unitTestUser'+testId+'@mail.ru');
+        bodyParsed.name.givenName.should.be.equal('John'+testId);
+        bodyParsed.name.middleName.should.be.equal('Teodor'+testId);
+        bodyParsed.name.familyName.should.be.equal('Doe'+testId);
+        bodyParsed.title.should.be.equal('Mr.');
+        bodyParsed.telefone.should.be.equal('555-339'+testId);
+        bodyParsed.localAddress.should.be.equal('Some Address');
+        bodyParsed.email.should.be.equal('unitTestUser'+testId+'@mail.ru');
+        bodyParsed.root.should.be.a.false;
+//and we can get this client
+        request({
+          'method':'GET',
+          'url':'http://localhost:'+port+'/api/v1/admin/clients/'+clientId,
+          'headers': {'huntKey':huntKey}
+        }, function(error, response, body){
+          if(error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(200);
+            var bodyParsed = JSON.parse(body);
+            verifyClient(bodyParsed);
+            done();
+          }
+        });
+      }
+    });
+  });
+
+  it('get recently created client by id', function(done){
+    request({
+      'method':'GET',
+      'url':'http://localhost:'+port+'/api/v1/admin/clients/'+clientId,
+      'headers': {'huntKey':huntKey}
+    }, function(error, response, body){
+      if(error) {
+        done(error);
+      } else {
+        response.statusCode.should.be.equal(200);
+        var bodyParsed = JSON.parse(body);
+        verifyClient(bodyParsed);
+        done();
+      }
+    });
   });
 
   it('lists all clients', function(done){
@@ -78,26 +146,9 @@ describe('/api/v1/owner/clients API resource test', function(){
       }
     });
   });
-/*/
-  it('get clients by id', function(done){
-    request({
-      'method':'GET',
-      'url':'http://localhost:'+port+'/api/v1/owner/clients/'+clientId,
-      'headers': {'huntKey':huntKey}
-    }, function(error, response, body){
-      if(error) {
-        done(error);
-      } else {
-        response.statusCode.should.be.equal(200);
-        var bodyParsed = JSON.parse(body);
-        bodyParsed.page.should.be.equal(1);
-        Array.isArray(bodyParsed.clients).should.be.true;
-        bodyParsed.clients.map(verifyClient);
-        done();
-      }
-    });
+
+  it('updates client', function(done){
+    done();
   });
-//*/
-  it('updates client');
   it('sends welcome link')
 });
