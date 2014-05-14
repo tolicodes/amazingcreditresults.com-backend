@@ -92,7 +92,11 @@ GET /auth/myself
   "root": true,
   "accountVerified": false,
   "telefone":"555-339-69-72",
-  "localAddress":"Gothem city"
+  "localAddress":"Gothem city",
+  "profile": {
+    "needQuestionnaire":true
+  }
+
 }
 +++++
 < 400
@@ -120,7 +124,10 @@ GET /api/v1/myself
   "root": true,
   "accountVerified": false,
   "telefone":"555-339-69-72",
-  "localAddress":"Gothem city"
+  "localAddress":"Gothem city",
+  "profile": {
+    "needQuestionnaire":true
+  }
 }
 +++++
 < 400
