@@ -189,7 +189,63 @@ describe('/api/v1/owner/clients API resource test', function(){
   });
 
   describe('owners updates client fully', function(){
-    it('will be done');
+    it('PUT request works', function(done){
+      request({
+        'method':'PUT',
+        'url':'http://localhost:'+port+'/api/v1/admin/clients/'+clientId,
+        'form':{
+          'localAddress':'new_City #'+testId,
+          'email': 'new_unitTestUser'+testId+'@mail.ru',
+          'givenName': 'new_John'+testId,
+          'middleName': 'new_Teodor'+testId,
+          'familyName': 'new_Doe'+testId,
+          'needQuestionnaire': true,
+          'telefone': '555-339'+testId,
+          'title': 'Mr.'
+        },
+        'headers': {'huntKey':huntKey}
+      }, function(error, response, body){
+        if(error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(202);
+          var bodyParsed = JSON.parse(body);
+          verifyClient(bodyParsed);
+          bodyParsed.localAddress.should.be.equal('new_City #'+testId);
+          bodyParsed.email.should.be.equal('new_unitTestUser'+testId+'@mail.ru');
+          bodyParsed.name.givenName.should.be.equal('new_John'+testId);
+          bodyParsed.name.middleName.should.be.equal('new_Teodor'+testId);
+          bodyParsed.name.familyName.should.be.equal('new_Doe'+testId);
+          bodyParsed.telefone.should.be.equal('555-339'+testId);
+          bodyParsed.title.should.be.equal('Mr.');
+          done();
+        }
+      });
+    });
+
+    it('client is actually updated', function(done){
+      request({
+        'method':'GET',
+        'url':'http://localhost:'+port+'/api/v1/admin/clients/'+clientId,
+        'headers': {'huntKey':huntKey}
+      }, function(error, response, body){
+        if(error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(200);
+          var bodyParsed = JSON.parse(body);
+          verifyClient(bodyParsed);
+          bodyParsed.localAddress.should.be.equal('new_City #'+testId);
+          bodyParsed.email.should.be.equal('new_unitTestUser'+testId+'@mail.ru');
+          bodyParsed.name.givenName.should.be.equal('new_John'+testId);
+          bodyParsed.name.middleName.should.be.equal('new_Teodor'+testId);
+          bodyParsed.name.familyName.should.be.equal('new_Doe'+testId);
+          bodyParsed.telefone.should.be.equal('555-339'+testId);
+          bodyParsed.title.should.be.equal('Mr.');
+          done();
+        }
+      });
+    });
   });
 
 
