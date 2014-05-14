@@ -3,7 +3,6 @@ module.exports = exports = function(core){
 
 //session based authorization
 
-
 //universal error reporter page for login process
 //buyer is redirected to this page when any of errors occurs
 //for example, when s/he used outdated welcome link
@@ -16,11 +15,12 @@ module.exports = exports = function(core){
 
 
 //it will be something like
-//https://amazingcreditresults.com/welcome/741fca619eaaa21dd2d469346034e1ef19cfafba8e85ff259e11642d1c2a5379ed84716b318776c69f5acf1d57fbbf24020cde6b76aae7a4c8bd1965e2ed65a0
+//https://amazingcreditresults.com/welcome/paputrahaetsobaka
 //links have ttl of 5 days
 //see Development Plan # Buyer 1
-  core.app.get('/buyer/welcome/:apiKey', function(request, response){
-    request.model.User.findOneByKeychain('welcomeLink',request.params.apiKey,
+//used in cookie session based authorization
+  core.app.get('/buyer/welcome/:welcomeLink', function(request, response){
+    request.model.User.findOneByKeychain('welcomeLink',request.params.welcomeLink,
       function(error, userFound){
         if(error) {
           throw error;
@@ -60,7 +60,7 @@ module.exports = exports = function(core){
                 'flash': {
                   'error': 'Your welcome link is not accepted!  Please, contact support to recieve a new one!'
                 }
-              });
+            });
           }
         }
       }
@@ -68,6 +68,7 @@ module.exports = exports = function(core){
   });
 
 //POST request for setting the password for first time!
+//used in cookie session based authorization
   core.app.post('/buyer/setPassword', function(request, response){
     if(request.body.apiKey && request.body.password){
     request.model.User.findOneByKeychain('welcomeLink',request.body.apiKey,
@@ -102,11 +103,13 @@ module.exports = exports = function(core){
       });
     } else {
 //no apiKey and password in post request body
-      response.send(400);
+      request.flash('error','The values of `apiKey` or `password` are missed!'); //todo - change to more clear
+      response.redirect('/buyer/error');
     }
   });
 
 //POST request for authorizing Buyer when s\he enters password
+//used in cookie session based authorization
   core.app.post('/buyer/login', function(request, response){
     if(request.user){
       request.flash('error','You are already authorized as '+request.user.displayName+'!'); //todo - change to more clear
@@ -142,8 +145,9 @@ module.exports = exports = function(core){
       }
     }
   });
-
-//header based authorization
+/*
+ * Header Based Authorization
+ */
 
 //setting password - first step
   core.app.post('/api/v1/buyer/setPassword', function(request, response){
@@ -188,7 +192,7 @@ module.exports = exports = function(core){
           }
         });
     } else {
-//no apiKey and password in post request body
+//no apiKey or password in post request body
       response.status(400);
       response.json({
         'Code':400,
@@ -237,7 +241,7 @@ module.exports = exports = function(core){
           }
         });
       } else {
-        //no apiKey and password in post request body
+//no apiKey and password in post request body
         response.status(400);
         response.json({
           'Code':400,
@@ -246,4 +250,4 @@ module.exports = exports = function(core){
       }
     }
   });
-};
+-};

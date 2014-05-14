@@ -63,7 +63,7 @@ Hunt.extendMiddleware(function(core){
 
 //loading different controllers for buyers
 Hunt.extendRoutes(require('./controllers/buyer/login.js'));
-Hunt.extendRoutes(require('./controllers/buyer/landing.js'));
+Hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
 
 //loading different controllers for owners
 Hunt.extendRoutes(require('./controllers/owner/login.js'));
@@ -72,13 +72,19 @@ Hunt.extendRoutes(require('./controllers/owner/editClients.js'));
 //loading controller shared by owners and buyers
 Hunt.extendRoutes(require('./controllers/shared.js'));
 
-
+//Development route to test error cacther middleware
 Hunt.extendRoutes(function(core){
   core.app.get('/testError', function(request,response){
-    throw new Error('Test error!');
+    if(core.config.env === 'development'){
+      throw new Error('Test error!');
+    } else {
+      response.send(404);
+    }
   });
 });
 
+//JSON error reporter middleware.
+//https://oselot.atlassian.net/browse/ACR-105
 Hunt.extendMiddleware(function(core){
   return function(error,request,response,next){
     response.status(500);
@@ -87,9 +93,9 @@ Hunt.extendMiddleware(function(core){
 });
 
 Hunt.on('start', function(evnt){
-//creating test users in development environment!
+//creating test owner in development environment!
   if(Hunt.config.env === 'development') {
-//    require('./lib/populateDatabase.js')(Hunt); //uncomment to repopulate database on every start
+    require('./lib/populateDatabase.js')(Hunt); //uncomment to repopulate database on every start
   }
 
   var welcomeLinkGenerator = require('./lib/welcome.js');
