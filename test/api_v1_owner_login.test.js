@@ -111,7 +111,7 @@ function testingCallback(error, response, body, done){
     bodyParsed.email.should.be.a.equal('owner@example.org');
     bodyParsed.root.should.be.true;
     bodyParsed.profile.should.be.an.Object;
-    bodyParsed.profile.needQuestionnaire.should.exist;
+//    bodyParsed.profile.needQuestionnaire.should.exist;
     bodyParsed.gravatar.should.be.a.equal('https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g');
     bodyParsed.gravatar30.should.be.a.equal('https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g');
     bodyParsed.gravatar50.should.be.a.equal('https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g');
