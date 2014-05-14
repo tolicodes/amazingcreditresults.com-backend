@@ -166,6 +166,26 @@ describe('/api/v1/myself works for owner', function(){
       'url':'http://localhost:'+port+'/api/v1/myself',
       'headers': {'huntKey':huntKeys[0]}
     }, function(error, response, body){
+      testingCallback(error, response, body, done);
+    });
+  });
+
+  it('works with `huntKey` as custom header for DELETE response', function(done){
+    request({
+      'method':'DELETE',
+      'url':'http://localhost:'+port+'/api/v1/myself',
+      'headers': {'huntKey':huntKeys[0]}
+    }, function(error, response, body){
+      testingCallback(error, response, body, done);
+    });
+  });
+
+  it('works with `huntKey` as custom header for PUT response', function(done){
+    request({
+      'method':'PUT',
+      'url':'http://localhost:'+port+'/api/v1/myself',
+      'headers': {'huntKey':huntKeys[0]}
+    }, function(error, response, body){
         testingCallback(error, response, body, done);
     });
   });
