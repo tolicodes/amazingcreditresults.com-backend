@@ -148,5 +148,6 @@ describe('/api/v1/owner/clients API resource test', function(){
   });
 
   it('updates client');
-  it('sends welcome link')
+  it('sends welcome link');
+  it('sends password reset link');
 });
