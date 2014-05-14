@@ -1,4 +1,5 @@
 var request = require('request'),
+  url = require('url'),
   should = require('should'),
   port = process.env.PORT || 3000,
   testId = Math.floor(Math.random()*10000),
@@ -248,7 +249,47 @@ describe('/api/v1/owner/clients API resource test', function(){
     });
   });
 
+  it('sends welcome link', function(done){
+    request({
+      'method':'POST',
+      'url':'http://localhost:'+port+'/api/v1/admin/clients/welcome/'+clientId,
+      'form':{ },
+      'headers': {'huntKey':huntKey}
+    }, function(error, response, body){
+      if(error) {
+        done(error);
+      } else {
+        response.statusCode.should.be.equal(202);
+        var bodyParsed = JSON.parse(body);
+        bodyParsed.message.should.be.equal('sent');
+        var params = url.parse(bodyParsed.welcomeLink);
+        ['http:','https:'].should.include(params.protocol);
+        params.pathname.should.match(/^\/buyer\/welcome\/[a-z]+$/);
+        bodyParsed.user.id.should.be.equal(clientId);
+        done();
+      }
+    });
+  });
 
-  it('sends welcome link');
-  it('sends password reset link');
+  it('sends password reset link', function(done){
+    request({
+      'method':'POST',
+      'url':'http://localhost:'+port+'/api/v1/admin/clients/resetPassword/'+clientId,
+      'form':{ },
+      'headers': {'huntKey':huntKey}
+    }, function(error, response, body){
+      if(error) {
+        done(error);
+      } else {
+        response.statusCode.should.be.equal(202);
+        var bodyParsed = JSON.parse(body);
+        bodyParsed.message.should.be.equal('sent');
+        var params = url.parse(bodyParsed.welcomeLink);
+        ['http:','https:'].should.include(params.protocol);
+        params.pathname.should.match(/^\/buyer\/welcome\/[a-z]+$/);
+        bodyParsed.user.id.should.be.equal(clientId);
+        done();
+      }
+    });
+  });
 });
