@@ -147,7 +147,52 @@ describe('/api/v1/owner/clients API resource test', function(){
     });
   });
 
-  it('updates client');
+  describe('owners updates client partialy', function(){
+    it('PUT request works', function(done){
+      request({
+        'method':'PUT',
+        'url':'http://localhost:'+port+'/api/v1/admin/clients/'+clientId,
+        'form':{
+          'localAddress':'City #'+clientId
+        },
+        'headers': {'huntKey':huntKey}
+      }, function(error, response, body){
+        if(error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(202);
+          var bodyParsed = JSON.parse(body);
+          verifyClient(bodyParsed);
+          bodyParsed.localAddress.should.be.equal('City #'+clientId);
+          done();
+        }
+      });
+    });
+
+    it('client is actually updated', function(done){
+      request({
+        'method':'GET',
+        'url':'http://localhost:'+port+'/api/v1/admin/clients/'+clientId,
+        'headers': {'huntKey':huntKey}
+      }, function(error, response, body){
+        if(error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(200);
+          var bodyParsed = JSON.parse(body);
+          verifyClient(bodyParsed);
+          bodyParsed.localAddress.should.be.equal('City #'+clientId);
+          done();
+        }
+      });
+    });
+  });
+
+  describe('owners updates client fully', function(){
+    it('will be done');
+  });
+
+
   it('sends welcome link');
   it('sends password reset link');
 });

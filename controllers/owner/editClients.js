@@ -85,7 +85,7 @@ var ensureAdmin = function(request, response, next){
               'accountVerified': user.accountVerified,
               'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : true,
               'telefone': user.profile ? user.profile.telefone : '',
-              'localAddress': user.profile ? user.profile.localAddress  : ''
+              'localAddress': user.profile ? user.profile.localAddress  : '',
           });
         } else {
           response.send(404);
@@ -157,7 +157,13 @@ var ensureAdmin = function(request, response, next){
               'profile': {
                 'needQuestionnaire': userFound.profile ? userFound.profile.needQuestionnaire : true
               },
-              'root': false
+              'gravatar': userFound.gravatar,
+              'gravatar30': userFound.gravatar30,
+              'gravatar50': userFound.gravatar50,
+              'gravatar80': userFound.gravatar80,
+              'gravatar100':  userFound.gravatar100,
+              'root': false,
+              'accountVerified': userFound.accountVerified
             });
           } else {
             response.status(404);
@@ -219,7 +225,12 @@ var ensureAdmin = function(request, response, next){
             'telefone': userCreated.profile.telefone,
             'localAddress': userCreated.profile.localAddress,
             'root': false,
-            'accountVerified':true
+            'accountVerified':true,
+            'gravatar': userCreated.gravatar,
+            'gravatar30': userCreated.gravatar30,
+            'gravatar50': userCreated.gravatar50,
+            'gravatar80': userCreated.gravatar80,
+            'gravatar100': userCreated.gravatar100
             });
         }
       });
