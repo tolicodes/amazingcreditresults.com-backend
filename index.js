@@ -1,18 +1,18 @@
 var hunt = require('hunt'),
   Hunt = hunt({
 //    'hostUrl':'https://dev.amazingcreditresults.com/', //for example
-//    'redisUrl':'', //from environment or default values
-    'mongoUrl':'mongodb://localhost/amazing',
+    'redisUrl': process.env.AMAZING_REDIS_URL || 'redis://localhost:6379',
+    'mongoUrl': process.env.AMAZING_MONGO_URL || 'mongodb://localhost/amazing',
     'io': {
       'loglevel': 0
     },
-    'huntKey':true, //hunt key authorization, just in case
+    'huntKey': true, //hunt key authorization, just in case
     'disableCsrf': true, //strongly not recommended for production!!!
-    'enableMongoose':true,
-    'enableMongooseUsers':true,
+    'enableMongoose': true,
+    'enableMongooseUsers': true,
     'public': __dirname+'/public/',
     'views': __dirname+'/views/',
-    'maxWorkers': 2,
+    'maxWorkers': 2, //for production use - 1 per CPU core
     'passport':{
       'local': true, //need for owners to be able to auth. Thats all!
       'signUpByEmail': false,
@@ -20,7 +20,7 @@ var hunt = require('hunt'),
       'resetPassword': false,
       'sessionExpireAfterSeconds': 5*60, //plan 1.4
 //      'apiKeyOutdates': 5*24*60*60*1000 //ttl of api key for buyer to authorize - 5 dayes
-      'apiKeyOutdates': 1*24*60*60*1000 //ttl of api key for buyer to authorize - 5 dayes //https://oselot.atlassian.net/browse/ACR-20
+      'apiKeyOutdates': 1*24*60*60*1000 //ttl of api key for buyer to authorize - 1 day //https://oselot.atlassian.net/browse/ACR-20
     }
   });
 
@@ -32,25 +32,21 @@ Hunt.extendApp(function(core){
   core.app.locals.javascripts.push({'url': '//yandex.st/jquery/2.0.3/jquery.min.js'});
   core.app.locals.javascripts.push({'url':'//yandex.st/bootstrap/3.1.1/js/bootstrap.min.js'});
   core.app.locals.javascripts.push({'url':'//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js'});
-//  core.app.locals.javascripts.push({'url': '/javascripts/hunt.js'});
 //*/
 });
 
 //access control middleware
 Hunt.extendMiddleware(function(core){
   return function(request, response, next){
-//    console.log(request.originalUrl);
     if(request.user){
       next();
     } else {
       if(
-          request.originalUrl === '/admin/login' ||
-          request.originalUrl === '/admin/login/' || //for express 4.0.0
+          /^\/admin\/login/.test(request.originalUrl) ||
           /^\/buyer\/welcome\/[a-z]+$/.test(request.originalUrl) ||
           /^\/api\/v1\//.test(request.originalUrl) ||
-          request.originalUrl === '/buyer/login' ||
-          request.originalUrl === '/buyer/setPassword' ||
-//          /^\/swagger\//.test(request.originalUrl) ||
+          /^\/buyer\/login/.test(request.originalUrl) ||
+          /^\/buyer\/setPassword/.test(request.originalUrl) ||
           /^\/auth\//.test(request.originalUrl) ) {
         next();
       } else {
@@ -105,8 +101,11 @@ Hunt.on('start', function(evnt){
   console.log(welcomeLinkGenerator());
 });
 
-//Hunt.on('httpSuccess', console.log);
-//Hunt.on('httpError', console.error);
+/*/
+//Some sort of logging. npm module of `forever` can output this all to files.
+Hunt.on('httpSuccess', console.log);
+Hunt.on('httpError', console.error);
+//*/
 
 //starting
 if(Hunt.config.env === 'development'){
