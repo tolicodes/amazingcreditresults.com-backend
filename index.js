@@ -21,7 +21,17 @@ var hunt = require('hunt'),
       'sessionExpireAfterSeconds': 5*60, //plan 1.4
 //      'apiKeyOutdates': 5*24*60*60*1000 //ttl of api key for buyer to authorize - 5 dayes
       'apiKeyOutdates': 1*24*60*60*1000 //ttl of api key for buyer to authorize - 1 day //https://oselot.atlassian.net/browse/ACR-20
-    }
+    },
+    'emailConfig' : process.env.AMAZING_AMAZON_USE_SES ? {
+      host : 'email-smtp.us-east-1.amazonaws.com',
+      port : 587,
+      name : 'dev.amazingcreditresults.com',//'54.86.168.135',
+      fromEmailAddr : process.env.AMAZING_AMAZON_SES_SMTP_FROM || 'anatolij@oselot.com',
+      auth: {
+        user: process.env.AMAZING_AMAZON_SES_SMTP_USERNAME || 'AKIAJ2ZQ6HBUVUQCRUIQ',
+        pass: process.env.AMAZING_AMAZON_SES_SMTP_PASSWORD || 'AuJw3HgKNWp+vpERHTnBmbl7LmPe7GXZfJnj4zK0zQKm'
+      }
+    } : false
   });
 
 Hunt.extendApp(function(core){
@@ -47,6 +57,7 @@ Hunt.extendMiddleware(function(core){
           /^\/api\/v1\//.test(request.originalUrl) ||
           /^\/buyer\/login/.test(request.originalUrl) ||
           /^\/buyer\/setPassword/.test(request.originalUrl) ||
+          /^\/testError/.test(request.originalUrl) ||
           /^\/auth\//.test(request.originalUrl) ) {
         next();
       } else {
@@ -91,7 +102,7 @@ Hunt.extendMiddleware(function(core){
 Hunt.on('start', function(evnt){
 //creating test owner in development environment!
   if(Hunt.config.env === 'development') {
-    require('./lib/populateDatabase.js')(Hunt); //uncomment to repopulate database on every start
+//    require('./lib/populateDatabase.js')(Hunt); //uncomment to repopulate database on every start
   }
 
   var welcomeLinkGenerator = require('./lib/welcome.js');
@@ -99,6 +110,10 @@ Hunt.on('start', function(evnt){
   console.log(welcomeLinkGenerator());
   console.log(welcomeLinkGenerator());
   console.log(welcomeLinkGenerator());
+
+
+//testing amazon SET
+  Hunt.sendEmail('anatolij@oselot.com','SES works','YRA!', console.error);
 });
 
 /*/
