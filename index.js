@@ -111,9 +111,10 @@ Hunt.on('start', function(evnt){
   console.log(welcomeLinkGenerator());
   console.log(welcomeLinkGenerator());
 
-
+/*/
 //testing amazon SET
   Hunt.sendEmail('anatolij@oselot.com','SES works','YRA!', console.error);
+//*/
 });
 
 /*/
