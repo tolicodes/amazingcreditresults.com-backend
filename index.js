@@ -34,6 +34,11 @@ var hunt = require('hunt'),
     } : false
   });
 
+//loading models
+Hunt.extendModel('Product',require('./models/Product.model.js'));
+Hunt.extendModel('TradeLine',require('./models/TradeLine.model.js'));
+Hunt.extendModel('Facade',require('./models/Facade.model.js'));
+
 Hunt.extendApp(function(core){
 //*/
 //setting up the css and javascripts to insert into layout
