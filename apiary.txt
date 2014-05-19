@@ -1,4 +1,4 @@
-HOST: http://54.86.168.135
+HOST: http://dev.amazingcreditresults.com/
 
 --- Amazing Api V1 ---
 
