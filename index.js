@@ -3,9 +3,7 @@ var hunt = require('hunt'),
 //    'hostUrl':'https://dev.amazingcreditresults.com/', //for example
     'redisUrl': process.env.AMAZING_REDIS_URL || 'redis://localhost:6379',
     'mongoUrl': process.env.AMAZING_MONGO_URL || 'mongodb://localhost/amazing',
-    'io': {
-      'loglevel': 0
-    },
+    'io': false,
     'huntKey': true, //hunt key authorization, just in case
     'disableCsrf': true, //strongly not recommended for production!!!
     'enableMongoose': true,
@@ -84,6 +82,9 @@ Hunt.extendRoutes(require('./controllers/owner/editClients.js'));
 //loading controller shared by owners and buyers
 Hunt.extendRoutes(require('./controllers/shared.js'));
 
+
+//loading controller for inventory table
+Hunt.extendRoutes(require('./controllers/buyer/tradelines.js'));
 //Development route to test error cacther middleware
 Hunt.extendRoutes(function(core){
   core.app.get('/testError', function(request,response){
