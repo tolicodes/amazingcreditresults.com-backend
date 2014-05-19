@@ -257,7 +257,8 @@ var ensureAdmin = function(request, response, next){
               userFound.invalidateSession(cb);
             },
             function(newApiKey, cb){
-              welcomeLink = core.config.hostUrl+'buyer/welcome/'+welcomeLink;
+//              welcomeLink = core.config.hostUrl+'buyer/welcome/'+welcomeLink;
+              welcomeLink = core.config.hostUrl+'#login/'+welcomeLink;
               userFound.notifyByEmail({
                 'layout':false,
                 'template':'emails/welcome',
@@ -301,7 +302,8 @@ var ensureAdmin = function(request, response, next){
               userFound.invalidateSession(cb);
             },
             function(newApiKey, cb){
-              welcomeLink = core.config.hostUrl+'buyer/welcome/'+welcomeLink;
+//              welcomeLink = core.config.hostUrl+'buyer/welcome/'+welcomeLink;
+              welcomeLink = core.config.hostUrl+'#login/'+welcomeLink;
               userFound.notifyByEmail({
                 'layout':false,
                 'template':'emails/welcomeResetPassword',

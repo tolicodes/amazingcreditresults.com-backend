@@ -250,4 +250,48 @@ module.exports = exports = function(core){
       }
     }
   });
+//https://oselot.atlassian.net/browse/ACR-145
+  core.app.get('/api/v1/buyer/needToSetPassword/:welcomeLink', function(request, response){
+    request.model.User.findOneByKeychain('welcomeLink',request.params.welcomeLink,
+      function(error, userFound){
+        if(error) {
+          throw error;
+        } else {
+          if(userFound) {
+            var apiKeyAge = Date.now() - userFound.apiKeyCreatedAt.getTime();
+            if(apiKeyAge < core.config.passport.apiKeyOutdates) {
+//key is fresh
+              if(!userFound.accountVerified){
+//2. The first time a Buyer clicks the link, s/he will see a prompt asking to create a password
+                response.json({
+                  'needToSetPassword':true
+                });
+              } else {
+//3. The second time a Buyer click the link, s/he will be prompted for the password
+                response.json({
+                  'needToSetPassword':false
+                });
+              }
+            } else {
+//key is outdated
+              response.status(400);
+              response.json({
+                'Code':400,
+                'Error':'Link is outdated!'
+              });
+            }
+          } else {
+//there is nobody, who has this key!
+            response.status(404);
+            response.json({
+              'Code':404,
+              'Error':'Link is not valid!'
+            });
+          }
+        }
+      }
+    );
+  });
+
+
 };
