@@ -125,7 +125,7 @@ describe('/api/v1/myself works for owner', function(){
   it('works with `huntKey` as `GET` parameter', function(done){
     request({
       'method':'GET',
-      'url':'http://localhost:'+port+'/api/v1/myself?huntKey='+huntKeys[0],
+      'url':'http://localhost:'+port+'/api/v1/myself?huntKey='+huntKeys[0]
     }, function(error, response, body){
         testingCallback(error, response, body, done);
     });
