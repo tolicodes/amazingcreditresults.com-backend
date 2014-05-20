@@ -101,6 +101,10 @@ var ensureAdmin = function(request, response, next){
       patch['keychain.email'] = request.body.email;
     }
 
+    if(request.body.accountVerified == true || request.body.accountVerified == false){
+      patch['accountVerified'] = request.body.accountVerified;
+    }
+
     ['familyName','givenName','middleName'].map(function(a){
       if(request.body[a]){
         patch['name.'+a] = request.body[a];
