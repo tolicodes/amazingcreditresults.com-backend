@@ -4,8 +4,7 @@ var request = require('request'),
   port = process.env.PORT || 3000,
   testId = Math.floor(Math.random()*10000),
   ownerHuntKey,
-  userIdwithVerifiedAccount,
-  userIdwithouitVerifiedAccount;
+  userId;
 
 describe('Unit test for user authorization by welcome link', function() {
   it('allows owner to authorize at first', function (done) {
@@ -32,8 +31,6 @@ describe('Unit test for user authorization by welcome link', function() {
   });
 
   describe('creating user without verified account', function(){
-    var userId,
-      welcomeLink;
     before(function(done){
       request({
         'method':'POST',
@@ -109,9 +106,48 @@ describe('Unit test for user authorization by welcome link', function() {
   });
 
   describe('creating user with verified account', function(){
-    it('owner updates this user profile to be verified');
-    it('makes this user to have correct response on /api/v1/api/v1/buyer/needToSetPassword/:welcomeLink');
+    var bodyParsed;
+    before(function(done){
+      request({
+        'method':'PUT',
+        'url':'http://localhost:'+port+'/api/v1/admin/clients/'+userId,
+        'form':{
+          'accountVerified':true
+        },
+        'headers': {'huntKey':ownerHuntKey}
+      }, function(error, response, body){
+        if(error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(202);
+          bodyParsed = JSON.parse(body);
+          done();
+        }
+      });
+    });
+
+    it('owner updates this user profile to be verified', function(){
+      bodyParsed.id.should.be.equal(userId);
+      bodyParsed.accountVerified.should.be.false;
+    });
+
+    it('makes this user to have correct response on /api/v1/api/v1/buyer/needToSetPassword/:welcomeLink',function(done){
+      request({
+        'method':'GET',
+        'url':'http://localhost:'+port+'/api/v1/buyer/needToSetPassword/'+welcomeLink,
+        'headers': { }
+      }, function(error, response, body){
+        if(error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(200);
+          var bodyParsed = JSON.parse(body);
+          bodyParsed.needToSetPassword.should.be.true;
+          done();
+        }
+      });
+    });
   });
 
-});
 
+});
