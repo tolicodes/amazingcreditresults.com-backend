@@ -264,7 +264,9 @@ describe('/api/v1/owner/clients API resource test', function(){
         bodyParsed.message.should.be.equal('sent');
         var params = url.parse(bodyParsed.welcomeLink);
         ['http:','https:'].should.include(params.protocol);
-        params.pathname.should.match(/^\/buyer\/welcome\/[a-z]+$/);
+//        params.pathname.should.match(/^\/buyer\/welcome\/[a-z]+$/);
+        params.pathname.should.be.equal('/');
+        params.hash.should.match(/^\#login\/[a-z]+$/);
         bodyParsed.user.id.should.be.equal(clientId);
         done();
       }
@@ -286,7 +288,8 @@ describe('/api/v1/owner/clients API resource test', function(){
         bodyParsed.message.should.be.equal('sent');
         var params = url.parse(bodyParsed.welcomeLink);
         ['http:','https:'].should.include(params.protocol);
-        params.pathname.should.match(/^\/buyer\/welcome\/[a-z]+$/);
+        params.pathname.should.be.equal('/');
+        params.hash.should.match(/^\#login\/[a-z]+$/);
         bodyParsed.user.id.should.be.equal(clientId);
         done();
       }
