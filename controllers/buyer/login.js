@@ -1,7 +1,8 @@
 //controller for buyer login process
 module.exports = exports = function(core){
-
+/*/
 //session based authorization
+//deprecated
 
 //universal error reporter page for login process
 //buyer is redirected to this page when any of errors occurs
@@ -145,6 +146,8 @@ module.exports = exports = function(core){
       }
     }
   });
+//*/
+
 /*
  * Header Based Authorization
  */
