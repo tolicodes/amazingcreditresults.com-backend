@@ -2,7 +2,7 @@ HOST: http://dev.amazingcreditresults.com/
 
 --- Amazing Api V1 ---
 
--- Buyer authorization with cookie based sessions --
+-- Buyer authorization with cookie based sessions (deprecated) --
 
 Authorize buyer by unique link. If link is valid, it responds with HTML page with form to set password,
 if link is invalid, it redirects to error page with message, that link is invalid or outdated
