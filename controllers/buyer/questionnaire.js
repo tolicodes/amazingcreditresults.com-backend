@@ -13,6 +13,8 @@ module.exports = exports = function(core){
       request.user.profile.answer1 = request.body.answer1;
       request.user.profile.answer2 = request.body.answer2;
       request.user.profile.answer3 = request.body.answer3;
+      request.user.profile.needQuestionnaire = ((request.body.needQuestionnaire === false) ? false : true);
+
       request.user.save(function(error, userSaved){
         if(error){
           throw error;

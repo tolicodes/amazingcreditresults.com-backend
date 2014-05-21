@@ -166,7 +166,7 @@ GET /buyer
 Saving Buyer answers to questions on dashboard
 POST /api/v1/buyer/saveQuestionnaireAnswers
 > Content-Type: application/x-www-form-urlencoded; charset=utf-8 | application/json; charset=utf-8
-{ "answer1": "1", "answer2":"2","answer3":"3"}
+{ "answer1": "1", "answer2":"2", "answer3":"3", "needQuestionnaire":true,}
 < 202
 < Content-Type: application/json
 {
@@ -178,12 +178,14 @@ POST /api/v1/buyer/saveQuestionnaireAnswers
     "middleName": ""
   },
   "profile": {
+    "needQuestionnaire": true,
     "answer1": "1",
     "answer2": "2",
     "answer3": "3"
   },
   "root": false,
-  "accountVerified": true
+  "accountVerified": true,
+
 }
 
 
