@@ -194,153 +194,118 @@ GET /api/v1/tradelines
 < 200
 < Content-Type: application/json
 {
-    "page":0,
-    "tradelines":[
-        {
-            "totalAus":100,
-            "usedAus":0,
-            "creditLimit":0
-            "cashLimit":0,
-            "balance":100,
-            "ncRating":0,
-            "bcRating":0,
-            "moRating":0,
-            "cost":1000,
-            "notes":"Some notes",
-            "seller":{
-                "id":"536cfc8a886fcbba14d07dd5",
-                "name":{},
-                "gravatar":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
-                "gravatar30":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
-                "gravatar50":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
-                "gravatar80":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
-                "gravatar100":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=100&d=wavatar&r=g",
-                "online":true},
-                "product":{
-                  "_id":"537e624d6b7a2e76ea0d33e5",
-                  "bank":"Sperbank (testing)",
-                  "bcRating":1,
-                  "maximumAus":100,
-                  "moRating":1,
-                  "name":"Visa Gemoroi 1",
-                  "ncRating":1,
-                  "notes":"This is your problem.",
-                  "reportsToExperian":false,
-                  "reports_to_equifax":false,
-                  "reports_to_transunion":false
-                },
-                "_id":"537e626d4971483f4287fe90",
-                "__v":0
-                },
-                {
-                "totalAus":100,
-                "usedAus":0,
-                "creditLimit":0,
-                "cashLimit":0,
-                "balance":100,
-                "ncRating":0,
-                "bcRating":0,
-                "moRating":0,
-                "cost":1000,
-                "notes":"Some notes",
-                "seller":{
-                      "id":"536cfc8a886fcbba14d07dd5",
-                      "name":{},
-                      "gravatar":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
-                      "gravatar30":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
-                      "gravatar50":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
-                      "gravatar80":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
-                      "gravatar100":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=100&d=wavatar&r=g",
-                      "online":true
-                  },
-                  "product":{
-                      "_id":"537e624d6b7a2e76ea0d33e5",
-                      "bank":"Sperbank (testing)",
-                      "bcRating":1,
-                      "maximumAus":100,
-                      "moRating":1,
-                      "name":"Visa Gemoroi 1",
-                      "ncRating":1,
-                      "notes":"This is your problem.",
-                      "reportsToExperian":false,
-                      "reports_to_equifax":false,
-                      "reports_to_transunion":false
-                  },
-                  "_id":"537e6293a4ee0769420e6152",
-                  "__v":0
-                  },
-                  {
-                  "totalAus":100,
-                  "usedAus":0,
-                  "creditLimit":0,
-                  "cashLimit":0,
-                  "balance":100,
-                  "ncRating":0,
-                  "bcRating":0,
-                  "moRating":0,"cost":1000,
-                  "notes":"Some notes",
-                  "seller":{
-                    "id":"536cfc8a886fcbba14d07dd5",
-                    "name":{},
-                    "gravatar":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
-                    "gravatar30":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
-                    "gravatar50":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
-                    "gravatar80":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
-                    "gravatar100":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=100&d=wavatar&r=g",
-                    "online":true
-                    },
-                    "product":{
-                        "_id":"537e624d6b7a2e76ea0d33e5",
-                        "bank":"Sperbank (testing)",
-                        "bcRating":1,
-                        "maximumAus":100,
-                        "moRating":1,
-                        "name":"Visa Gemoroi 1",
-                        "ncRating":1,
-                        "notes":"This is your problem.",
-                        "reportsToExperian":false,
-                        "reports_to_equifax":false,
-                        "reports_to_transunion":false
-                    },
-                    "_id":"537e6293a4ee0769420e6153",
-                    "__v":0},
-                    {
-                        "totalAus":100,"usedAus":0,
-                        "creditLimit":0,
-                        "cashLimit":0,
-                        "balance":100,
-                        "ncRating":0,
-                        "bcRating":0,
-                        "moRating":0,
-                        "cost":1000,
-                        "notes":"Some notes",
-                        "seller":{
-                        "id":"536cfc8a886fcbba14d07dd5",
-                        "name":{},
-                        "gravatar":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
-                        "gravatar30":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
-                        "gravatar50":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
-                        "gravatar80":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
-                        "gravatar100":"https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=100&d=wavatar&r=g",
-                        "online":true
-                    },
-                    "product":{
-                        "_id":"537e624d6b7a2e76ea0d33e5",
-                        "bank":"Sperbank (testing)",
-                        "bcRating":1,
-                        "maximumAus":100,
-                        "moRating":1,
-                        "name":"Visa Gemoroi 1",
-                        "ncRating":1,"notes":"This is your problem.",
-                        "reportsToExperian":false,
-                        "reports_to_equifax":false,
-                        "reports_to_transunion":false
-                    },
-                    "_id":"537e6293a4ee0769420e6154",
-                    "__v":0
-                    }
-                    ]
-               }
+  "page":0,
+  "tradelines":[
+    {
+      "totalAus": 100,
+      "usedAus": 0,
+      "creditLimit": 0,
+      "cashLimit": 0,
+      "balance": 100,
+      "ncRating": 0,
+      "bcRating": 0,
+      "moRating": 0,
+      "cost": 1000,
+      "notes": "Some notes",
+      "seller": "536cfc8a886fcbba14d07dd5",
+      "product": {
+        "_id": "537e624d6b7a2e76ea0d33e5",
+        "bank": "Sperbank (testing)",
+        "bcRating": 1,
+        "maximumAus": 100,
+        "moRating": 1,
+        "name": "Visa Gemoroi 1",
+        "ncRating": 1,
+        "notes": "This is your problem.",
+        "reportsToExperian": false,
+        "reports_to_equifax": false,
+        "reports_to_transunion": false
+      },
+      "_id": "537e626d4971483f4287fe90",
+      "__v": 0
+    },
+    {
+      "totalAus": 100,
+      "usedAus": 0,
+      "creditLimit": 0,
+      "cashLimit": 0,
+      "balance": 100,
+      "ncRating": 0,
+      "bcRating": 0,
+      "moRating": 0,
+      "cost": 1000,
+      "notes": "Some notes",
+      "seller": "536cfc8a886fcbba14d07dd5",
+      "product": {
+        "_id": "537e624d6b7a2e76ea0d33e5",
+        "bank": "Sperbank (testing)",
+        "bcRating": 1,
+        "maximumAus": 100,
+        "moRating": 1,
+        "name": "Visa Gemoroi 1",
+        "ncRating": 1,
+        "notes": "This is your problem.",
+        "reportsToExperian": false,
+        "reports_to_equifax": false,
+        "reports_to_transunion": false
+      },
+      "_id": "537e6293a4ee0769420e6152",
+      "__v": 0
+    },
+    {
+      "totalAus": 100,
+      "usedAus": 0,
+      "creditLimit": 0,
+      "cashLimit": 0,
+      "balance": 100,
+      "ncRating": 0,
+      "bcRating": 0,
+      "moRating": 0, "cost": 1000,
+      "notes": "Some notes",
+      "seller": "536cfc8a886fcbba14d07dd5",
+      "product": {
+        "_id": "537e624d6b7a2e76ea0d33e5",
+        "bank": "Sperbank (testing)",
+        "bcRating": 1,
+        "maximumAus": 100,
+        "moRating": 1,
+        "name": "Visa Gemoroi 1",
+        "ncRating": 1,
+        "notes": "This is your problem.",
+        "reportsToExperian": false,
+        "reports_to_equifax": false,
+        "reports_to_transunion": false
+      },
+      "_id": "537e6293a4ee0769420e6153",
+      "__v": 0},
+    {
+      "totalAus": 100, "usedAus": 0,
+      "creditLimit": 0,
+      "cashLimit": 0,
+      "balance": 100,
+      "ncRating": 0,
+      "bcRating": 0,
+      "moRating": 0,
+      "cost": 1000,
+      "notes": "Some notes",
+      "seller": "536cfc8a886fcbba14d07dd5",
+      "product": {
+        "_id": "537e624d6b7a2e76ea0d33e5",
+        "bank": "Sperbank (testing)",
+        "bcRating": 1,
+        "maximumAus": 100,
+        "moRating": 1,
+        "name": "Visa Gemoroi 1",
+        "ncRating": 1, "notes": "This is your problem.",
+        "reportsToExperian": false,
+        "reports_to_equifax": false,
+        "reports_to_transunion": false
+      },
+      "_id": "537e6293a4ee0769420e6154",
+      "__v": 0
+    }
+  ]
+}
 +++++
 < 401
 < Content-Type: application/json
