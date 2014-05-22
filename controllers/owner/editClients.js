@@ -54,7 +54,8 @@ var ensureAdmin = function(request, response, next){
               'accountVerified': user.accountVerified
             }
           });
-          response.json({ 'page':1,'clients':usersPrepared});
+          response.status(200);
+          response.json({'page':1, 'clients':usersPrepared});
         }
       });
   });
@@ -88,7 +89,8 @@ var ensureAdmin = function(request, response, next){
               'localAddress': user.profile ? user.profile.localAddress  : ''
           });
         } else {
-          response.send(404);
+          response.status(404);
+          response.json({'Code':404,'Error':'User with this id do not exists!'});
         }
       }
     });
@@ -171,7 +173,7 @@ var ensureAdmin = function(request, response, next){
             });
           } else {
             response.status(404);
-            response.json({'error':'User with this ID do not exists!'});
+            response.json({'Code':404,'Error':'User with this ID do not exists!'});
          }
       }}
     );
@@ -239,7 +241,8 @@ var ensureAdmin = function(request, response, next){
         }
       });
     } else {
-      response.send(400, 'Value of '+missed+' is missed!');
+      response.status(400);
+      response.json({'Code':400, 'Error':'Required value of '+missed+' is missed!'});
     }
   });
 
