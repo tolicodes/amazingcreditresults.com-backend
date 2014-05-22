@@ -85,7 +85,7 @@ var ensureAdmin = function(request, response, next){
               'accountVerified': user.accountVerified,
               'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : true,
               'telefone': user.profile ? user.profile.telefone : '',
-              'localAddress': user.profile ? user.profile.localAddress  : '',
+              'localAddress': user.profile ? user.profile.localAddress  : ''
           });
         } else {
           response.send(404);
@@ -266,7 +266,7 @@ var ensureAdmin = function(request, response, next){
               userFound.notifyByEmail({
                 'layout':false,
                 'template':'emails/welcome',
-                'subject':'Site access hyperlink',//todo - change to something more meaningfull
+                'subject':'Site access hyperlink to enter site',//todo - change to something more meaningfull
                 'name': userFound.name,
                 'welcomeLink': welcomeLink,
                 'telefone': userFound.profile.telefone,
@@ -311,7 +311,7 @@ var ensureAdmin = function(request, response, next){
               userFound.notifyByEmail({
                 'layout':false,
                 'template':'emails/welcomeResetPassword',
-                'subject':'Site access hyperlink',
+                'subject':'Site access hyperlink to reset password', //todo - change to somethig more meaningfull
                 'name': userFound.name,
                 'welcomeLink': welcomeLink,
                 'telefone': userFound.profile.telefone,
