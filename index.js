@@ -4,7 +4,7 @@ var hunt = require('hunt'),
     'redisUrl': process.env.AMAZING_REDIS_URL || 'redis://localhost:6379',
     'mongoUrl': process.env.AMAZING_MONGO_URL || 'mongodb://localhost/amazing',
     'io': false,
-    'huntKey': true, //hunt key authorization, just in case
+    'huntKey': true,
     'disableCsrf': true, //strongly not recommended for production!!!
     'enableMongoose': true,
     'enableMongooseUsers': true,
@@ -108,7 +108,7 @@ Hunt.extendMiddleware(function(core){
 Hunt.on('start', function(evnt){
 //creating test owner in development environment!
   if(Hunt.config.env === 'development') {
-//    require('./lib/populateDatabase.js')(Hunt); //uncomment to repopulate database on every start
+    require('./lib/populateDatabase.js')(Hunt); //uncomment to repopulate database on every start
   }
 
   var welcomeLinkGenerator = require('./lib/welcome.js');
