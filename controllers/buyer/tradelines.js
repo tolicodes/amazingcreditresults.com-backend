@@ -4,7 +4,7 @@ module.exports = exports = function(core){
       request.model.TradeLine.find()
         .skip(0)
         .limit(100)
-        .populate('seller')
+//        .populate('seller')
         .populate('product')
         .sort('+name')
         .exec(function(error, tradelines){
