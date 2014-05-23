@@ -31,7 +31,7 @@ describe('Unit test for user authorization by welcome link', function () {
     });
   });
 
-  describe('creating user without verified account', function () {
+  describe('owner is creating user without verified account, that we will use for tests', function () {
     before(function (done) {
       request({
         'method': 'POST',
@@ -105,6 +105,51 @@ describe('Unit test for user authorization by welcome link', function () {
       });
     });
 //https://oselot.atlassian.net/browse/ACR-174
+    it('makes this user to have the correct response for failing to login via /api/v1/buyer/login', function (done) {
+      request({
+        'method': 'POST',
+        'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+        'headers': { },
+        'form': {
+          'apiKey': welcomeLink,
+          'password': 'fiflesAndFufles'
+        }
+      }, function (error, response, body) {
+        if (error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(403);
+          var bodyParsed = JSON.parse(body);
+          bodyParsed.Code.should.be.equal(403);
+          bodyParsed.Error.should.be.equal("Unable to authorize - wrong password!");
+          done();
+        }
+      });
+    });
+
+    it('makes this user to have the correct response for failing to login via /api/v1/buyer/login', function (done) {
+      request({
+        'method': 'POST',
+        'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+        'headers': { },
+        'form': {
+          'apiKey': 'thisIsSomeStupidWelcomeLink1111',
+          'password': 'fiflesAndFufles'
+        }
+      }, function (error, response, body) {
+        if (error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(403);
+          var bodyParsed = JSON.parse(body);
+          bodyParsed.Code.should.be.equal(403);
+          bodyParsed.Error.should.be.equal("Unable to authorize - wrong welcome link!");
+          done();
+        }
+      });
+    });
+
+
     it('makes this user to have the correct response for setting password via /api/v1/buyer/setPassword', function (done) {
       request({
         'method': 'POST',
