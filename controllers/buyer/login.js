@@ -169,6 +169,12 @@ module.exports = exports = function(core){
                   if(error){
                     throw error;
                   } else {
+                    userFound.notifyByEmail({
+                      'subject':'Your password is changed!',
+                      'template':'emails/updPassword',
+                      'name':userFound.name,
+                      'ip': request.ip
+                    });
                     response.status(201);
                     response.json({
                       'Code':201,
