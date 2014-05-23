@@ -170,60 +170,61 @@ describe('Unit test for user authorization by welcome link', function () {
           done();
         }
       });
+    });
 
-      it('makes this user to have correct response for authorizing via /api/v1/buyer/login', function (done) {
-        request({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/login',
-          'headers': { },
-          'form': {
-            'apiKey': welcomeLink,
-            'password': 'fiflesAndFufles'
-          }
-        }, function (error, response, body) {
-          if (error) {
-            done(error);
-          } else {
-            response.statusCode.should.be.equal(201);
-            var bodyParsed = JSON.parse(body);
-            bodyParsed.Code.should.be.equal(201);
-            bodyParsed.Success.should.be.equal('Welcome!');
-            bodyParsed.huntKey.should.be.a.String;
-            buyerHuntKey = bodyParsed.huntKey;
-            done();
-          }
-        });
-      });
-
-      it('actually authorizes user via header based sessions', function (done) {
-        request({
-          'method': 'GET',
-          'url': 'http://localhost:' + port + '/api/v1/myself',
-          'headers': {'huntKey': buyerHuntKey}
-        }, function (error, response, body) {
-          response.statusCode.should.be.equal(200);
+    it('makes this user to have correct response for authorizing via /api/v1/buyer/login', function (done) {
+      request({
+        'method': 'POST',
+        'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+        'headers': { },
+        'form': {
+          'apiKey': welcomeLink,
+          'password': 'fiflesAndFufles'
+        }
+      }, function (error, response, body) {
+        if (error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(201);
           var bodyParsed = JSON.parse(body);
-          bodyParsed.id.should.be.equal(userId);
+          bodyParsed.Code.should.be.equal(201);
+          bodyParsed.Success.should.be.equal('Welcome!');
+          bodyParsed.huntKey.should.be.a.String;
+          buyerHuntKey = bodyParsed.huntKey;
           done();
-        });
-      });
-
-      it('makes this user to have correct response on /api/v1/api/v1/buyer/needToSetPassword/:welcomeLink', function (done) {
-        request({
-          'method': 'GET',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/needToSetPassword/' + welcomeLink,
-          'headers': { }
-        }, function (error, response, body) {
-          if (error) {
-            done(error);
-          } else {
-            response.statusCode.should.be.equal(200);
-            var bodyParsed = JSON.parse(body);
-            bodyParsed.needToSetPassword.should.be.true;
-            done();
-          }
-        });
+        }
       });
     });
+
+    it('actually authorizes user via header based sessions', function (done) {
+      request({
+        'method': 'GET',
+        'url': 'http://localhost:' + port + '/api/v1/myself',
+        'headers': {'huntKey': buyerHuntKey}
+      }, function (error, response, body) {
+        response.statusCode.should.be.equal(200);
+        var bodyParsed = JSON.parse(body);
+        bodyParsed.id.should.be.equal(userId);
+        done();
+      });
+    });
+
+    it('makes this user to have correct response on /api/v1/api/v1/buyer/needToSetPassword/:welcomeLink', function (done) {
+      request({
+        'method': 'GET',
+        'url': 'http://localhost:' + port + '/api/v1/buyer/needToSetPassword/' + welcomeLink,
+        'headers': { }
+      }, function (error, response, body) {
+        if (error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(200);
+          var bodyParsed = JSON.parse(body);
+          bodyParsed.needToSetPassword.should.be.false;
+          done();
+        }
+      });
+    });
+
   });
 });
