@@ -333,8 +333,8 @@ module.exports = exports = function (core) {
   });
 //https://oselot.atlassian.net/browse/ACR-58
   core.app.post('/api/v1/admin/createOwner', function (request, response) {
-    if (request.body.email && request.body.password) {
-      request.model.User.signUp(request.username, request.password, function (error, userCreated) {
+    if (request.body.username && request.body.password) {
+      request.model.User.signUp(request.body.username, request.body.password, function (error, userCreated) {
         if (error) {
           throw error;
         } else {
