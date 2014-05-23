@@ -95,7 +95,7 @@ POST /api/v1/buyer/login
 -- Buyer/Owner profile json --
 
 Get information about currently authenticated (by cookie based session) user
-Additional info about sessionless authorization is published here https://bitbucket.org/ocelot/amazingcreditresults.com-backend
+Additional info about sessionless authorization is published here https://bitbucket.org/oselot/amazingcreditresults.com-backend
 GET /auth/myself
 < 200
 < Content-Type: application/json; charset=utf-8
@@ -126,7 +126,7 @@ GET /auth/myself
 
 
 Get information about currently authenticated (by cookie based session) user
-Additional info about sessionless authorization is published here https://bitbucket.org/ocelot/amazingcreditresults.com-backend
+Additional info about sessionless authorization is published here https://bitbucket.org/oselot/amazingcreditresults.com-backend
 GET /api/v1/myself
 < 200
 < Content-Type: application/json; charset=utf-8
