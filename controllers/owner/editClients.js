@@ -3,15 +3,15 @@ var welcomeLinkGenerator = require('./../../lib/welcome.js');
 
 module.exports = exports = function (core) {
 
-  var frmDt = function (date) {
-    var h = today.getHours();
-    var m = today.getMinutes();
-    var s = today.getSeconds();
+  var frmDt = function (today) {
+    var h = today.getHours(),
+     m = today.getMinutes();
+
     h = h % 12;
     h = h ? h : 12; // the hour '0' should be '12'
+
     var ampm = h >= 12 ? 'PM' : 'AM';
     m = m < 10 ? '0' + m : m;
-    s = s < 10 ? '0' + s : s;
     return (today.toLocaleDateString() + ' ' + h + ':' + m + ' ' + ampm + ' GMT');
   };
 
