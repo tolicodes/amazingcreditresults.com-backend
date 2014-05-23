@@ -172,6 +172,51 @@ describe('Unit test for user authorization by welcome link', function () {
       });
     });
 
+    it('makes this user to have the correct response for failing to set password via /api/v1/buyer/setPassword', function (done) {
+      request({
+        'method': 'POST',
+        'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
+        'headers': { },
+        'form': {
+          'notApiKey': welcomeLink,
+          'password': 'fiflesAndFufles'
+        }
+      }, function (error, response, body) {
+        if (error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(400);
+          var bodyParsed = JSON.parse(body);
+          bodyParsed.Code.should.be.equal(400);
+          bodyParsed.Error.should.be.equal('Missed parameter - `apiKey` or `password`!');
+          done();
+        }
+      });
+    });
+
+    it('makes this user to have the correct response for failing to set password via /api/v1/buyer/setPassword', function (done) {
+      request({
+        'method': 'POST',
+        'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
+        'headers': { },
+        'form': {
+          'apiKey': 'thisIsSomeStupidWelcomeLink1111',
+          'password': 'fiflesAndFufles'
+        }
+      }, function (error, response, body) {
+        if (error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(400);
+          var bodyParsed = JSON.parse(body);
+          bodyParsed.Code.should.be.equal(400);
+          bodyParsed.Error.should.be.equal("Wrong or outdated welcome link! Please, contact support for a new one!");
+          done();
+        }
+      });
+    });
+
+
     it('makes this user to have correct response for authorizing via /api/v1/buyer/login', function (done) {
       request({
         'method': 'POST',
