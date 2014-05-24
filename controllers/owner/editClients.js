@@ -101,7 +101,13 @@ module.exports = exports = function (core) {
           });
         } else {
           response.status(404);
-          response.json({'Code': 404, 'Error': 'User with this id do not exists!'});
+          response.json({
+            'status': 'Error',
+            'errors': [{
+              'code': 404,
+              'message': 'User with this id do not exists!'
+            }]
+          });
         }
       }
     });
@@ -168,7 +174,13 @@ module.exports = exports = function (core) {
             });
           } else {
             response.status(404);
-            response.json({'Code': 404, 'Error': 'User with this ID do not exists!'});
+            response.json({
+              'status': 'Error',
+              'errors': [{
+                'code': 404,
+                'message': 'User with this ID do not exists!'
+              }]
+            });
           }
         }
       }
@@ -238,7 +250,13 @@ module.exports = exports = function (core) {
       });
     } else {
       response.status(400);
-      response.json({'Code': 400, 'Error': 'Required value of ' + missed + ' is missed!'});
+      response.json({
+        'status': 'Error',
+        'errors': [{
+          'code': 400,
+          'message': 'Required value of ' + missed + ' is missed!'
+        }]
+      });
     }
   });
 
@@ -353,7 +371,25 @@ module.exports = exports = function (core) {
       });
     } else {
       response.status(400);
-      response.json({'error': 'Fields of username or password are missed'});
+      var errors = [];
+      if (!request.body.apiKey) {
+        errors.push({
+          'code': 400,
+          'message': 'Missed parameter - `username`!',
+          'field': 'username'
+        });
+      }
+      if (!request.body.password) {
+        errors.push({
+          'code': 400,
+          'message': 'Missed parameter - `password`!',
+          'field': 'password'
+        });
+      }
+      response.json({
+        'status': 'Error',
+        'errors': errors
+      });
     }
   });
 };
