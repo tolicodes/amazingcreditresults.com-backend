@@ -289,7 +289,7 @@ describe('/api/v1/owner/clients API resource test', function(){
         var params = url.parse(bodyParsed.welcomeLink);
         ['http:','https:'].should.include(params.protocol);
         params.pathname.should.be.equal('/');
-        params.hash.should.match(/^\#setPassword\/[a-z]+$/);
+        params.hash.should.match(/^\#login\/[a-z]+$/);
         bodyParsed.user.id.should.be.equal(clientId);
         done();
       }
