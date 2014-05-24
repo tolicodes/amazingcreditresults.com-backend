@@ -306,7 +306,7 @@ module.exports = exports = function (core) {
             },
             function (newApiKey, cb) {
 //              welcomeLink = core.config.hostUrl+'buyer/welcome/'+welcomeLink;
-              welcomeLink = core.config.hostUrl + '#setPassword/' + welcomeLink;
+              welcomeLink = core.config.hostUrl + '#login/' + welcomeLink;
               userFound.notifyByEmail({
                 'layout': false,
                 'template': 'emails/welcomeResetPassword',
