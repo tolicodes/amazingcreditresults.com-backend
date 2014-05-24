@@ -39,11 +39,25 @@ Verify, if this welcomeLink is valid - not outdated, have Buyer associated with 
 GET /api/v1/buyer/needToSetPassword/:welcomeLink
 < 200
 < Content-Type: application/json; charset=utf-8
-{"needToSetPassword":true}
+{
+    "needToSetPassword":true,
+    "name":{
+        "familyName": "Doe",
+        "middleName": "Theodor",
+        "givenName": "John"
+    }
+}
 +++++
 < 200
 < Content-Type: application/json; charset=utf-8
-{"needToSetPassword":false}
+{
+    "needToSetPassword":false,
+    "name":{
+        "familyName": "Doe",
+        "middleName": "Theodor",
+        "givenName": "John"
+    }
+}
 +++++
 < 400
 < Content-Type: application/json; charset=utf-8

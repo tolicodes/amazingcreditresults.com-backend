@@ -319,12 +319,14 @@ module.exports = exports = function(core){
               if(!userFound.accountVerified){
 //2. The first time a Buyer clicks the link, s/he will see a prompt asking to create a password
                 response.json({
-                  'needToSetPassword':true
+                  'needToSetPassword':true,
+                  'name': userFound.name
                 });
               } else {
 //3. The second time a Buyer click the link, s/he will be prompted for the password
                 response.json({
-                  'needToSetPassword':false
+                  'needToSetPassword':false,
+                  'name': userFound.name
                 });
               }
             } else {
