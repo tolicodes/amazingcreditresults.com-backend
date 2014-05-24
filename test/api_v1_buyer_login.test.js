@@ -120,8 +120,6 @@ describe('Unit test for user authorization by welcome link', function () {
         } else {
           response.statusCode.should.be.equal(403);
           var bodyParsed = JSON.parse(body);
-          bodyParsed.status.should.be.equal('Error');
-          bodyParsed.errors.should.be.an.Array;
           done();
         }
       });
@@ -142,8 +140,6 @@ describe('Unit test for user authorization by welcome link', function () {
         } else {
           response.statusCode.should.be.equal(403);
           var bodyParsed = JSON.parse(body);
-          bodyParsed.status.should.be.equal('Error');
-          bodyParsed.errors.should.be.an.Array;
           done();
         }
       });
@@ -187,8 +183,6 @@ describe('Unit test for user authorization by welcome link', function () {
         } else {
           response.statusCode.should.be.equal(400);
           var bodyParsed = JSON.parse(body);
-          bodyParsed.status.should.be.equal('Error');
-          bodyParsed.errors.should.be.an.Array;
           done();
         }
       });
@@ -209,8 +203,6 @@ describe('Unit test for user authorization by welcome link', function () {
         } else {
           response.statusCode.should.be.equal(400);
           var bodyParsed = JSON.parse(body);
-          bodyParsed.status.should.be.equal('Error');
-          bodyParsed.errors.should.be.an.Array;
           done();
         }
       });
