@@ -100,8 +100,15 @@ Hunt.extendRoutes(function(core){
 //https://oselot.atlassian.net/browse/ACR-105
 Hunt.extendMiddleware(function(core){
   return function(error,request,response,next){
-    response.status(500);
-    response.json({'code':500,'Message':'Internal server error','error':error.message, 'stack':error.stack});
+      response.status(500);
+      response.json({
+        "status": "Error",
+        "errors": [ {
+          "code": 500,
+          "message": error.message
+        }
+        ]
+      });
   };
 });
 

@@ -186,16 +186,24 @@ module.exports = exports = function(core){
 //key is outdated
                 response.status(400);
                 response.json({
-                  'Code':400,
-                  'Error':'Wrong or outdated welcome link! Please, contact support for a new one!'
+                  'status': 'Error',
+                  'errors': [{
+                    'code': 400,
+                    'message': 'Wrong or outdated welcome link! Please, contact support for a new one!',
+                    }
+                  ]
                 });
               }
             } else {
 //user is do not exists, or set his/her password already, or is owner
               response.status(400);
               response.json({
-                'Code':400,
-                'Error':'Wrong or outdated welcome link! Please, contact support for a new one!'
+                  'status': 'Error',
+                  'errors': [{
+                    'code': 400,
+                    'message': 'Wrong or outdated welcome link! Please, contact support for a new one!'
+                    }
+                  ]
               });
             }
           }
@@ -203,9 +211,24 @@ module.exports = exports = function(core){
     } else {
 //no apiKey or password in post request body
       response.status(400);
+      var errors=[];
+      if(!request.body.apiKey){
+        errors.push({
+          'code': 400,
+          'message': 'Missed parameter - `apiKey`!',
+          'field':'apiKey'
+          });
+      }
+      if(!request.body.password){
+        errors.push({
+          'code': 400,
+          'message': 'Missed parameter - `password`!',
+          'field':'password'
+          });
+      }
       response.json({
-        'Code':400,
-        'Error':'Missed parameter - `apiKey` or `password`!'
+        'status': 'Error',
+        'errors': errors
       });
     }
   });
@@ -236,26 +259,49 @@ module.exports = exports = function(core){
               } else {
                 response.status(403);
                 response.json({
-                  'Code':403,
-                  'Error':'Unable to authorize - wrong password!'
+                  'status': 'Error',
+                  'errors': [{
+                    'code':403,
+                    'message':'Unable to authorize - wrong password!',
+                    'field':'password'
+                  }]
                 });
               }
             } else {
               response.status(403);
               response.json({
-                'Code':403,
-                'Error':'Unable to authorize - wrong welcome link!'
+                  'status': 'Error',
+                  'errors': [{
+                    'code':403,
+                    'message':'Unable to authorize - wrong welcome link!',
+                    'field':'welcome'
+                  }]
               });
             }
           }
         });
       } else {
 //no apiKey and password in post request body
-        response.status(400);
-        response.json({
-          'Code':400,
-          'Error':'Missed parameter - `apiKey` or `password`!'
-        });
+      response.status(400);
+      var errors=[];
+      if(!request.body.apiKey){
+        errors.push({
+          'code': 400,
+          'message': 'Missed parameter - `apiKey`!',
+          'field':'apiKey'
+          });
+      }
+      if(!request.body.password){
+        errors.push({
+          'code': 400,
+          'message': 'Missed parameter - `password`!',
+          'field':'password'
+          });
+      }
+      response.json({
+        'status': 'Error',
+        'errors': errors
+      });
       }
     }
   });
@@ -285,22 +331,26 @@ module.exports = exports = function(core){
 //key is outdated
               response.status(400);
               response.json({
-                'Code':400,
-                'Error':'Link is outdated!'
+                'status': 'Error',
+                  'errors': [{
+                    'code':400,
+                    'message':'Link is outdated!'
+                  }]
               });
             }
           } else {
 //there is nobody, who has this key!
             response.status(404);
             response.json({
-              'Code':404,
-              'Error':'Link is not valid!'
+                'status': 'Error',
+                  'errors': [{
+                    'code':404,
+                    'message':'Link is not valid!'
+                  }]
             });
           }
         }
       }
     );
   });
-
-
 };

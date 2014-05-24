@@ -120,8 +120,8 @@ describe('Unit test for user authorization by welcome link', function () {
         } else {
           response.statusCode.should.be.equal(403);
           var bodyParsed = JSON.parse(body);
-          bodyParsed.Code.should.be.equal(403);
-          bodyParsed.Error.should.be.equal("Unable to authorize - wrong password!");
+          bodyParsed.status.should.be.equal('Error');
+          bodyParsed.errors.should.be.an.Array;
           done();
         }
       });
@@ -142,8 +142,8 @@ describe('Unit test for user authorization by welcome link', function () {
         } else {
           response.statusCode.should.be.equal(403);
           var bodyParsed = JSON.parse(body);
-          bodyParsed.Code.should.be.equal(403);
-          bodyParsed.Error.should.be.equal("Unable to authorize - wrong welcome link!");
+          bodyParsed.status.should.be.equal('Error');
+          bodyParsed.errors.should.be.an.Array;
           done();
         }
       });
@@ -187,8 +187,8 @@ describe('Unit test for user authorization by welcome link', function () {
         } else {
           response.statusCode.should.be.equal(400);
           var bodyParsed = JSON.parse(body);
-          bodyParsed.Code.should.be.equal(400);
-          bodyParsed.Error.should.be.equal('Missed parameter - `apiKey` or `password`!');
+          bodyParsed.status.should.be.equal('Error');
+          bodyParsed.errors.should.be.an.Array;
           done();
         }
       });
@@ -209,8 +209,8 @@ describe('Unit test for user authorization by welcome link', function () {
         } else {
           response.statusCode.should.be.equal(400);
           var bodyParsed = JSON.parse(body);
-          bodyParsed.Code.should.be.equal(400);
-          bodyParsed.Error.should.be.equal("Wrong or outdated welcome link! Please, contact support for a new one!");
+          bodyParsed.status.should.be.equal('Error');
+          bodyParsed.errors.should.be.an.Array;
           done();
         }
       });
