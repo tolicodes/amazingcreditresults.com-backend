@@ -332,16 +332,24 @@ module.exports = exports = function (core) {
 //key is outdated
               response.status(400);
               response.json({
-                'Code': 400,
-                'Error': 'Link is outdated!'
+                'status': 'Error',
+                'errors': [{
+                    "code": 400,
+                    'message': 'Link is outdated!'
+                  }
+                ]
               });
             }
           } else {
 //there is nobody, who has this key!
             response.status(404);
             response.json({
-              'Code': 404,
-              'Error': 'Link is not valid!'
+                'status': 'Error',
+                'errors': [{
+                    "code": 404,
+                    'message': 'Link is not valid!'
+                  }
+                ]
             });
           }
         }
