@@ -66,11 +66,42 @@ core.app.get('/api/v1/owner/products/:id', ensureUserIsOwnerMiddleware, function
 });
 
 core.app.post('/api/v1/owner/products', ensureUserIsOwnerMiddleware, function(request, response){
-
+  var params = {
+    'name': request.body.name,
+    'bank': request.body.bank,
+    'type': request.body.type,
+    'ncRating': request.body.ncRating,
+    'bcRating': request.body.bcRating,
+    'moRating': request.body.moRating,
+    'reportsToExperian': request.body.reportsToExperian,
+    'reportsToEquifax': request.body.reportsToEquifax,
+    'reportsToTransunion': request.body.reportsToTransunion
+  };
+  request.model.Product.create(params, function(error, productCreated){
+    if(error) {
+      throw error;
+    } else {
+      response.status(201);
+      response.json({'data':productCreated});
+    }
+  });
 });
 
 core.app.put('/api/v1/owner/products/:id', ensureUserIsOwnerMiddleware, function(request, response){
-
+  var patch = { };
+  request.model.Product.findOneAndUpdate({
+        '_id': request.params.id,
+        'root': false
+    },
+    patch,
+    function(error, productUpdated){
+      if(error) {
+        throw error;
+      } else {
+        response.status(201);
+        response.json({'data': productUpdated});
+      }
+  });
 });
 
 core.app.delete('/api/v1/owner/products/:id', ensureUserIsOwnerMiddleware, function(request, response){
