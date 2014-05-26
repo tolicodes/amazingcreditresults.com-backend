@@ -14,7 +14,7 @@
  */
 
 module.exports = exports = function (core) {
-  var ranks = ['Bronze', 'Silver', 'Platinium'],
+  var ranks = ['None','Bronze', 'Silver', 'Gold'],
     types = ['MasterCard', 'Visa', 'American Express', 'Discover'];
 
   var ProductSchema = new core.mongoose.Schema({

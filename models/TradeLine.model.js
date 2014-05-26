@@ -18,7 +18,7 @@
  */
 
 module.exports = exports = function (core) {
-  var ranks = ['Bronze', 'Silver', 'Platinium'];
+  var ranks = ['None','Bronze', 'Silver', 'Gold'];
 
   var TradeLineSchema = new core.mongoose.Schema({
       'product': { type: core.mongoose.Schema.Types.ObjectId, ref: 'Product' },
