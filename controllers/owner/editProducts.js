@@ -87,12 +87,22 @@ core.app.post('/api/v1/owner/products', ensureUserIsOwnerMiddleware, function(re
   });
 });
 
+//actually the patch behavior
 core.app.put('/api/v1/owner/products/:id', ensureUserIsOwnerMiddleware, function(request, response){
-  var patch = { };
-  request.model.Product.findOneAndUpdate({
-        '_id': request.params.id,
-        'root': false
-    },
+  var patch = {};
+
+  [
+    'name','bank','type','ncRating','bcRating',
+    'moRating','reportsToExperian',
+    'reportsToEquifax','reportsToTransunion'
+  ].map(function(n){
+    if(request.body[n]) {
+      patch[n] = request.body[n];
+    }
+  });
+
+
+  request.model.Product.findOneAndUpdate({'_id': request.params.id,},
     patch,
     function(error, productUpdated){
       if(error) {
