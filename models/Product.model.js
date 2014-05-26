@@ -94,7 +94,7 @@ module.exports = exports = function (core) {
       'ncRating': this.ncRating,
       'bcRating': this.bcRating,
       'moRating': this.moRating,
-//*/
+/*/
       '_ncRating': this._ncRating,
       '_bcRating': this._bcRating,
       '_moRating': this._moRating,

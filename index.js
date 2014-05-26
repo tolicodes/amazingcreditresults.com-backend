@@ -78,6 +78,7 @@ Hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
 //loading different controllers for owners
 Hunt.extendRoutes(require('./controllers/owner/login.js'));
 Hunt.extendRoutes(require('./controllers/owner/editClients.js'));
+Hunt.extendRoutes(require('./controllers/owner/editProducts.js'));
 
 //loading controller shared by owners and buyers
 Hunt.extendRoutes(require('./controllers/shared.js'));
@@ -113,9 +114,9 @@ Hunt.extendMiddleware(function(core){
 });
 
 Hunt.on('start', function(evnt){
-//creating test owner in development environment!
+//populating database with test data in development environment!
   if(Hunt.config.env === 'development') {
-    require('./lib/populateDatabase.js')(Hunt); //uncomment to repopulate database on every start
+//    require('./lib/populateDatabase.js')(Hunt); //uncomment to repopulate database on every start
   }
 
   var welcomeLinkGenerator = require('./lib/welcome.js');

@@ -2,7 +2,7 @@ module.exports = exports = function(core){
   core.app.get('/api/v1/tradelines', function(request, response){
     if(request.user){
       request.model.TradeLine.find()
-        .skip(0)
+        .skip(0) //todo - pagination. later, when the data structure is accepted
         .limit(15)
 //        .populate('seller')
         .populate('product')
