@@ -1,25 +1,10 @@
-/*
-
- id
- name - Saphire
- bank - CHASE
- nc_rating - 0-2 (Bronze, Silver, Platinium)
- bc_rating - 0-2 (Bronze, Silver, Platinium)
- mo_rating - 0-2 (Bronze, Silver, Platinium)
- reports_to_experian - TRUE
- reports_to_equifax - FALSE
- reports_to_transunion - TRUE
- notes - Blah Blah
- maximum_aus -
- */
-
 module.exports = exports = function (core) {
   var ranks = ['None','Bronze', 'Silver', 'Gold'],
     types = ['MasterCard', 'Visa', 'American Express', 'Discover'];
 
   var ProductSchema = new core.mongoose.Schema({
-    'name': {type: String},
-    'bank': {type: String},
+    'name': {type: String, required: true},
+    'bank': {type: String, required: true},
     '_ncRating': { type: Number, min: 0, max: 2, default: 0 },
     '_bcRating': { type: Number, min: 0, max: 2, default: 0 },
     '_moRating': { type: Number, min: 0, max: 2, default: 0 },
@@ -36,9 +21,23 @@ module.exports = exports = function (core) {
   });
 
   ProductSchema.index({
-    name: 1
+    name: 1 //todo - more indexes? depends on workflow...
   });
 
+  ProductSchema.pre('remove', function(next){
+    var t = this;
+    core.model.TradeLine.count({'product':t._id}, function(error, tradeLinesFound){
+      if(error) {
+        next(error);
+      } else {
+        if(tradeLinesFound === 0){
+          next();
+        } else {
+          next(new Error('Unable to remove this Product. It is used by '+tradeLinesFound+' tradelines!'));
+        }
+      }
+    });
+  });
 
   ProductSchema.virtual('ncRating')
     .get(function () {
@@ -83,7 +82,7 @@ module.exports = exports = function (core) {
         this._type = i;
       }
     });
-//*/
+
   ProductSchema.methods.toJSON = function () {
     return {
       'id': this.id,
@@ -105,6 +104,6 @@ module.exports = exports = function (core) {
       'reportsToTransunion': this.reportsToTransunion
     }
   };
-//*/
+
   return core.mongoConnection.model('Product', ProductSchema);
 };

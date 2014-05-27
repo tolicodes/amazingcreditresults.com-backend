@@ -124,8 +124,7 @@ Hunt.extendMiddleware(function(core){
         "errors": [ {
           "code": 500,
           "message": error.message
-        }
-        ]
+        }]
       });
     }
   };
