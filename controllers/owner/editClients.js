@@ -15,14 +15,7 @@ module.exports = exports = function (core) {
     return (today.toLocaleDateString() + ' ' + h + ':' + m + ' ' + ampm + ' GMT');
   };
 
-  var ensureAdmin = function (request, response, next) {
-    if (request.user && request.user.root) {
-      next();
-    } else {
-      request.flash('error', 'Authentication required!');
-      response.redirect('/admin/login');
-    }
-  };
+  var ensureAdmin = require('./middleware.js');
 
   core.app.get('/admin/clients', ensureAdmin, function (request, response) {
     response.render('owner/editClientsDev', {'title': 'Edit clients'})
