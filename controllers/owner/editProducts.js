@@ -70,17 +70,18 @@ module.exports = exports = function (core) {
   });
 
   core.app.post('/api/v1/owner/products', ensureUserIsOwnerMiddleware, function (request, response) {
-    var params = {
-      'name': request.body.name,
-      'bank': request.body.bank,
-      'type': request.body.type,
-      'ncRating': request.body.ncRating,
-      'bcRating': request.body.bcRating,
-      'moRating': request.body.moRating,
-      'reportsToExperian': request.body.reportsToExperian,
-      'reportsToEquifax': request.body.reportsToEquifax,
-      'reportsToTransunion': request.body.reportsToTransunion
-    };
+    var params = {};
+
+    [
+      'name', 'bank', 'type', 'ncRating', 'bcRating',
+      'moRating', 'reportsToExperian',
+      'reportsToEquifax', 'reportsToTransunion'
+    ].map(function (n) {
+        if (request.body[n]) {
+          params[n] = request.body[n];
+        }
+    });
+
     request.model.Product.create(params, function (error, productCreated) {
       if (error) {
         throw error;
@@ -103,7 +104,7 @@ module.exports = exports = function (core) {
         if (request.body[n]) {
           patch[n] = request.body[n];
         }
-      });
+    });
 
 
     request.model.Product.findOneAndUpdate({'_id': request.params.id},
