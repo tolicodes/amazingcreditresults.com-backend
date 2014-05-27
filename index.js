@@ -74,6 +74,7 @@ Hunt.extendMiddleware(function(core){
 //loading different controllers for buyers
 Hunt.extendRoutes(require('./controllers/buyer/login.js'));
 Hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
+Hunt.extendRoutes(require('./controllers/buyer/sessionBasedLogin.js')); //deprecated
 
 //loading different controllers for owners
 Hunt.extendRoutes(require('./controllers/owner/login.js'));
@@ -100,7 +101,7 @@ Hunt.extendRoutes(function(core){
 //JSON error reporter middleware.
 //https://oselot.atlassian.net/browse/ACR-105
 Hunt.extendMiddleware(function(core){
-  return function(error, request,response,next){
+  return function(error, request, response, next){
 //http://mongoosejs.com/docs/validation.html
     if(error.name === 'ValidationError') {
       response.status(400);
