@@ -74,11 +74,13 @@ Hunt.extendMiddleware(function(core){
 //loading different controllers for buyers
 Hunt.extendRoutes(require('./controllers/buyer/login.js'));
 Hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
+Hunt.extendRoutes(require('./controllers/buyer/sessionBasedLogin.js')); //deprecated
 
 //loading different controllers for owners
 Hunt.extendRoutes(require('./controllers/owner/login.js'));
 Hunt.extendRoutes(require('./controllers/owner/editClients.js'));
 Hunt.extendRoutes(require('./controllers/owner/editProducts.js'));
+Hunt.extendRoutes(require('./controllers/owner/editTradelines.js'));
 
 //loading controller shared by owners and buyers
 Hunt.extendRoutes(require('./controllers/shared.js'));
@@ -100,16 +102,33 @@ Hunt.extendRoutes(function(core){
 //JSON error reporter middleware.
 //https://oselot.atlassian.net/browse/ACR-105
 Hunt.extendMiddleware(function(core){
-  return function(error,request,response,next){
+  return function(error, request, response, next){
+//http://mongoosejs.com/docs/validation.html
+    if(error.name === 'ValidationError') {
+      response.status(400);
+      var errs=[];
+      for (var x in error.errors){
+        errs.push({
+          'code':400,
+          'message': error.errors[x].message,
+          'field': error.errors[x].path,
+          'value': error.errors[x].value,
+        });
+      }
+      response.json({
+        "status": "Error",
+        "errors": errs
+      });
+    } else {
       response.status(500);
       response.json({
         "status": "Error",
         "errors": [ {
           "code": 500,
           "message": error.message
-        }
-        ]
+        }]
       });
+    }
   };
 });
 

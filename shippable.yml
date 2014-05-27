@@ -1,0 +1,22 @@
+# Build Environment
+build_environment: Ubuntu 12.04
+
+# language setting
+language: node_js
+
+# version numbers, testing against two versions of node
+node_js:
+  - 0.10.28
+
+# services to use
+services:
+  - redis
+  - mongodb
+
+notifications:
+    email:
+        recipients:
+            - anatolij@oselot.com
+            - anatolij.nowak@yandex.ru
+         on_success: change
+         on_failure: always

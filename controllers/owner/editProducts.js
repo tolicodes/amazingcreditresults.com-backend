@@ -1,22 +1,7 @@
 module.exports = exports = function (core) {
 //https://oselot.atlassian.net/browse/ACR-191
 
-  function ensureUserIsOwnerMiddleware(request, response, next) {
-    if (request.user && request.user.root) {
-      next();
-    } else {
-      response.status(403);
-      response.json({
-        'status': 'Error',
-        'errors': [
-          {
-            'code': 403,
-            'message': 'Access denied!'
-          }
-        ]
-      });
-    }
-  }
+  var ensureUserIsOwnerMiddleware = require('./middleware.js');
 
   function formatProduct(product) {
     return product;
@@ -70,17 +55,18 @@ module.exports = exports = function (core) {
   });
 
   core.app.post('/api/v1/owner/products', ensureUserIsOwnerMiddleware, function (request, response) {
-    var params = {
-      'name': request.body.name,
-      'bank': request.body.bank,
-      'type': request.body.type,
-      'ncRating': request.body.ncRating,
-      'bcRating': request.body.bcRating,
-      'moRating': request.body.moRating,
-      'reportsToExperian': request.body.reportsToExperian,
-      'reportsToEquifax': request.body.reportsToEquifax,
-      'reportsToTransunion': request.body.reportsToTransunion
-    };
+    var params = {};
+
+    [
+      'name', 'bank', 'type', 'ncRating', 'bcRating',
+      'moRating', 'reportsToExperian',
+      'reportsToEquifax', 'reportsToTransunion'
+    ].map(function (n) {
+        if (request.body[n]) {
+          params[n] = request.body[n];
+        }
+    });
+
     request.model.Product.create(params, function (error, productCreated) {
       if (error) {
         throw error;
@@ -103,7 +89,7 @@ module.exports = exports = function (core) {
         if (request.body[n]) {
           patch[n] = request.body[n];
         }
-      });
+    });
 
 
     request.model.Product.findOneAndUpdate({'_id': request.params.id},

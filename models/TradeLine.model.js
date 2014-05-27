@@ -21,8 +21,8 @@ module.exports = exports = function (core) {
   var ranks = ['None','Bronze', 'Silver', 'Gold'];
 
   var TradeLineSchema = new core.mongoose.Schema({
-      'product': { type: core.mongoose.Schema.Types.ObjectId, ref: 'Product' },
-      'seller': { type: core.mongoose.Schema.Types.ObjectId, ref: 'User' },
+      'product': { type: core.mongoose.Schema.Types.ObjectId, ref: 'Product', required:true },
+      'seller': { type: core.mongoose.Schema.Types.ObjectId, ref: 'User', required:true },
       'totalAus': { type: Number, min: 0, max: 9999 },
       'usedAus': { type: Number, min: 0, max: 9999 },
       'creditLimit': { type: Number, min: 0, max: 999999 },
@@ -40,6 +40,45 @@ module.exports = exports = function (core) {
     }
   );
 //todo - add parameters for length of credit history, credit score, debt to income ratio, etc. so we can extract more precisious the tradelines
+
+  TradeLineSchema.index({
+    product: 1,
+    seller: 1
+//    _ncRating: 1, //not sure - depends on workflow
+//    _bcRating: 1,
+//    _moRating: 1
+  });
+
+  TradeLineSchema.pre('save', function(next){
+    var t = this;
+    core.model.Product.findById(t.product, function(error, productFound){
+      if(error) {
+        next(error);
+      } else {
+        if(productFound) {
+          next();
+        } else {
+          next(new Error('Unable to find corresponding Product'));
+        }
+      }
+    });
+  });
+
+  TradeLineSchema.pre('save', function(next){
+    var t = this;
+    core.model.User.findById(t.seller, function(error, sellerFound){
+      if(error) {
+        next(error);
+      } else {
+        if(sellerFound) {
+          next();
+        } else {
+          next(new Error('Unable to find corresponding Seller among the Users'));
+        }
+      }
+    });
+  });
+
 
   TradeLineSchema.virtual('ncRating')
     .get(function () {
@@ -79,14 +118,6 @@ module.exports = exports = function (core) {
         this._moRating = i;
       }
     });
-
-  TradeLineSchema.index({
-    product: 1,
-    seller: 1
-//    _ncRating: 1,
-//    _bcRating: 1,
-//    _moRating: 1
-  });
 
   TradeLineSchema.methods.toJSON = function () {
     return {
