@@ -599,3 +599,211 @@ POST /api/v1/admin/createOwner
   "root": true,
   "accountVerified": true
 }
+
+
+-- Owner resource to edit products --
+
+List all products
+GET /api/v1/owner/products
+< 200
+< Content-Type: application/json
+{
+    "metaData": {
+        "totalPages": 1,
+        "page": 1
+    },
+    "data": [
+        {
+            "id": "537e7a9567b9f6d7f81d13b6",
+            "name": "Visa Gemoroi 0",
+            "bank": "Sperbank (testing)",
+            "type": "MasterCard",
+            "ncRating": "None",
+            "bcRating": "None",
+            "moRating": "None",
+            "reportsToExperian": false
+        },
+        {
+            "id": "537e7a9567b9f6d7f81d13b7",
+            "name": "Visa Gemoroi 2",
+            "bank": "Sperbank (testing)",
+            "type": "MasterCard",
+            "ncRating": "None",
+            "bcRating": "None",
+            "moRating": "None",
+            "reportsToExperian": false
+        },
+        {
+            "id": "537e7a9567b9f6d7f81d13b8",
+            "name": "Visa Gemoroi 1",
+            "bank": "Sperbank (testing)",
+            "type": "MasterCard",
+            "ncRating": "None",
+            "bcRating": "None",
+            "moRating": "None",
+            "reportsToExperian": false
+        },
+        {
+            "id": "5383b1855c6102209833f31d",
+            "name": "Gemoroi 0",
+            "bank": "Sperbank (testing)",
+            "type": "MasterCard",
+            "ncRating": "None",
+            "bcRating": "None",
+            "moRating": "None",
+            "reportsToExperian": false,
+            "reportsToEquifax": false,
+            "reportsToTransunion": false
+        },
+        {
+            "id": "5383b1855c6102209833f31e",
+            "name": "Gemoroi 1",
+            "bank": "Sperbank (testing)",
+            "type": "MasterCard",
+            "ncRating": "None",
+            "bcRating": "None",
+            "moRating": "None",
+            "reportsToExperian": false,
+            "reportsToEquifax": false,
+            "reportsToTransunion": false
+        },
+        {
+            "id": "5383b1855c6102209833f31f",
+            "name": "Gemoroi 2",
+            "bank": "Sperbank (testing)",
+            "type": "MasterCard",
+            "ncRating": "None",
+            "bcRating": "None",
+            "moRating": "None",
+            "reportsToExperian": false,
+            "reportsToEquifax": false,
+            "reportsToTransunion": false
+        }
+    ]
+}
+
+
+Get one product by id
+GET /api/v1/owner/products/{:id}
+< 200
+< Content-Type: application/json
+{
+    "data": {
+        "id":"537e7a9567b9f6d7f81d13b6",
+        "name":"Visa Gemoroi 0",
+        "bank":"Sperbank (testing)",
+        "type":"MasterCard",
+        "ncRating":"None",
+        "bcRating":"None",
+        "moRating":"None",
+        "reportsToExperian":false
+    }
+}
+
+Update (patch) product
+PUT /api/v1/owner/products/{:id}
+> Content-Type: application/json
+{
+    "name":"Visa Gemoroi 0",
+    "bank":"Sperbank (testing)",
+    "type":"MasterCard",
+    "ncRating":"None",
+    "bcRating":"None",
+    "moRating":"None",
+    "reportsToExperian":false,
+    "reportsToEquifax": false,
+    "reportsToTransunion": false
+}
+< 201
+< Content-Type: application/json
+
+
+Delete product
+DELETE /api/v1/owner/products/{:id}
+< 202
+< Content-Type: application/json
+{"status": "deleted"}
+
+
+-- Owner resource to edit tradelines --
+
+List all tradelines
+GET /api/v1/owner/tradelines
+< 200
+< Content-Type: application/json
+{
+    "metaData": {},
+    "data": [
+        {
+            "id": "537e7a957ba2f24310e3ecb5",
+            "totalAus": 100,
+            "usedAus": 0,
+            "creditLimit": 0,
+            "cashLimit": 0,
+            "balance": 100,
+            "cost": 1000,
+            "notes": "Some notes",
+            "seller": {
+                "id": "536bd8b988dfc8adc31a1c44",
+                "name": {},
+                "gravatar": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
+                "gravatar30": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
+                "gravatar50": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
+                "gravatar80": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
+                "gravatar100": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=100&d=wavatar&r=g",
+                "online": true
+            },
+            "product": {
+                "id": "537e7a9567b9f6d7f81d13b6",
+                "name": "Visa Gemoroi 0",
+                "bank": "Sperbank (testing)",
+                "reportsToExperian": false,
+                "ncRating": "None",
+                "bcRating": "None",
+                "moRating": "None",
+                "type": "MasterCard"
+            },
+            "ncRating": "None",
+            "bcRating": "None",
+            "moRating": "None"
+        },
+        {
+            "id": "537e7a957ba2f24310e3ecb4",
+            "totalAus": 100,
+            "usedAus": 0,
+            "creditLimit": 0,
+            "cashLimit": 0,
+            "balance": 100,
+            "cost": 1000,
+            "notes": "Some notes",
+            "seller": {
+                "id": "536bd8b988dfc8adc31a1c44",
+                "name": {},
+                "gravatar": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
+                "gravatar30": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
+                "gravatar50": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
+                "gravatar80": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
+                "gravatar100": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=100&d=wavatar&r=g",
+                "online": true
+            },
+            "product": {
+                "id": "537e7a9567b9f6d7f81d13b6",
+                "name": "Visa Gemoroi 0",
+                "bank": "Sperbank (testing)",
+                "reportsToExperian": false,
+                "ncRating": "None",
+                "bcRating": "None",
+                "moRating": "None",
+                "type": "MasterCard"
+            },
+            "ncRating": "None",
+            "bcRating": "None",
+            "moRating": "None"
+        },
+    ]
+}
+
+Get one tradeline
+GET /api/v1/owner/tradelines/:id
+< 200
+< Content-Type: application/json

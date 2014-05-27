@@ -80,6 +80,7 @@ Hunt.extendRoutes(require('./controllers/buyer/sessionBasedLogin.js')); //deprec
 Hunt.extendRoutes(require('./controllers/owner/login.js'));
 Hunt.extendRoutes(require('./controllers/owner/editClients.js'));
 Hunt.extendRoutes(require('./controllers/owner/editProducts.js'));
+Hunt.extendRoutes(require('./controllers/owner/editTradelines.js'));
 
 //loading controller shared by owners and buyers
 Hunt.extendRoutes(require('./controllers/shared.js'));
