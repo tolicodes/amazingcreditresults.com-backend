@@ -124,6 +124,44 @@ describe('/api/v1/owner/products test', function(){
       }
     });
   });
-  it('owner can update product');
+
+  it('owner can update product', function(done){
+    request({
+      'method':'PUT',
+      'url':'http://localhost:'+port+'/api/v1/owner/products/'+productId,
+      'headers': { 'huntKey':ownerHuntKey },
+      'form' : {
+        'name': '1SuperMega'+testId,
+        'bank': '1SuperMegaBank'+testId,
+        'type': 'Visa',
+        'ncRating': 'Gold',
+        'bcRating': 'Gold',
+        'moRating': 'Gold',
+        'reportsToExperian': true,
+        'reportsToEquifax': true,
+        'reportsToTransunion': true
+      }
+    }, function(error, response, body){
+      if(error) {
+        done(error);
+      } else {
+        response.statusCode.should.be.equal(201);
+        var bodyParsed = JSON.parse(body);
+        bodyParsed.data.name.should.be.equal('1SuperMega'+testId);
+        bodyParsed.data.bank.should.be.equal('1SuperMegaBank'+testId);
+        bodyParsed.data.type.should.be.equal('Visa');
+        bodyParsed.data.ncRating.should.be.equal('Gold');
+        bodyParsed.data.bcRating.should.be.equal('Gold');
+        bodyParsed.data.moRating.should.be.equal('Gold');
+        bodyParsed.data.reportsToExperian.should.be.true;
+        bodyParsed.data.reportsToEquifax.should.be.true;
+        bodyParsed.data.reportsToTransunion.should.be.true;
+        bodyParsed.data.id.should.be.equal(productId);
+        done();
+      }
+    });
+
+  });
+
   it('owner can delete product with now tradelines associated');
 });

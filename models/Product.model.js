@@ -78,7 +78,7 @@ module.exports = exports = function (core) {
     })
     .set(function (val) {
       var i = types.indexOf(val);
-      if (i == -1) {
+      if (i !== -1) {
         this._type = i;
       }
     });
