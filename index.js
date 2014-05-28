@@ -135,7 +135,7 @@ Hunt.extendMiddleware(function(core){
 Hunt.on('start', function(evnt){
 //populating database with test data in development environment!
   if(Hunt.config.env === 'development') {
-//    require('./lib/populateDatabase.js')(Hunt); //uncomment to repopulate database on every start
+    require('./lib/populateDatabase.js')(Hunt); //uncomment to repopulate database on every start
   }
 
   var welcomeLinkGenerator = require('./lib/welcome.js');
