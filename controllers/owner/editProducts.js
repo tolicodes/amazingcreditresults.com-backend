@@ -1,5 +1,6 @@
-module.exports = exports = function (core) {
 //https://oselot.atlassian.net/browse/ACR-191
+
+module.exports = exports = function (core) {
 
   var ensureUserIsOwnerMiddleware = require('./middleware.js');
 

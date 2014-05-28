@@ -2,9 +2,9 @@ var request = require('request'),
   should = require('should'),
   port = process.env.PORT || 3000,
   ownerHuntKey,
-  productId;
+  tradeLineId;
 
-describe('/api/v1/owner/products test', function(){
+describe('/api/v1/owner/tradelines test', function(){
   before(function(done){
     request({
       'method':'POST',
@@ -27,9 +27,9 @@ describe('/api/v1/owner/products test', function(){
     });
   });
 
-  it('owner can create product');
-  it('owner can list products');
-  it('owner can list one product');
-  it('owner can update product');
-  it('owner can delete product with now tradelines associated');
+  it('owner can create tradeline');
+  it('owner can list tradelines');
+  it('owner can list one tradeline');
+  it('owner can update tradeline');
+  it('owner can delete tradeline?');
 });
