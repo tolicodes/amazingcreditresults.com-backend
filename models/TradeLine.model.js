@@ -1,22 +1,3 @@
-/*
-
- TRADELINE
- id
- card_id
- seller_id
- total_aus
- used_aus
- credit_limit
- cash_limit
- balance
- nc_rating
- bc_rating
- mo_rating
- cost
- price
-
- */
-
 module.exports = exports = function (core) {
   var ranks = ['None','Bronze', 'Silver', 'Gold'];
 

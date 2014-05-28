@@ -31,15 +31,83 @@ module.exports = exports = function (core) {
       });
   });
 
-  core.app.post('/api/v1/owner/tradelines', ensureUserIsOwnerMiddleware, function(request, response){
-
+  core.app.get('/api/v1/owner/tradelines/:id', ensureUserIsOwnerMiddleware, function(request, response){
+    request.model.TradeLine
+      .findById(request.params.id)
+      .exec(function(error, tradelineFound){
+        if(error){
+          throw error;
+        } else {
+          if(tradelineFound) {
+            response.json(tradelineFound);
+          } else {
+            response.status(404);
+            response.json({
+              'status': 'Error',
+              'errors': [{
+                'code': 404,
+                'message': 'Tradeline with this id '+request.params.id+' do not exists!'
+              }]
+            });
+          }
+        }
+      });
   });
 
-  core.app.get('/api/v1/owner/tradelines/:id', ensureUserIsOwnerMiddleware, function(request, response){
-
+  core.app.post('/api/v1/owner/tradelines', ensureUserIsOwnerMiddleware, function(request, response){
+    var fields = {};
+    [
+     'name','product','seller','totalAus','usedAus',
+     'creditLimit','cashLimit','balance','ncRating',
+     'bcRating','moRating','cost','notes'
+    ].map(function(field){
+      if(request.body[field]){
+        fields[field]=request.body[field];
+      }
+    });
+    request.model.TradeLine.create(fields, function(error, tradelineCreated){
+      if(error) {
+        throw error;
+      } else {
+        response.json(tradelineCreated);
+      }
+    });
   });
 
   core.app.put('/api/v1/owner/tradelines/:id', ensureUserIsOwnerMiddleware, function(request, response){
+    var fields = {};
+    [
+     'name','product','seller','totalAus','usedAus',
+     'creditLimit','cashLimit','balance','ncRating',
+     'bcRating','moRating','cost','notes'
+    ].map(function(field){
+      if(request.body[field]){
+        fields[field]=request.body[field];
+      }
+    });
 
+    request.model.User.TradeLine(
+      { '_id': request.params.id }, patch, { 'upsert': false }, function (error, tradelineFound) {
+        if(error) {
+          throw error;
+        } else {
+          if(tradelineFound) {
+            response.json(tradelineFound);
+          } else {
+            response.status(404);
+            response.json({
+              'status': 'Error',
+              'errors': [{
+                'code': 404,
+                'message': 'Tradeline with this id '+request.params.id+' do not exists!'
+              }]
+            });
+          }
+        }
+      });
+  });
+
+  core.app.delete('/api/v1/owner/tradelines/:id', ensureUserIsOwnerMiddleware, function(request, response){
+    response.send('ok)');
   });
 };
