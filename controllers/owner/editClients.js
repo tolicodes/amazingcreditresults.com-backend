@@ -324,8 +324,8 @@ module.exports = exports = function (core) {
                 'subject': 'Site access hyperlink to reset password', //todo - change to somethig more meaningfull
                 'name': userFound.name,
                 'welcomeLink': welcomeLink,
-                'telefone': userFound.profile.telefone,
-                'localAddress': userFound.profile.localAddress,
+                'telefone': userFound.profile ? userFound.profile.telefone : null,
+                'localAddress': userFound.profile ? userFound.profile.localAddress : null,
                 'date': frmDt(new Date())
               });
               cb();
