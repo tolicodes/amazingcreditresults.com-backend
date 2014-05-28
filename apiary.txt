@@ -716,6 +716,17 @@ PUT /api/v1/owner/products/{:id}
 }
 < 201
 < Content-Type: application/json
+{
+    "name":"Visa Gemoroi 0",
+    "bank":"Sperbank (testing)",
+    "type":"MasterCard",
+    "ncRating":"None",
+    "bcRating":"None",
+    "moRating":"None",
+    "reportsToExperian":false,
+    "reportsToEquifax": false,
+    "reportsToTransunion": false
+}
 
 
 Delete product
