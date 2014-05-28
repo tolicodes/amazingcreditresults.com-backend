@@ -843,8 +843,8 @@ GET /api/v1/owner/tradelines/:id
 
 
 Update (patch) one tradeline
-> Content-Type: application/json
 PUT /api/v1/owner/tradelines/:id
+> Content-Type: application/json
 {
     "id": "537e7a957ba2f24310e3ecb4",
     "totalAus": 15,
