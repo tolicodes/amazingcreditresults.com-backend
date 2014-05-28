@@ -8,8 +8,7 @@ var request = require('request'),
   userId;
 
 describe('Unit test for user authorization by welcome link', function () {
-  it('allows owner to authorize at first', function (done) {
-
+  before(function(done){
     request({
       'method': 'POST',
       'url': 'http://localhost:' + port + '/api/v1/owner/login',
