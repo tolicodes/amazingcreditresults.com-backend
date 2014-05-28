@@ -842,7 +842,7 @@ GET /api/v1/owner/tradelines/:id
 }
 
 
-Update (patch) one tradeline
+Update (patch) one tradeline, ratings can be 'None','Bronze','Silver','Gold'
 PUT /api/v1/owner/tradelines/:id
 > Content-Type: application/json
 {
@@ -857,8 +857,8 @@ PUT /api/v1/owner/tradelines/:id
     "seller": "536bd8b988dfc8adc31a1c44",
     "product": "537e7a9567b9f6d7f81d13b6",
     "ncRating": "None",
-    "bcRating": "None",
-    "moRating": "None"
+    "bcRating": "Bronze",
+    "moRating": "Silver"
 }
 < 201
 < Content-Type: application/json
@@ -874,6 +874,6 @@ PUT /api/v1/owner/tradelines/:id
     "seller": "536bd8b988dfc8adc31a1c44",
     "product": "537e7a9567b9f6d7f81d13b6",
     "ncRating": "None",
-    "bcRating": "None",
-    "moRating": "None"
+    "bcRating": "Bronze",
+    "moRating": "Silver"
 }
