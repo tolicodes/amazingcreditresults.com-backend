@@ -64,7 +64,41 @@ describe('/api/v1/owner/products test', function(){
       }
     });
   });
-  it('owner can list products');
+  it('owner can list products', function(done){
+    request({
+      'method':'GET',
+      'url':'http://localhost:'+port+'/api/v1/owner/products',
+      'headers': { 'huntKey':ownerHuntKey }
+    }, function(error, response, body){
+      if(error) {
+        done(error);
+      } else {
+        response.statusCode.should.be.equal(200);
+        var bodyParsed = JSON.parse(body);
+        Array.isArray(bodyParsed.data).should.be.true;
+        bodyParsed.data.map(function(product){
+          product.id.should.be.a.String;
+          product.name.should.be.a.String;
+          product.bank.should.be.a.String;
+          product.type.should.be.a.String;
+
+          [
+            'MasterCard', 'Visa',
+            'American Express', 'Discover'
+          ].should.containEql(product.type);
+
+          ['ncRating','bcRating','moRating'].map(function(r){
+            ['None','Bronze', 'Silver', 'Gold'].should.containEql(product[r])
+          });
+          product.reportsToExperian.should.be.a.Boolean;
+          product.reportsToEquifax.should.be.a.Boolean;
+          product.reportsToTransunion.should.be.a.Boolean;
+        });
+        done();
+      }
+    });
+
+  });
   it('owner can list one product', function(done){
     request({
       'method':'GET',
