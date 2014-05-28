@@ -807,3 +807,73 @@ Get one tradeline
 GET /api/v1/owner/tradelines/:id
 < 200
 < Content-Type: application/json
+{
+    "id": "537e7a957ba2f24310e3ecb4",
+    "totalAus": 15,
+    "usedAus": 0,
+    "creditLimit": 0,
+    "cashLimit": 0,
+    "balance": 100,
+    "cost": 1000,
+    "notes": "Some notes",
+    "seller": {
+        "id": "536bd8b988dfc8adc31a1c44",
+        "name": {},
+        "gravatar": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
+        "gravatar30": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
+        "gravatar50": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
+        "gravatar80": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
+        "gravatar100": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=100&d=wavatar&r=g",
+        "online": true
+    },
+    "product": {
+        "id": "537e7a9567b9f6d7f81d13b6",
+        "name": "Visa Gemoroi 0",
+        "bank": "Sperbank (testing)",
+        "reportsToExperian": false,
+        "ncRating": "None",
+        "bcRating": "None",
+        "moRating": "None",
+        "type": "MasterCard"
+    },
+    "ncRating": "None",
+    "bcRating": "None",
+    "moRating": "None"
+}
+
+
+Update (patch) one tradeline
+> Content-Type: application/json
+PUT /api/v1/owner/tradelines/:id
+{
+    "id": "537e7a957ba2f24310e3ecb4",
+    "totalAus": 15,
+    "usedAus": 0,
+    "creditLimit": 0,
+    "cashLimit": 0,
+    "balance": 100,
+    "cost": 1000,
+    "notes": "Some notes",
+    "seller": "536bd8b988dfc8adc31a1c44",
+    "product": "537e7a9567b9f6d7f81d13b6",
+    "ncRating": "None",
+    "bcRating": "None",
+    "moRating": "None"
+}
+< 201
+< Content-Type: application/json
+{
+    "id": "537e7a957ba2f24310e3ecb4",
+    "totalAus": 15,
+    "usedAus": 0,
+    "creditLimit": 0,
+    "cashLimit": 0,
+    "balance": 100,
+    "cost": 1000,
+    "notes": "Some notes",
+    "seller": "536bd8b988dfc8adc31a1c44",
+    "product": "537e7a9567b9f6d7f81d13b6",
+    "ncRating": "None",
+    "bcRating": "None",
+    "moRating": "None"
+}
