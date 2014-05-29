@@ -18,8 +18,8 @@
     "hunt":"0.1.2"
   },
   "devDependencies": {
-    "request":"latest",
-    "mocha":"latest",
-    "should":"latest"
+    "request":"2.34.0",
+    "mocha":"1.18.2",
+    "should":"3.3.1"
   }
 }
