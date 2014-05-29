@@ -42,7 +42,16 @@ module.exports = exports = function (core) {
         if(productFound) {
           next();
         } else {
-          next(new Error('Unable to find corresponding Product'));
+
+          var err = new core.mongoose.Error.ValidationError('Unable to find corresponding Product!');
+          err.errors = {
+            'product': {
+              'message':'Unable to find corresponding Product!',
+              'field': 'product',
+              'value': t.product,
+            }
+          }
+          next(err);
         }
       }
     });
@@ -57,7 +66,10 @@ module.exports = exports = function (core) {
         if(sellerFound) {
           next();
         } else {
-          next(new Error('Unable to find corresponding Seller among the Users'));
+          var err = new Error('Unable to find corresponding Seller among the Users!');
+          err.name = 'ValidationError';
+          next(err);
+
         }
       }
     });
