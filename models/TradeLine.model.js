@@ -15,6 +15,7 @@ module.exports = exports = function (core) {
       '_bcRating': { type: Number, min: 0, max: 2, default: 0 },
       '_moRating': { type: Number, min: 0, max: 2, default: 0 },
       'cost': { type: Number, min: 0, max: 10000000},
+      'price': { type: Number, min: 0, max: 10000000},
       'notes': String
     },
     {
@@ -111,6 +112,7 @@ module.exports = exports = function (core) {
       'cashLimit': this.cashLimit,
       'currentBalance': this.currentBalance,
       'cost': this.cost,
+      'price': this.price,
       'notes': this.notes,
       'seller': this.seller,
       'statementDate': this.statementDate,

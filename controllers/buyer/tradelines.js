@@ -39,6 +39,7 @@ module.exports = exports = function(core){
                   'moRating': t.product.moRating,
                   'type': t.product.type
                 },
+                'price': t.price,
                 'ncRating': t.ncRating,
                 'bcRating': t.bcRating,
                 'moRating': t.moRating

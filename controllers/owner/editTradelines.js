@@ -59,7 +59,7 @@ module.exports = exports = function (core) {
   core.app.post('/api/v1/owner/tradelines', ensureUserIsOwnerMiddleware, function(request, response){
     var fields = {};
     [
-     'name','product','seller','totalAus','usedAus',
+     'name','product','seller','totalAus','usedAus','price',
      'creditLimit','cashLimit','currentBalance','ncRating',
      'bcRating','moRating','cost','notes'
     ].map(function(field){
