@@ -69,9 +69,8 @@ module.exports = exports = function (core) {
         fields[field] = request.body[field];
       }
     });
-    fields.seller = fields.seller || request.user.id;
-    console.log(fields);
-    request.model.TradeLine.create(fields, function(error, tradelineCreated){
+    var newTradeLine = new request.model.TradeLine(fields);
+    newTradeLine.save(function(error, tradelineCreated){
       if(error) {
         throw error;
       } else {

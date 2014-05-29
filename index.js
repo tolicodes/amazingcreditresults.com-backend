@@ -88,10 +88,10 @@ Hunt.extendRoutes(function(core){
 
 //JSON error reporter middleware.
 //https://oselot.atlassian.net/browse/ACR-105
-Hunt.extendMiddleware(function(core){
-  return function(error, request, response, next){
+Hunt.extendRoutes(function(core){
+  core.app.use(function(error, request, response, next){
 //http://mongoosejs.com/docs/validation.html
-    if(error.name === 'ValidationError') {
+    if(error.name == 'ValidationError') {
       response.status(400);
       var errs=[];
       for (var x in error.errors){
@@ -116,7 +116,7 @@ Hunt.extendMiddleware(function(core){
         }]
       });
     }
-  };
+  });
 });
 
 Hunt.on('start', function(evnt){

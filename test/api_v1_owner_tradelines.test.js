@@ -90,8 +90,15 @@ describe('/api/v1/owner/tradelines test', function(){
       if(error) {
         done(error);
       } else {
-        response.statusCode.should.be.equal(500);
-        //console.log(body);
+        response.statusCode.should.be.equal(400);
+        var bodyParsed = JSON.parse(body);
+        bodyParsed.status.should.be.equal('Error');
+        bodyParsed.errors.should.be.an.Array;
+        bodyParsed.errors.length.should.be.equal(1);
+        bodyParsed.errors[0].code.should.be.equal(400);
+        bodyParsed.errors[0].message.should.be.equal('Unable to find corresponding Product!');
+        bodyParsed.errors[0].field.should.be.equal('product');
+        bodyParsed.errors[0].value.should.be.equal('5366506291e1e82b0f4be503');
         done();
       }
     });
@@ -123,8 +130,15 @@ describe('/api/v1/owner/tradelines test', function(){
       if(error) {
         done(error);
       } else {
-        response.statusCode.should.be.equal(500);
-        //console.log(body);
+        response.statusCode.should.be.equal(400);
+        var bodyParsed = JSON.parse(body);
+        bodyParsed.status.should.be.equal('Error');
+        bodyParsed.errors.should.be.an.Array;
+        bodyParsed.errors.length.should.be.equal(1);
+        bodyParsed.errors[0].code.should.be.equal(400);
+        bodyParsed.errors[0].message.should.be.equal('Unable to find corresponding Seller among the Users!');
+        bodyParsed.errors[0].field.should.be.equal('seller');
+        bodyParsed.errors[0].value.should.be.equal('5366506291e1e82b0f4be503');
         done();
       }
     });
@@ -227,7 +241,6 @@ describe('/api/v1/owner/tradelines test', function(){
       } else {
         response.statusCode.should.be.equal(200);
         var bodyParsed = JSON.parse(body);
-        console.log(bodyParsed);
         bodyParsed.data.id.should.be.equal(tradeLineId);
 /*/
 //Mongoose ORM acts strange

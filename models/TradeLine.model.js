@@ -33,48 +33,26 @@ module.exports = exports = function (core) {
 //    _moRating: 1
   });
 
-  TradeLineSchema.pre('save', function(next){
-    var t = this;
-    core.model.Product.findById(t.product, function(error, productFound){
+
+  TradeLineSchema.path('product').validate(function(value, respond) {
+    return core.model.Product.findById(value, function(error, productFound){
       if(error) {
-        next(error);
+        throw error;
       } else {
-        if(productFound) {
-          next();
-        } else {
-          var err = new Error('Unable to find corresponding Product!');
-          //var err = new core.mongoose.Error.ValidationError('Unable to find corresponding Product!');
-          //err.errors = {
-            //'product': {
-              //'message':'Unable to find corresponding Product!',
-              //'field': 'product',
-              //'value': t.product,
-            //}
-          //}
-          next(err);
-        }
+        respond(productFound?true:false);
       }
     });
-  });
+  }, 'Unable to find corresponding Product!');
 
-  TradeLineSchema.pre('save', function(next){
-    var t = this;
-    console.log(t.seller);
-    core.model.User.findById(t.seller, function(error, sellerFound){
+  TradeLineSchema.path('seller').validate(function(value, respond) {
+    return core.model.User.findById(value, function(error, userFound){
       if(error) {
-        next(error);
+        throw error;
       } else {
-        if(sellerFound) {
-          next();
-        } else {
-          var err = new Error('Unable to find corresponding Seller among the Users!');
-//          err.name = 'ValidationError';
-          next(err);
-        }
+        respond(userFound?true:false);
       }
     });
-  });
-
+  }, 'Unable to find corresponding Seller among the Users!');
 
   TradeLineSchema.virtual('ncRating')
     .get(function () {
