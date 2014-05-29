@@ -157,7 +157,31 @@ describe('/api/v1/owner/products test', function(){
         bodyParsed.data.reportsToEquifax.should.be.true;
         bodyParsed.data.reportsToTransunion.should.be.true;
         bodyParsed.data.id.should.be.equal(productId);
-        done();
+
+        request({
+          'method':'GET',
+          'url':'http://localhost:'+port+'/api/v1/owner/products/'+productId,
+          'headers': { 'huntKey':ownerHuntKey }
+          }, function(error1, response1, body){
+            if(error1) {
+              done(error1);
+            } else {
+              response1.statusCode.should.be.equal(200);
+              var bodyParsed = JSON.parse(body);
+              bodyParsed.data.name.should.be.equal('1SuperMega'+testId);
+              bodyParsed.data.bank.should.be.equal('1SuperMegaBank'+testId);
+              bodyParsed.data.type.should.be.equal('Visa');
+              bodyParsed.data.ncRating.should.be.equal('Gold');
+              bodyParsed.data.bcRating.should.be.equal('Gold');
+              bodyParsed.data.moRating.should.be.equal('Gold');
+              bodyParsed.data.reportsToExperian.should.be.true;
+              bodyParsed.data.reportsToEquifax.should.be.true;
+              bodyParsed.data.reportsToTransunion.should.be.true;
+              bodyParsed.data.id.should.be.equal(productId);
+              done();
+            }
+          }
+        );
       }
     });
 
@@ -187,7 +211,8 @@ describe('/api/v1/owner/products test', function(){
               response1.statusCode.should.be.equal(404);
               done();
             }
-          });
+          }
+        );
       }
     });
   });
