@@ -716,17 +716,6 @@ PUT /api/v1/owner/products/{:id}
 }
 < 201
 < Content-Type: application/json
-{
-    "name":"Visa Gemoroi 0",
-    "bank":"Sperbank (testing)",
-    "type":"MasterCard",
-    "ncRating":"None",
-    "bcRating":"None",
-    "moRating":"None",
-    "reportsToExperian":false,
-    "reportsToEquifax": false,
-    "reportsToTransunion": false
-}
 
 
 Delete product
@@ -753,6 +742,7 @@ GET /api/v1/owner/tradelines
             "cashLimit": 0,
             "balance": 100,
             "cost": 1000,
+            "price":1100,
             "notes": "Some notes",
             "seller": {
                 "id": "536bd8b988dfc8adc31a1c44",
@@ -786,6 +776,7 @@ GET /api/v1/owner/tradelines
             "cashLimit": 0,
             "balance": 100,
             "cost": 1000,
+            "price":1100,
             "notes": "Some notes",
             "seller": {
                 "id": "536bd8b988dfc8adc31a1c44",
@@ -819,6 +810,7 @@ GET /api/v1/owner/tradelines/:id
 < 200
 < Content-Type: application/json
 {
+    "data": {
     "id": "537e7a957ba2f24310e3ecb4",
     "totalAus": 15,
     "usedAus": 0,
@@ -826,6 +818,7 @@ GET /api/v1/owner/tradelines/:id
     "cashLimit": 0,
     "balance": 100,
     "cost": 1000,
+    "price":1100,
     "notes": "Some notes",
     "seller": {
         "id": "536bd8b988dfc8adc31a1c44",
@@ -850,6 +843,7 @@ GET /api/v1/owner/tradelines/:id
     "ncRating": "None",
     "bcRating": "None",
     "moRating": "None"
+    }
 }
 
 
@@ -864,6 +858,7 @@ PUT /api/v1/owner/tradelines/:id
     "cashLimit": 0,
     "balance": 100,
     "cost": 1000,
+    "price":1100,
     "notes": "Some notes",
     "seller": "536bd8b988dfc8adc31a1c44",
     "product": "537e7a9567b9f6d7f81d13b6",
@@ -874,19 +869,22 @@ PUT /api/v1/owner/tradelines/:id
 < 201
 < Content-Type: application/json
 {
-    "id": "537e7a957ba2f24310e3ecb4",
-    "totalAus": 15,
-    "usedAus": 0,
-    "creditLimit": 0,
-    "cashLimit": 0,
-    "balance": 100,
-    "cost": 1000,
-    "notes": "Some notes",
-    "seller": "536bd8b988dfc8adc31a1c44",
-    "product": "537e7a9567b9f6d7f81d13b6",
-    "ncRating": "None",
-    "bcRating": "Bronze",
-    "moRating": "Silver"
+    "data":{
+        "id": "537e7a957ba2f24310e3ecb4",
+        "totalAus": 15,
+        "usedAus": 0,
+        "creditLimit": 0,
+        "cashLimit": 0,
+        "balance": 100,
+        "cost": 1000,
+        "price":1100,
+        "notes": "Some notes",
+        "seller": "536bd8b988dfc8adc31a1c44",
+        "product": "537e7a9567b9f6d7f81d13b6",
+        "ncRating": "None",
+        "bcRating": "Bronze",
+        "moRating": "Silver"
+    }
 }
 
 
@@ -900,6 +898,7 @@ POST /api/v1/owner/tradelines
     "cashLimit": 0,
     "balance": 100,
     "cost": 1000,
+    "price":1100,
     "notes": "Some notes",
     "seller": "536bd8b988dfc8adc31a1c44",
     "product": "537e7a9567b9f6d7f81d13b6",
@@ -910,6 +909,7 @@ POST /api/v1/owner/tradelines
 < 201
 < Content-Type: application/json
 {
+    "data": {
     "id": "537e7a957ba2f24310e3ecb4",
     "totalAus": 15,
     "usedAus": 0,
@@ -917,10 +917,12 @@ POST /api/v1/owner/tradelines
     "cashLimit": 0,
     "balance": 100,
     "cost": 1000,
+    "price":1100,
     "notes": "Some notes",
     "seller": "536bd8b988dfc8adc31a1c44",
     "product": "537e7a9567b9f6d7f81d13b6",
     "ncRating": "None",
     "bcRating": "Bronze",
     "moRating": "Silver"
+    }
 }

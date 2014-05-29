@@ -71,7 +71,7 @@ module.exports = exports = function (core) {
       if(error) {
         throw error;
       } else {
-        response.json(tradelineCreated);
+        response.json({data: tradelineCreated});
       }
     });
   });
