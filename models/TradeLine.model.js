@@ -11,9 +11,9 @@ module.exports = exports = function (core) {
       'creditLimit': { type: Number, min: 0, max: 999999 },
       'cashLimit': { type: Number, min: 0, max: 999999 },
       'currentBalance': { type: Number, min: 0, max: 9999 },
-      '_ncRating': { type: Number, min: 0, max: 2, default: 0 },
-      '_bcRating': { type: Number, min: 0, max: 2, default: 0 },
-      '_moRating': { type: Number, min: 0, max: 2, default: 0 },
+      '_ncRating': { type: Number, min: 0, max: 3, default: 0 },
+      '_bcRating': { type: Number, min: 0, max: 3, default: 0 },
+      '_moRating': { type: Number, min: 0, max: 3, default: 0 },
       'cost': { type: Number, min: 0, max: 10000000},
       'price': { type: Number, min: 0, max: 10000000},
       'notes': String

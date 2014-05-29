@@ -82,7 +82,7 @@ module.exports = exports = function (core) {
   });
 
   core.app.put('/api/v1/owner/tradelines/:id', ensureUserIsOwnerMiddleware, function(request, response){
-    request.model.User.TradeLine.findById(request.params.id, function(error, tradeLineFound){
+    request.model.TradeLine.findById(request.params.id, function(error, tradeLineFound){
       if(error){
         throw error;
       } else {
@@ -101,6 +101,7 @@ module.exports = exports = function (core) {
             if(err){
               throw err;
             } else {
+              response.status(202);
               response.json({data: tradeLineSaved});
             }
           });

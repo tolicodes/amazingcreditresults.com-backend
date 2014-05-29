@@ -255,6 +255,49 @@ describe('/api/v1/owner/tradelines test', function(){
       }
     });
   });
-  it('owner can update tradeline');
+
+  it('owner can update tradeline', function(done){
+    request({
+      'method':'PUT',
+      'url':'http://localhost:'+port+'/api/v1/owner/tradelines/'+tradeLineId,
+      'headers': { 'huntKey':ownerHuntKey },
+      'form': {
+        'product': productId,
+        'seller': ownerId,
+        'totalAus': 11,
+        'usedAus': 6,
+        'price': 1099,
+        'creditLimit': 9999,
+        'cashLimit': 9999,
+        'currentBalance': 9999,
+        'ncRating':'None',
+        'bcRating':'Bronze',
+        'moRating':'Gold',
+        'cost':999,
+        'notes':'Some notes111'
+      }
+    }, function(error, response, body){
+      if(error) {
+        done(error);
+      } else {
+        response.statusCode.should.be.equal(202);
+        var bodyParsed = JSON.parse(body);
+//        bodyParsed.data.product.should.be.equal(productId);
+//        bodyParsed.data.seller.should.be.equal(ownerId);
+        bodyParsed.data.totalAus.should.be.equal(11);
+        bodyParsed.data.usedAus.should.be.equal(6);
+        bodyParsed.data.price.should.be.equal(1099);
+        bodyParsed.data.creditLimit.should.be.equal(9999);
+        bodyParsed.data.cashLimit.should.be.equal(9999);
+        bodyParsed.data.currentBalance.should.be.equal(9999);
+        bodyParsed.data.ncRating.should.be.equal('None');
+        bodyParsed.data.bcRating.should.be.equal('Bronze');
+        bodyParsed.data.moRating.should.be.equal('Gold');
+        bodyParsed.data.cost.should.be.equal(999);
+        bodyParsed.data.notes.should.be.equal('Some notes111');
+        done();
+      }
+    });
+  });
   it('owner can delete tradeline?');
 });
