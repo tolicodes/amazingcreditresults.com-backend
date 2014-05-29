@@ -179,7 +179,43 @@ describe('/api/v1/owner/tradelines test', function(){
     });
   });
 
-  it('owner can list tradelines');
+  it('owner can list tradelines', function(done){
+    request({
+      'method':'GET',
+      'url':'http://localhost:'+port+'/api/v1/owner/tradelines',
+      'headers': { 'huntKey':ownerHuntKey }
+    }, function(error, response, body){
+      if(error) {
+        done(error);
+      } else {
+        response.statusCode.should.be.equal(200);
+        var bodyParsed = JSON.parse(body);
+        Array.isArray(bodyParsed.data).should.be.true;
+        bodyParsed.data.length.should.be.above(1);
+        bodyParsed.data.map(function(tradeline){
+          tradeline.id.should.be.a.String;
+          tradeline.id.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
+          tradeline.totalAus.should.be.below(16);
+          tradeline.usedAus.should.be.below(16);
+          tradeline.creditLimit.should.be.below(1000000);
+//          tradeline.currentBalance.should.be.below(1000000);
+          tradeline.cost.should.be.a.Number;
+          tradeline.price.should.be.a.Number;
+          tradeline.notes.should.be.a.String;
+          tradeline.seller.id.should.be.a.String;
+          tradeline.seller.id.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
+          tradeline.dateOpen.should.be.a.Date;
+          tradeline.product.id.should.be.a.String;
+          tradeline.product.id.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
+          ['ncRating','bcRating','moRating'].map(function(r){
+            ['None','Bronze', 'Silver', 'Gold'].should.containEql(tradeline[r])
+          });
+        });
+        done()
+      }
+    });
+
+  });
   it('owner can list one tradeline', function(done){
     request({
       'method':'GET',
