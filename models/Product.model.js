@@ -5,9 +5,9 @@ module.exports = exports = function (core) {
   var ProductSchema = new core.mongoose.Schema({
     'name': {type: String, required: true},
     'bank': {type: String, required: true},
-    '_ncRating': { type: Number, min: 0, max: 2, default: 0 },
-    '_bcRating': { type: Number, min: 0, max: 2, default: 0 },
-    '_moRating': { type: Number, min: 0, max: 2, default: 0 },
+    '_ncRating': { type: Number, min: 0, max: 3, default: 0 },
+    '_bcRating': { type: Number, min: 0, max: 3, default: 0 },
+    '_moRating': { type: Number, min: 0, max: 3, default: 0 },
     '_type': { type: Number, min: 0, max: 3, default: 0 },
     'reportsToExperian': Boolean,
     'reportsToEquifax': Boolean,

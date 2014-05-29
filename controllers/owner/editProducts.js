@@ -66,7 +66,7 @@ module.exports = exports = function (core) {
         if (request.body[n]) {
           params[n] = request.body[n];
         }
-    });
+      });
 
     request.model.Product.create(params, function (error, productCreated) {
       if (error) {
@@ -84,43 +84,43 @@ module.exports = exports = function (core) {
 //suprising :-(
 
   core.app.put('/api/v1/owner/products/:id', ensureUserIsOwnerMiddleware, function (request, response) {
-    request.model.Product.findById(request.params.id), function(error, productFound){
-        if (error) {
-          throw error;
-        } else {
-          if(productFound) {
-            [
-              'name', 'bank', 'type', 'ncRating', 'bcRating',
-              'moRating', 'reportsToExperian',
-              'reportsToEquifax', 'reportsToTransunion'
-            ].map(function (n) {
-                if (request.body[n]) {
-                  productFound[n] = request.body[n];
-                }
-            });
-
-            productFound.save(function(err1, productSaved){
-              if(err1) {
-                throw err1;
-              } else {
-                response.status(202);
-                response.json({ 'data':productSaved });
+    request.model.Product.findById(request.params.id, function (error, productFound) {
+      if (error) {
+        throw error;
+      } else {
+        if (productFound) {
+          [
+            'name', 'bank', 'type', 'ncRating', 'bcRating',
+            'moRating', 'reportsToExperian',
+            'reportsToEquifax', 'reportsToTransunion'
+          ].map(function (n) {
+              if (request.body[n]) {
+                productFound[n] = request.body[n];
               }
             });
-          } else {
-            response.status(404);
-            response.json({
-              'status':'Error',
-              'errors': [
-                {
-                  'code': 404,
-                  'message': 'Product with this id do not exists!'
-                }
-              ]
-            });
-          }
+
+          productFound.save(function (err1, productSaved) {
+            if (err1) {
+              throw err1;
+            } else {
+              response.status(202);
+              response.json({ 'data': productSaved });
+            }
+          });
+        } else {
+          response.status(404);
+          response.json({
+            'status': 'Error',
+            'errors': [
+              {
+                'code': 404,
+                'message': 'Product with this id do not exists!'
+              }
+            ]
+          });
         }
-    };
+      }
+    });
   });
 
   core.app.delete('/api/v1/owner/products/:id', ensureUserIsOwnerMiddleware, function (request, response) {

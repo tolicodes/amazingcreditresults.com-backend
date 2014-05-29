@@ -145,7 +145,7 @@ describe('/api/v1/owner/products test', function(){
       if(error) {
         done(error);
       } else {
-        response.statusCode.should.be.equal(201);
+        response.statusCode.should.be.equal(202);
         var bodyParsed = JSON.parse(body);
         bodyParsed.data.name.should.be.equal('1SuperMega'+testId);
         bodyParsed.data.bank.should.be.equal('1SuperMegaBank'+testId);
