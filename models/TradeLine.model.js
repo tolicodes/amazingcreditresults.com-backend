@@ -6,9 +6,11 @@ module.exports = exports = function (core) {
       'seller': { type: core.mongoose.Schema.Types.ObjectId, ref: 'User', required:true },
       'totalAus': { type: Number, min: 0, max: 9999 },
       'usedAus': { type: Number, min: 0, max: 9999 },
+      'statementDate': { type: Number, min: 0, max: 10 },
+      'dateOpen': {type: Date, default: Date.now()},
       'creditLimit': { type: Number, min: 0, max: 999999 },
       'cashLimit': { type: Number, min: 0, max: 999999 },
-      'balance': { type: Number, min: 0, max: 9999 },
+      'currentBalance': { type: Number, min: 0, max: 9999 },
       '_ncRating': { type: Number, min: 0, max: 2, default: 0 },
       '_bcRating': { type: Number, min: 0, max: 2, default: 0 },
       '_moRating': { type: Number, min: 0, max: 2, default: 0 },
@@ -107,10 +109,12 @@ module.exports = exports = function (core) {
       'usedAus': this.usedAus,
       'creditLimit': this.creditLimit,
       'cashLimit': this.cashLimit,
-      'balance': this.balance,
+      'currentBalance': this.currentBalance,
       'cost': this.cost,
       'notes': this.notes,
       'seller': this.seller,
+      'statementDate': this.statementDate,
+      'dateOpen': this.dateOpen,
       'product': {
         'id':this.product.id,
         'name':this.product.name,
@@ -121,11 +125,11 @@ module.exports = exports = function (core) {
         'ncRating': this.product.ncRating,
         'bcRating': this.product.bcRating,
         'moRating': this.product.moRating,
-        'type': this.product.type,
+        'type': this.product.type
       },
       'ncRating': this.ncRating,
       'bcRating': this.bcRating,
-      'moRating': this.moRating,
+      'moRating': this.moRating
     }
   };
 

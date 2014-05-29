@@ -60,7 +60,7 @@ module.exports = exports = function (core) {
     var fields = {};
     [
      'name','product','seller','totalAus','usedAus',
-     'creditLimit','cashLimit','balance','ncRating',
+     'creditLimit','cashLimit','currentBalance','ncRating',
      'bcRating','moRating','cost','notes'
     ].map(function(field){
       if(request.body[field]){
@@ -80,7 +80,7 @@ module.exports = exports = function (core) {
     var fields = {};
     [
      'name','product','seller','totalAus','usedAus',
-     'creditLimit','cashLimit','balance','ncRating',
+     'creditLimit','cashLimit','currentBalance','ncRating',
      'bcRating','moRating','cost','notes'
     ].map(function(field){
       if(request.body[field]){
@@ -88,14 +88,30 @@ module.exports = exports = function (core) {
       }
     });
 
-    request.model.User.TradeLine(
-      { '_id': request.params.id }, patch, { 'upsert': false }, function (error, tradelineFound) {
-        if(error) {
-          throw error;
+    request.model.User.TradeLine.findById(request.params.id, function(error, tradeLineFound){
+      if(error){
+        throw error;
+      } else {
+        if(tradeLineFound){
+          [
+            'name','product','seller','totalAus','usedAus',
+            'creditLimit','cashLimit','currentBalance','ncRating',
+            'bcRating','moRating','cost','notes'
+          ].map(function(field){
+              if(request.body[field]){
+                tradeLineFound[field]=request.body[field];
+              }
+           });
+
+          tradeLineFound.save(function(err, tradeLineSaved){
+            if(err){
+              throw err;
+            } else {
+              response.json({data: tradeLineSaved});
+            }
+          });
+
         } else {
-          if(tradelineFound) {
-            response.json(tradelineFound);
-          } else {
             response.status(404);
             response.json({
               'status': 'Error',
@@ -104,12 +120,12 @@ module.exports = exports = function (core) {
                 'message': 'Tradeline with this id '+request.params.id+' do not exists!'
               }]
             });
-          }
         }
-      });
+      }
+    });
   });
 
   core.app.delete('/api/v1/owner/tradelines/:id', ensureUserIsOwnerMiddleware, function(request, response){
-    response.send('ok)');
+    response.send('not implemented');
   });
 };

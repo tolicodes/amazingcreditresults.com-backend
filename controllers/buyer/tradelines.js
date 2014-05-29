@@ -14,14 +14,19 @@ module.exports = exports = function(core){
             var tradeLinesPrepared = tradeLines.map(function(t){
               return {
                 'id': t._id,
+/*/
+//not shown to buyer as stated here https://oselot.atlassian.net/wiki/display/ACR/Inventory+Table+Requirements
                 'totalAus': t.totalAus,
                 'usedAus': t.usedAus,
                 'creditLimit': t.creditLimit,
                 'cashLimit': t.cashLimit,
-                'balance': t.balance,
+                'currentBalance': t.currentBalance,
                 'cost': t.cost,
                 'notes': t.notes,
+//*/
                 'seller': t.seller,
+                'statementDate': t.statementDate,
+                'dateOpen': t.dateOpen,
                 'product': {
                   'id':t.product.id,
                   'name':t.product.name,
@@ -32,11 +37,11 @@ module.exports = exports = function(core){
                   'ncRating': t.product.ncRating,
                   'bcRating': t.product.bcRating,
                   'moRating': t.product.moRating,
-                  'type': t.product.type,
+                  'type': t.product.type
                 },
                 'ncRating': t.ncRating,
                 'bcRating': t.bcRating,
-                'moRating': t.moRating,
+                'moRating': t.moRating
               }
             });
             response.json({
