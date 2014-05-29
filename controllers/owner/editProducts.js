@@ -79,30 +79,48 @@ module.exports = exports = function (core) {
   });
 
 //actually the patch behavior
+
+//http://stackoverflow.com/questions/18040315/why-arent-defaults-setters-validators-and-middleware-not-applied-for-findonea
+//suprising :-(
+
   core.app.put('/api/v1/owner/products/:id', ensureUserIsOwnerMiddleware, function (request, response) {
-    var patch = {};
-
-    [
-      'name', 'bank', 'type', 'ncRating', 'bcRating',
-      'moRating', 'reportsToExperian',
-      'reportsToEquifax', 'reportsToTransunion'
-    ].map(function (n) {
-        if (request.body[n]) {
-          patch[n] = request.body[n];
-        }
-    });
-
-
-    request.model.Product.findOneAndUpdate({'_id': request.params.id},
-      patch,
-      function (error, productUpdated) {
+    request.model.Product.findById(request.params.id), function(error, productFound){
         if (error) {
           throw error;
         } else {
-          response.status(201);
-          response.json({'data': productUpdated});
+          if(productFound) {
+            [
+              'name', 'bank', 'type', 'ncRating', 'bcRating',
+              'moRating', 'reportsToExperian',
+              'reportsToEquifax', 'reportsToTransunion'
+            ].map(function (n) {
+                if (request.body[n]) {
+                  productFound[n] = request.body[n];
+                }
+            });
+
+            productFound.save(function(err1, productSaved){
+              if(err1) {
+                throw err1;
+              } else {
+                response.status(202);
+                response.json({ 'data':productSaved });
+              }
+            });
+          } else {
+            response.status(404);
+            response.json({
+              'status':'Error',
+              'errors': [
+                {
+                  'code': 404,
+                  'message': 'Product with this id do not exists!'
+                }
+              ]
+            });
+          }
         }
-      });
+    };
   });
 
   core.app.delete('/api/v1/owner/products/:id', ensureUserIsOwnerMiddleware, function (request, response) {
