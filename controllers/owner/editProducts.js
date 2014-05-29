@@ -40,7 +40,7 @@ module.exports = exports = function (core) {
             'data': formatProduct(product)
           });
         } else {
-          response.status(400);
+          response.status(404);
           response.json({
             'status': 'Error',
             'errors': [

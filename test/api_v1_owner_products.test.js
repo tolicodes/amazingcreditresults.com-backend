@@ -163,5 +163,32 @@ describe('/api/v1/owner/products test', function(){
 
   });
 
-  it('owner can delete product with no tradelines associated');
+  it('owner can delete product with no tradelines associated', function(done){
+    request({
+      'method':'DELETE',
+      'url':'http://localhost:'+port+'/api/v1/owner/products/'+productId,
+      'headers': { 'huntKey':ownerHuntKey }
+    }, function(error, response, body){
+      if(error) {
+        done(error);
+      } else {
+        response.statusCode.should.be.equal(202);
+        var bodyParsed = JSON.parse(body);
+        bodyParsed.status.should.be.equal('deleted');
+
+        request({
+          'method':'GET',
+          'url':'http://localhost:'+port+'/api/v1/owner/products/'+productId,
+          'headers': { 'huntKey':ownerHuntKey }
+          }, function(error1, response1, body){
+            if(error1) {
+              done(error1);
+            } else {
+              response1.statusCode.should.be.equal(404);
+              done();
+            }
+          });
+      }
+    });
+  });
 });
