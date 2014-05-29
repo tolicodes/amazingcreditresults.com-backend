@@ -2,37 +2,6 @@ HOST: http://dev.amazingcreditresults.com/
 
 --- Amazing Api V1 ---
 
--- Buyer authorization with cookie based sessions (deprecated) --
-
-Authorize buyer by unique link. If link is valid, it responds with HTML page with form to set password,
-if link is invalid, it redirects to error page with message, that link is invalid or outdated
-GET /buyer/welcome/{apiKey}
-< 200
-< Content-Type: text/html
-+++++
-< 302
-< Location: /buyer/error
-
-
-Set password for buyer when he authorizes first time, than redirects back to page, where s/he has to enter password
-POST /buyer/setPassword
-> Content-Type: application/x-www-form-urlencoded; charset=utf-8 | application/json; charset=utf-8
-{ "apiKey": "someVeryLongApiKey", "password":"SomeNewPasswordToSet"}
-< 302
-< Location: /buyer/welcome/{apiKey}
-+++++
-< 400
-< Content-Type: application/json; charset=utf-8
-
-
-Authorize Buyer with password
-POST /buyer/login
-> Content-Type: application/x-www-form-urlencoded; charset=utf-8 | application/json; charset=utf-8
-{ "apiKey": "someVeryLongApiKey", "password":"SomeNewPasswordToSet"}
-< 302
-< Location: /buyer/welcome/{apiKey}
-
-
 -- Buyer authorization with http header based session --
 
 Verify, if this welcomeLink is valid - not outdated, have Buyer associated with it, etc...
@@ -172,12 +141,6 @@ GET /api/v1/myself
 
 -- Buyer dashboard --
 
-Buyer dashboard with questionary, propositions, cart, etc. SPA application. On this page buyer is redirected after succesefull login.
-GET /buyer
-< 200
-< Content-Type: text/html
-
-
 Saving Buyer answers to questions on dashboard
 POST /api/v1/buyer/saveQuestionnaireAnswers
 > Content-Type: application/x-www-form-urlencoded; charset=utf-8 | application/json; charset=utf-8
@@ -203,122 +166,59 @@ POST /api/v1/buyer/saveQuestionnaireAnswers
 }
 
 
-Get list of tradelines
+Get list of tradelines (only active!)
 GET /api/v1/tradelines
 < 200
 < Content-Type: application/json
 {
-  "page":0,
-  "tradelines":[
-    {
-      "totalAus": 100,
-      "usedAus": 0,
-      "creditLimit": 0,
-      "cashLimit": 0,
-      "balance": 100,
-      "ncRating": 0,
-      "bcRating": 0,
-      "moRating": 0,
-      "cost": 1000,
-      "notes": "Some notes",
-      "seller": "536cfc8a886fcbba14d07dd5",
-      "product": {
-        "_id": "537e624d6b7a2e76ea0d33e5",
-        "bank": "Sperbank (testing)",
-        "bcRating": 1,
-        "maximumAus": 100,
-        "moRating": 1,
-        "name": "Visa Gemoroi 1",
-        "ncRating": 1,
-        "notes": "This is your problem.",
-        "reportsToExperian": false,
-        "reports_to_equifax": false,
-        "reports_to_transunion": false
-      },
-      "_id": "537e626d4971483f4287fe90",
-      "__v": 0
+    "metaData": {
+        "totalPages": 1,
+        "page": 1
     },
-    {
-      "totalAus": 100,
-      "usedAus": 0,
-      "creditLimit": 0,
-      "cashLimit": 0,
-      "balance": 100,
-      "ncRating": 0,
-      "bcRating": 0,
-      "moRating": 0,
-      "cost": 1000,
-      "notes": "Some notes",
-      "seller": "536cfc8a886fcbba14d07dd5",
-      "product": {
-        "_id": "537e624d6b7a2e76ea0d33e5",
-        "bank": "Sperbank (testing)",
-        "bcRating": 1,
-        "maximumAus": 100,
-        "moRating": 1,
-        "name": "Visa Gemoroi 1",
-        "ncRating": 1,
-        "notes": "This is your problem.",
-        "reportsToExperian": false,
-        "reports_to_equifax": false,
-        "reports_to_transunion": false
-      },
-      "_id": "537e6293a4ee0769420e6152",
-      "__v": 0
-    },
-    {
-      "totalAus": 100,
-      "usedAus": 0,
-      "creditLimit": 0,
-      "cashLimit": 0,
-      "balance": 100,
-      "ncRating": 0,
-      "bcRating": 0,
-      "moRating": 0, "cost": 1000,
-      "notes": "Some notes",
-      "seller": "536cfc8a886fcbba14d07dd5",
-      "product": {
-        "_id": "537e624d6b7a2e76ea0d33e5",
-        "bank": "Sperbank (testing)",
-        "bcRating": 1,
-        "maximumAus": 100,
-        "moRating": 1,
-        "name": "Visa Gemoroi 1",
-        "ncRating": 1,
-        "notes": "This is your problem.",
-        "reportsToExperian": false,
-        "reports_to_equifax": false,
-        "reports_to_transunion": false
-      },
-      "_id": "537e6293a4ee0769420e6153",
-      "__v": 0},
-    {
-      "totalAus": 100, "usedAus": 0,
-      "creditLimit": 0,
-      "cashLimit": 0,
-      "balance": 100,
-      "ncRating": 0,
-      "bcRating": 0,
-      "moRating": 0,
-      "cost": 1000,
-      "notes": "Some notes",
-      "seller": "536cfc8a886fcbba14d07dd5",
-      "product": {
-        "_id": "537e624d6b7a2e76ea0d33e5",
-        "bank": "Sperbank (testing)",
-        "bcRating": 1,
-        "maximumAus": 100,
-        "moRating": 1,
-        "name": "Visa Gemoroi 1",
-        "ncRating": 1, "notes": "This is your problem.",
-        "reportsToExperian": false,
-        "reports_to_equifax": false,
-        "reports_to_transunion": false
-      },
-      "_id": "537e6293a4ee0769420e6154",
-      "__v": 0
-    }
-  ]
+    "data": [
+        {
+            "id": "5387bff4db5aaf0b36d05aa8",
+            "seller": "536cfc8a886fcbba14d07dd5",
+            "dateOpen": "2014-05-29T23:17:08.252Z",
+            "product": {
+                "id": "53876d8d18547d20333926fb",
+                "name": "Gemoroi 0",
+                "bank": "Sperbank (testing)",
+                "reportsToExperian": false,
+                "reportsToEquifax": false,
+                "reportsToTransunion": false,
+                "ncRating": "None",
+                "bcRating": "None",
+                "moRating": "None",
+                "type": "MasterCard"
+            },
+            "price": 1100,
+            "ncRating": "Bronze",
+            "bcRating": "Bronze",
+            "moRating": "Bronze"
+        },
+        {
+            "id": "5387bff4db5aaf0b36d05aa9",
+            "seller": "536cfc8a886fcbba14d07dd5",
+            "dateOpen": "2014-05-29T23:17:08.252Z",
+            "product": {
+                "id": "53876d8d18547d20333926fb",
+                "name": "Gemoroi 0",
+                "bank": "Sperbank (testing)",
+                "reportsToExperian": false,
+                "reportsToEquifax": false,
+                "reportsToTransunion": false,
+                "ncRating": "Gold",
+                "bcRating": "Gold",
+                "moRating": "Gold",
+                "type": "MasterCard"
+            },
+            "price": 1100,
+            "ncRating": "Bronze",
+            "bcRating": "Bronze",
+            "moRating": "Bronze"
+        }
+    ]
 }
 +++++
 < 401
@@ -343,41 +243,7 @@ POST /api/v1/owner/login
 { "Code":400, "Error":"The values of `username` or `password` are not provided!" }
 
 
--- Owner api for session based authorization
-
-Form to enter login and password
-GET /admin/login
-< 200
-< Content-Type: text/html
-
-
-Form action for owners to authorize
-POST /auth/login
-> Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
-{ "username":"owner@example.org", "password":"test123" }
-< 302
-< Location: /auth/success
-
-
-Route to process successefull authorization (flash message with success description is added)
-GET /auth/success
-< 302
-< Location: /
-
-
-Route to process failed authorization (flash message with error description is added)
-GET /auth/failure
-< 302
-< Location: /admin/login
-
-
 -- Owner resource to edit clients --
-
-List all clients - SPA application
-GET /admin/clients
-< 200
-< Content-Type: text/html
-
 
 List all clients in JSON format
 GET /api/v1/admin/clients?page={:pageNumber}
@@ -744,6 +610,7 @@ GET /api/v1/owner/tradelines
             "cost": 1000,
             "price":1100,
             "notes": "Some notes",
+            "active":false,
             "seller": {
                 "id": "536bd8b988dfc8adc31a1c44",
                 "name": {},
@@ -778,6 +645,7 @@ GET /api/v1/owner/tradelines
             "cost": 1000,
             "price":1100,
             "notes": "Some notes",
+            "active":true,
             "seller": {
                 "id": "536bd8b988dfc8adc31a1c44",
                 "name": {},

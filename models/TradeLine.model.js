@@ -16,7 +16,8 @@ module.exports = exports = function (core) {
       '_moRating': { type: Number, min: 0, max: 3, default: 0 },
       'cost': { type: Number, min: 0, max: 10000000},
       'price': { type: Number, min: 0, max: 10000000},
-      'notes': String
+      'notes': String,
+      'active':{type: Boolean, default: false}
     },
     {
       toObject: { getters: true, virtuals: true },
@@ -104,6 +105,7 @@ module.exports = exports = function (core) {
       'cost': this.cost,
       'price': this.price,
       'notes': this.notes,
+      'active': this.active,
       'seller': this.seller,
       'statementDate': this.statementDate,
       'dateOpen': this.dateOpen,
