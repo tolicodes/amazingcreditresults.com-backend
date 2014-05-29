@@ -1,11 +1,6 @@
 //controller for buyer Questionnaire and dashboard
 module.exports = exports = function(core){
 
-//show buyer the dashboard with Questionnaire?
-  core.app.get('/buyer', function(request, response){
-    response.render('buyer/stage3',{'title':'Dashboard'});
-  });
-
 //save buyer answers to Questionnaire - we recieve POST, we respond with JSON
   core.app.post('/api/v1/buyer/saveQuestionnaireAnswers', function(request, response){
     if(request.user){

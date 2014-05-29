@@ -1,5 +1,6 @@
 //controller that covers owners login
 module.exports = exports = function(core){
+/*/
   core.app.get('/', function(request,response){
     response.render('landing', {'title':'Welcome!'});
   });
@@ -24,6 +25,7 @@ module.exports = exports = function(core){
     request.flash('error','Authentication failed!');
     response.redirect('/admin/login');
   });
+//*/
 
 //header based authorization
   core.app.post('/api/v1/owner/login', function(request, response){

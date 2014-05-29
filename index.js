@@ -12,7 +12,7 @@ var hunt = require('hunt'),
     'views': __dirname+'/views/',
     'maxWorkers': 2, //for production use - 1 per CPU core
     'passport':{
-      'local': true, //need for owners to be able to auth. Thats all!
+      'local': false,
       'signUpByEmail': false,
       'verifyEmail': false,
       'resetPassword': false,
@@ -48,33 +48,9 @@ Hunt.extendApp(function(core){
 //*/
 });
 
-//access control middleware
-Hunt.extendMiddleware(function(core){
-  return function(request, response, next){
-    if(request.user){
-      next();
-    } else {
-      if(
-          /^\/admin\/login/.test(request.originalUrl) ||
-          /^\/buyer\/welcome\/[a-z]+$/.test(request.originalUrl) ||
-          /^\/api\/v1\//.test(request.originalUrl) ||
-          /^\/buyer\/login/.test(request.originalUrl) ||
-          /^\/buyer\/setPassword/.test(request.originalUrl) ||
-          /^\/testError/.test(request.originalUrl) ||
-          /^\/auth\//.test(request.originalUrl) ) {
-        next();
-      } else {
-        response.status(200);
-        response.render('landing',{'title':'Landing page'});
-      }
-    }
-  };
-});
-
 //loading different controllers for buyers
 Hunt.extendRoutes(require('./controllers/buyer/login.js'));
 Hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
-Hunt.extendRoutes(require('./controllers/buyer/sessionBasedLogin.js')); //deprecated
 
 //loading different controllers for owners
 Hunt.extendRoutes(require('./controllers/owner/login.js'));
@@ -89,13 +65,24 @@ Hunt.extendRoutes(require('./controllers/shared.js'));
 Hunt.extendRoutes(require('./controllers/buyer/tradelines.js'));
 
 //Development route to test error catcher middleware
-Hunt.extendRoutes(function(core){
-  core.app.get('/testError', function(request,response){
-    if(core.config.env === 'development'){
+if(Hunt.config.env === 'development') {
+  Hunt.extendRoutes(function (core) {
+    core.app.get('/testError', function (request, response) {
       throw new Error('Test error!');
-    } else {
-      response.send(404);
-    }
+    });
+  });
+}
+
+Hunt.extendRoutes(function(core){
+  core.app.all('*', function(request,response){
+    response.status(404);
+    response.json({
+      "status": "Error",
+      "errors": [ {
+        "code": 404,
+        "message": 'This API endpoint do not exists!'
+      }]
+    });
   });
 });
 
@@ -137,15 +124,8 @@ Hunt.on('start', function(evnt){
   if(Hunt.config.env === 'development') {
     require('./lib/populateDatabase.js')(Hunt); //uncomment to repopulate database on every start
   }
-
-  var welcomeLinkGenerator = require('./lib/welcome.js');
-  console.log('Testing welcome link generator:');
-  console.log(welcomeLinkGenerator());
-  console.log(welcomeLinkGenerator());
-  console.log(welcomeLinkGenerator());
-
 /*/
-//testing amazon SET
+//testing amazon SES
   Hunt.sendEmail('anatolij@oselot.com','SES works','YRA!', console.error);
 //*/
 });

@@ -163,5 +163,5 @@ describe('/api/v1/owner/products test', function(){
 
   });
 
-  it('owner can delete product with now tradelines associated');
+  it('owner can delete product with no tradelines associated');
 });

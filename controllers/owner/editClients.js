@@ -17,10 +17,6 @@ module.exports = exports = function (core) {
 
   var ensureAdmin = require('./middleware.js');
 
-  core.app.get('/admin/clients', ensureAdmin, function (request, response) {
-    response.render('owner/editClientsDev', {'title': 'Edit clients'})
-  });
-
   core.app.get('/api/v1/admin/clients', ensureAdmin, function (request, response) {
     var page = request.query.page || 1,
       order = request.query.order;
