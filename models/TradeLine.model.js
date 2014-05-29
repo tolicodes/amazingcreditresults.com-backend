@@ -15,7 +15,7 @@ module.exports = exports = function (core) {
       '_bcRating': { type: Number, min: 0, max: 2, default: 0 },
       '_moRating': { type: Number, min: 0, max: 2, default: 0 },
       'cost': { type: Number, min: 0, max: 10000000},
-      'price': { type: Number, min: 0, max: 10000000},
+      'price': { type: Number, min: 0, max: 10000000, required: true},
       'notes': String
     },
     {

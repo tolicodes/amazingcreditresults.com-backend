@@ -77,24 +77,13 @@ module.exports = exports = function (core) {
   });
 
   core.app.put('/api/v1/owner/tradelines/:id', ensureUserIsOwnerMiddleware, function(request, response){
-    var fields = {};
-    [
-     'name','product','seller','totalAus','usedAus',
-     'creditLimit','cashLimit','currentBalance','ncRating',
-     'bcRating','moRating','cost','notes'
-    ].map(function(field){
-      if(request.body[field]){
-        fields[field]=request.body[field];
-      }
-    });
-
     request.model.User.TradeLine.findById(request.params.id, function(error, tradeLineFound){
       if(error){
         throw error;
       } else {
         if(tradeLineFound){
           [
-            'name','product','seller','totalAus','usedAus',
+            'name','product','seller','totalAus','usedAus', 'price',
             'creditLimit','cashLimit','currentBalance','ncRating',
             'bcRating','moRating','cost','notes'
           ].map(function(field){
