@@ -36,12 +36,14 @@ module.exports = exports = function (core) {
   core.app.get('/api/v1/owner/tradelines/:id', ensureUserIsOwnerMiddleware, function(request, response){
     request.model.TradeLine
       .findById(request.params.id)
+      .populate('seller')
+      .populate('product')
       .exec(function(error, tradelineFound){
         if(error){
           throw error;
         } else {
           if(tradelineFound) {
-            response.json(tradelineFound);
+            response.json({'data':tradelineFound});
           } else {
             response.status(404);
             response.json({
@@ -59,18 +61,21 @@ module.exports = exports = function (core) {
   core.app.post('/api/v1/owner/tradelines', ensureUserIsOwnerMiddleware, function(request, response){
     var fields = {};
     [
-     'name','product','seller','totalAus','usedAus','price',
+     'product','seller','totalAus','usedAus','price',
      'creditLimit','cashLimit','currentBalance','ncRating',
      'bcRating','moRating','cost','notes'
     ].map(function(field){
       if(request.body[field]){
-        fields[field]=request.body[field];
+        fields[field] = request.body[field];
       }
     });
+    fields.seller = fields.seller || request.user.id;
+    console.log(fields);
     request.model.TradeLine.create(fields, function(error, tradelineCreated){
       if(error) {
         throw error;
       } else {
+        response.status(201);
         response.json({data: tradelineCreated});
       }
     });
@@ -83,7 +88,7 @@ module.exports = exports = function (core) {
       } else {
         if(tradeLineFound){
           [
-            'name','product','seller','totalAus','usedAus', 'price',
+            'product','seller','totalAus','usedAus', 'price',
             'creditLimit','cashLimit','currentBalance','ncRating',
             'bcRating','moRating','cost','notes'
           ].map(function(field){

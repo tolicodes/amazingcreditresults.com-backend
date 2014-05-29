@@ -42,15 +42,15 @@ module.exports = exports = function (core) {
         if(productFound) {
           next();
         } else {
-
-          var err = new core.mongoose.Error.ValidationError('Unable to find corresponding Product!');
-          err.errors = {
-            'product': {
-              'message':'Unable to find corresponding Product!',
-              'field': 'product',
-              'value': t.product,
-            }
-          }
+          var err = new Error('Unable to find corresponding Product!');
+          //var err = new core.mongoose.Error.ValidationError('Unable to find corresponding Product!');
+          //err.errors = {
+            //'product': {
+              //'message':'Unable to find corresponding Product!',
+              //'field': 'product',
+              //'value': t.product,
+            //}
+          //}
           next(err);
         }
       }
@@ -59,6 +59,7 @@ module.exports = exports = function (core) {
 
   TradeLineSchema.pre('save', function(next){
     var t = this;
+    console.log(t.seller);
     core.model.User.findById(t.seller, function(error, sellerFound){
       if(error) {
         next(error);
@@ -67,9 +68,8 @@ module.exports = exports = function (core) {
           next();
         } else {
           var err = new Error('Unable to find corresponding Seller among the Users!');
-          err.name = 'ValidationError';
+//          err.name = 'ValidationError';
           next(err);
-
         }
       }
     });

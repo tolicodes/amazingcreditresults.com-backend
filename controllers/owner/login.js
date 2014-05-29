@@ -36,7 +36,7 @@ module.exports = exports = function(core){
         } else {
           if(userFound && userFound.root && userFound.verifyPassword(request.body.password)){
             response.status(200);
-            response.json({'Code':200, 'huntKey':userFound.apiKey})
+            response.json({'Code':200, 'id':userFound.id,'huntKey':userFound.apiKey})
           } else {
             response.status(403);
             response.json({'Code':403,'Error':'Unable to authorize Owner with this credentials!'});
