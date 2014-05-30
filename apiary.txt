@@ -669,7 +669,7 @@ POST /api/v1/owner/products
     "status": "Error",
     "errors": [
         {
-        "code": 403,
+        "code": 401,
         "message": "Authorization required!"
         }
     ]
@@ -725,7 +725,7 @@ PUT /api/v1/owner/products/{:id}
     "status": "Error",
     "errors": [
         {
-        "code": 403,
+        "code": 401,
         "message": "Authorization required!"
         }
     ]
@@ -751,13 +751,37 @@ DELETE /api/v1/owner/products/{:id}
     ]
 }
 +++++
+< 400
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 400,
+        "message": "Product with this ID is used by Tradelines!"
+        }
+    ]
+}
++++++
+< 400
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 400,
+        "message": "ID is not defined!"
+        }
+    ]
+}
++++++
 < 401
 < Content-Type: application/json
 {
     "status": "Error",
     "errors": [
         {
-        "code": 403,
+        "code": 401,
         "message": "Authorization required!"
         }
     ]
@@ -865,7 +889,7 @@ GET /api/v1/owner/tradelines
     "status": "Error",
     "errors": [
         {
-        "code": 403,
+        "code": 401,
         "message": "Authorization required!"
         }
     ]
@@ -944,7 +968,7 @@ GET /api/v1/owner/tradelines/:id
     "status": "Error",
     "errors": [
         {
-        "code": 403,
+        "code": 401,
         "message": "Authorization required!"
         }
     ]
@@ -1010,7 +1034,7 @@ PUT /api/v1/owner/tradelines/:id
     "status": "Error",
     "errors": [
         {
-        "code": 403,
+        "code": 401,
         "message": "Authorization required!"
         }
     ]
@@ -1075,7 +1099,7 @@ POST /api/v1/owner/tradelines
     "status": "Error",
     "errors": [
         {
-        "code": 403,
+        "code": 401,
         "message": "Authorization required!"
         }
     ]
