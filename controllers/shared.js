@@ -22,8 +22,14 @@ module.exports = exports = function (core) {
         'accountVerified': user.accountVerified,
         'telefone': user.profile ? user.profile.telefone : '',
         'localAddress': user.profile ? user.profile.localAddress : '',
+        'roles': {
+          'owner': user.roles ? user.roles.owner : false,
+          'seller': user.roles ? user.roles.seller : false,
+          'buyer': user.roles ? user.roles.buyer : false
+        },
         'profile': {
-          'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : true
+          'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : true,
+
         }
       });
     } else {
