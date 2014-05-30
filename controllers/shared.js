@@ -27,14 +27,12 @@ module.exports = exports = function (core) {
           'seller': user.roles ? user.roles.seller : false,
           'buyer': user.roles ? user.roles.buyer : false
         },
-        'profile': {
-          'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : true,
-
+        'profile': user.profile
         }
       });
     } else {
       response.status(400);
-      response.json({'error': 'Authorization required!'})
+      response.json({'Error': 'Authorization required!'})
     }
   }
 

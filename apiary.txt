@@ -9,7 +9,7 @@ GET /api/v1/buyer/needToSetPassword/:welcomeLink
 < 200
 < Content-Type: application/json; charset=utf-8
 {
-    "needToSetPassword":true,
+    "needToSetPassword": true,
     "name":{
         "familyName": "Doe",
         "middleName": "Theodor",
@@ -20,7 +20,7 @@ GET /api/v1/buyer/needToSetPassword/:welcomeLink
 < 200
 < Content-Type: application/json; charset=utf-8
 {
-    "needToSetPassword":false,
+    "needToSetPassword": false,
     "name":{
         "familyName": "Doe",
         "middleName": "Theodor",
@@ -39,7 +39,7 @@ GET /api/v1/buyer/needToSetPassword/:welcomeLink
 
 Set password on first time, when new Buyer follows the link in email message
 POST /api/v1/buyer/setPassword
-> Content-Type: application/x-www-form-urlencoded; charset=utf-8 | application/json; charset=utf-8
+> Content-Type: application/json; charset=utf-8
 { "apiKey": "someVeryLongApiKey", "password":"SomeNewPasswordToSet"}
 < 201
 < Content-Type: application/json; charset=utf-8
@@ -56,7 +56,7 @@ POST /api/v1/buyer/setPassword
 
 Authorize Buyer with password
 POST /api/v1/buyer/login
-> Content-Type: application/x-www-form-urlencoded; charset=utf-8 | application/json; charset=utf-8
+> Content-Type: application/json; charset=utf-8
 { "apiKey": "someVeryLongApiKey", "password":"SomeNewPasswordToSet"}
 < 201
 < Content-Type: application/json; charset=utf-8
@@ -77,47 +77,21 @@ POST /api/v1/buyer/login
 
 -- Buyer/Owner profile json --
 
-Get information about currently authenticated (by cookie based session) user
-Additional info about sessionless authorization is published here https://bitbucket.org/oselot/amazingcreditresults.com-backend
-GET /auth/myself
-< 200
-< Content-Type: application/json; charset=utf-8
-{
-  "id": "536cfc8a886fcbba14d07dd5",
-  "huntKey": "1fcfaecdc53ce05ac5aa0658a977931b77d28861799c9b0261af1d83d713d2ea910b7f110d8f76fe02748040903cd70cef7107357395125c9a2888100f0634a9",
-  "email": "owner@example.org",
-  "name": {},
-  "gravatar": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
-  "gravatar30": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
-  "gravatar50": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
-  "gravatar80": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
-  "gravatar100": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=100&d=wavatar&r=g",
-  "root": true,
-  "accountVerified": false,
-  "telefone":"555-339-69-72",
-  "localAddress":"Gothem city",
-  "profile": {
-    "needQuestionnaire":true
-  }
-}
-+++++
-< 400
-< Content-Type: application/json; charset=utf-8
-{
-  "error":"Authorization required!"
-}
-
-
-Get information about currently authenticated (by cookie based session) user
+Get information about currently authenticated (by cookie or header based session) user
 Additional info about sessionless authorization is published here https://bitbucket.org/oselot/amazingcreditresults.com-backend
 GET /api/v1/myself
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
 < Content-Type: application/json; charset=utf-8
 {
   "id": "536cfc8a886fcbba14d07dd5",
   "huntKey": "1fcfaecdc53ce05ac5aa0658a977931b77d28861799c9b0261af1d83d713d2ea910b7f110d8f76fe02748040903cd70cef7107357395125c9a2888100f0634a9",
   "email": "owner@example.org",
-  "name": {},
+  "name": {
+    "givenName": "Jean Batist",
+    "middleName": "Emmanuele",
+    "familyName": "Zorg"
+  },
   "gravatar": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
   "gravatar30": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
   "gravatar50": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
@@ -127,15 +101,23 @@ GET /api/v1/myself
   "accountVerified": false,
   "telefone":"555-339-69-72",
   "localAddress":"Gothem city",
+  "roles":{
+    "owner":true,
+    "buyer":false,
+    "seller":false
+  },
   "profile": {
-    "needQuestionnaire":true
+    "needQuestionnaire":true,
+    "answer1": "1",
+    "answer2": "2",
+    "answer3": "3"
   }
 }
 +++++
 < 400
 < Content-Type: application/json; charset=utf-8
 {
-  "error":"Authorization required!"
+  "Error":"Authorization required!"
 }
 
 
@@ -143,7 +125,8 @@ GET /api/v1/myself
 
 Saving Buyer answers to questions on dashboard
 POST /api/v1/buyer/saveQuestionnaireAnswers
-> Content-Type: application/x-www-form-urlencoded; charset=utf-8 | application/json; charset=utf-8
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+> Content-Type: application/json; charset=utf-8
 { "answer1": "1", "answer2":"2", "answer3":"3", "needQuestionnaire":true,}
 < 202
 < Content-Type: application/json
@@ -162,12 +145,13 @@ POST /api/v1/buyer/saveQuestionnaireAnswers
     "answer3": "3"
   },
   "root": false,
-  "accountVerified": true,
+  "accountVerified": true
 }
 
 
-Get list of tradelines (only active!)
+Get list of tradelines avaible for this Buyer (Buyer can see only active tradelines, with some fields hidden)
 GET /api/v1/tradelines
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
 < Content-Type: application/json
 {
@@ -231,7 +215,7 @@ GET /api/v1/tradelines
 
 Endpoint to retrieve huntKey
 POST /api/v1/owner/login
-> Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
+> Content-Type: application/json; charset=utf-8 application | application/json; charset=utf-8
 { "username":"owner@example.org", "password":"test123" }
 < 200
 { "Code":200, "huntKey":"someRealyLongString" }
@@ -247,6 +231,7 @@ POST /api/v1/owner/login
 
 List all clients in JSON format
 GET /api/v1/admin/clients?page={:pageNumber}
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
 < Content-Type: application/json
 {
@@ -313,6 +298,7 @@ GET /api/v1/admin/clients?page={:pageNumber}
 
 Owner gets one client by id
 GET /api/v1/admin/clients/{:id}
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
 < Content-Type: application/json
 {
@@ -338,7 +324,8 @@ GET /api/v1/admin/clients/{:id}
 
 Owner updates buyer. The behavior is actually patch - the fields mentioned in accepted request are only updated. https://oselot.atlassian.net/browse/ACR-108
 PUT /api/v1/admin/clients/{:id}
-> Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+> Content-Type: application/json; charset=utf-8 application | application/json; charset=utf-8
 {"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org","telefone":"555-339-69-72","localAddress":"Gothem city","needQuestionnaire":true, "title":"Mr."}
 < 201
 < Content-Type: application/json
@@ -369,7 +356,8 @@ PUT /api/v1/admin/clients/{:id}
 
 Create new client
 POST /api/v1/admin/clients
-> Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+> Content-Type: application/json; charset=utf-8 application | application/json; charset=utf-8
 {"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org","telefone":"555-339-69-72","localAddress":"Gothem city","title":"Mr.","needQuestionnaire":true}
 < 202
 < Content-Type: application/json
@@ -392,6 +380,7 @@ POST /api/v1/admin/clients
 
 Send client notification email with welcome link
 POST /api/v1/admin/clients/welcome/:id
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 201
 < Content-Type: application/json
 {
@@ -418,7 +407,8 @@ POST /api/v1/admin/clients/welcome/:id
 
 Owner resets clients password and sends notification email with welcome link
 POST /api/v1/admin/clients/resetPassword/:id
-> Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+> Content-Type: application/json; charset=utf-8 application | application/json; charset=utf-8
 < 201
 < Content-Type: application/json
 {
@@ -445,7 +435,8 @@ POST /api/v1/admin/clients/resetPassword/:id
 
 Owner can create other owners
 POST /api/v1/admin/createOwner
-> Content-Type: application/x-www-form-urlencoded; charset=utf-8 application | application/json; charset=utf-8
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+> Content-Type: application/json; charset=utf-8 application | application/json; charset=utf-8
 {"email":"owner123@example.org", "password":"lalala"}
 < 201
 < Content-Type: application/json
@@ -471,6 +462,7 @@ POST /api/v1/admin/createOwner
 
 List all products
 GET /api/v1/owner/products
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
 < Content-Type: application/json
 {
@@ -504,9 +496,9 @@ GET /api/v1/owner/products
             "name": "Visa Gemoroi 1",
             "bank": "Sperbank (testing)",
             "type": "MasterCard",
-            "ncRating": "None",
-            "bcRating": "None",
-            "moRating": "None",
+            "ncRating": "Silver",
+            "bcRating": "Silver",
+            "moRating": "Silver",
             "reportsToExperian": false
         },
         {
@@ -514,9 +506,9 @@ GET /api/v1/owner/products
             "name": "Gemoroi 0",
             "bank": "Sperbank (testing)",
             "type": "MasterCard",
-            "ncRating": "None",
-            "bcRating": "None",
-            "moRating": "None",
+            "ncRating": "Gold",
+            "bcRating": "Gold",
+            "moRating": "Gold",
             "reportsToExperian": false,
             "reportsToEquifax": false,
             "reportsToTransunion": false
@@ -551,6 +543,7 @@ GET /api/v1/owner/products
 
 Get one product by id
 GET /api/v1/owner/products/{:id}
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
 < Content-Type: application/json
 {
@@ -568,6 +561,7 @@ GET /api/v1/owner/products/{:id}
 
 Update (patch) product
 PUT /api/v1/owner/products/{:id}
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json
 {
     "name":"Visa Gemoroi 0",
@@ -586,6 +580,7 @@ PUT /api/v1/owner/products/{:id}
 
 Delete product
 DELETE /api/v1/owner/products/{:id}
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 202
 < Content-Type: application/json
 {"status": "deleted"}
@@ -595,6 +590,7 @@ DELETE /api/v1/owner/products/{:id}
 
 List all tradelines
 GET /api/v1/owner/tradelines
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
 < Content-Type: application/json
 {
@@ -675,6 +671,7 @@ GET /api/v1/owner/tradelines
 
 Get one tradeline
 GET /api/v1/owner/tradelines/:id
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
 < Content-Type: application/json
 {
@@ -717,6 +714,7 @@ GET /api/v1/owner/tradelines/:id
 
 Update (patch) one tradeline, ratings can be 'None','Bronze','Silver','Gold'
 PUT /api/v1/owner/tradelines/:id
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json
 {
     "id": "537e7a957ba2f24310e3ecb4",
@@ -758,6 +756,7 @@ PUT /api/v1/owner/tradelines/:id
 
 Create tradeline, ratings can be 'None','Bronze','Silver','Gold'
 POST /api/v1/owner/tradelines
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json
 {
     "totalAus": 15,
