@@ -28,7 +28,6 @@ module.exports = exports = function (core) {
           'buyer': user.roles ? user.roles.buyer : false
         },
         'profile': user.profile
-        }
       });
     } else {
       response.status(400);
