@@ -15,7 +15,7 @@
   "author": "Anatolij Ostroumov",
   "license": "MIT",
   "dependencies": {
-    "hunt":"0.1.2"
+    "hunt":"https://api.github.com/repos/vodolaz095/hunt/tarball/master"
   },
   "devDependencies": {
     "request":"2.34.0",
