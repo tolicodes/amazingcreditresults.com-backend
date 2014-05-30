@@ -230,7 +230,7 @@ POST /api/v1/owner/login
 -- Owner resource to edit clients --
 
 List all clients in JSON format
-GET /api/v1/admin/clients?page={:pageNumber}
+GET /api/v1/admin/clients
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
 < Content-Type: application/json
@@ -539,6 +539,30 @@ GET /api/v1/owner/products
         }
     ]
 }
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Authorization required!"
+        }
+    ]
+}
 
 
 Get one product by id
@@ -558,6 +582,31 @@ GET /api/v1/owner/products/{:id}
         "reportsToExperian":false
     }
 }
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Authorization required!"
+        }
+    ]
+}
+
 
 Update (patch) product
 PUT /api/v1/owner/products/{:id}
@@ -576,6 +625,43 @@ PUT /api/v1/owner/products/{:id}
 }
 < 201
 < Content-Type: application/json
+{
+    "data": {
+        "name":"Visa Gemoroi 0",
+        "bank":"Sperbank (testing)",
+        "type":"MasterCard",
+        "ncRating":"None",
+        "bcRating":"None",
+        "moRating":"None",
+        "reportsToExperian":false,
+        "reportsToEquifax": false,
+        "reportsToTransunion": false
+    }
+}
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Authorization required!"
+        }
+    ]
+}
 
 
 Delete product
@@ -584,6 +670,30 @@ DELETE /api/v1/owner/products/{:id}
 < 202
 < Content-Type: application/json
 {"status": "deleted"}
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Authorization required!"
+        }
+    ]
+}
 
 
 -- Owner resource to edit tradelines --
@@ -668,6 +778,31 @@ GET /api/v1/owner/tradelines
         },
     ]
 }
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Authorization required!"
+        }
+    ]
+}
+
 
 Get one tradeline
 GET /api/v1/owner/tradelines/:id
@@ -709,6 +844,30 @@ GET /api/v1/owner/tradelines/:id
     "bcRating": "None",
     "moRating": "None"
     }
+}
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Authorization required!"
+        }
+    ]
 }
 
 
@@ -752,6 +911,30 @@ PUT /api/v1/owner/tradelines/:id
         "moRating": "Silver"
     }
 }
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Authorization required!"
+        }
+    ]
+}
 
 
 Create tradeline, ratings can be 'None','Bronze','Silver','Gold'
@@ -792,4 +975,28 @@ POST /api/v1/owner/tradelines
     "bcRating": "Bronze",
     "moRating": "Silver"
     }
+}
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Authorization required!"
+        }
+    ]
 }
