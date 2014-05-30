@@ -1,5 +1,6 @@
 //controller for owner users to edit the clients list
-var welcomeLinkGenerator = require('./../../lib/welcome.js');
+var welcomeLinkGenerator = require('./../../lib/welcome.js'),
+  ensureOwner = require('./../middleware.js').ensureOwner;
 
 module.exports = exports = function (core) {
 
@@ -15,9 +16,9 @@ module.exports = exports = function (core) {
     return (today.toLocaleDateString() + ' ' + h + ':' + m + ' ' + ampm + ' GMT');
   };
 
-  var ensureAdmin = require('./middleware.js');
 
-  core.app.get('/api/v1/admin/clients', ensureAdmin, function (request, response) {
+
+  core.app.get('/api/v1/admin/clients', ensureOwner, function (request, response) {
     var page = request.query.page || 1,
       order = request.query.order;
 
@@ -60,7 +61,7 @@ module.exports = exports = function (core) {
       });
   });
 
-  core.app.get('/api/v1/admin/clients/:id', ensureAdmin, function (request, response) {
+  core.app.get('/api/v1/admin/clients/:id', ensureOwner, function (request, response) {
     request.model.User.findById(request.params.id, function (error, user) {
       if (error) {
         throw error;
@@ -102,7 +103,7 @@ module.exports = exports = function (core) {
     });
   });
 
-  core.app.put('/api/v1/admin/clients/:id', ensureAdmin, function (request, response) {
+  core.app.put('/api/v1/admin/clients/:id', ensureOwner, function (request, response) {
 //https://oselot.atlassian.net/browse/ACR-108
     var patch = {};
     if (request.body.email) {
@@ -177,7 +178,7 @@ module.exports = exports = function (core) {
   });
 
 
-  core.app.post('/api/v1/admin/clients', ensureAdmin, function (request, response) {
+  core.app.post('/api/v1/admin/clients', ensureOwner, function (request, response) {
     var isOk,
       missed;
     [
@@ -250,7 +251,7 @@ module.exports = exports = function (core) {
   });
 
 //send message with link to site, without reseting the password
-  core.app.post('/api/v1/admin/clients/welcome/:id', ensureAdmin, function (request, response) {
+  core.app.post('/api/v1/admin/clients/welcome/:id', ensureOwner, function (request, response) {
     request.model.User.findById(request.params.id, function (error, userFound) {
       if (error) {
         throw error;
@@ -294,7 +295,7 @@ module.exports = exports = function (core) {
     });
   });
 
-  core.app.post('/api/v1/admin/clients/resetPassword/:id', ensureAdmin, function (request, response) {
+  core.app.post('/api/v1/admin/clients/resetPassword/:id', ensureOwner, function (request, response) {
     request.model.User.findById(request.params.id, function (error, userFound) {
       if (error) {
         throw error;
