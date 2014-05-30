@@ -16,7 +16,30 @@ module.exports = exports = function (core) {
     return (today.toLocaleDateString() + ' ' + h + ':' + m + ' ' + ampm + ' GMT');
   };
 
-
+  function formatUser = function(user){
+    return {
+      'id': user.id,
+      'email': user.email,
+      'name': {
+        'familyName': user.name.familyName, //http://schema.org/familyName
+        'givenName': user.name.givenName, //http://schema.org/givenName
+        'middleName': user.name.middleName //http://schema.org/middleName - at least the google oauth has this structure!
+      },
+      'title': user.profile ? (user.profile.title || 'Mr.') : 'Mr.',
+      'telefone': user.profile ? (user.profile.telefone || '') : '',
+      'localAddress': user.profile ? (user.profile.localAddress || '') : '',
+      'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : true,
+      'gravatar': user.gravatar,
+      'gravatar30': user.gravatar30,
+      'gravatar50': user.gravatar50,
+      'gravatar80': user.gravatar80,
+      'gravatar100': user.gravatar100,
+      'online': user.online,
+      'root': user.root,
+      'roles': user.roles,
+      'accountVerified': user.accountVerified
+    }
+  }
 
   core.app.get('/api/v1/admin/clients', ensureOwner, function (request, response) {
     var page = request.query.page || 1,
@@ -32,31 +55,9 @@ module.exports = exports = function (core) {
         if (error) {
           throw error;
         } else {
-          var usersPrepared = usersFound.map(function (user) {
-            return {
-              'id': user.id,
-              'email': user.email,
-              'name': {
-                'familyName': user.name.familyName, //http://schema.org/familyName
-                'givenName': user.name.givenName, //http://schema.org/givenName
-                'middleName': user.name.middleName //http://schema.org/middleName - at least the google oauth has this structure!
-              },
-              'title': user.profile ? (user.profile.title || 'Mr.') : 'Mr.',
-              'telefone': user.profile ? (user.profile.telefone || '') : '',
-              'localAddress': user.profile ? (user.profile.localAddress || '') : '',
-              'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : true,
-              'gravatar': user.gravatar,
-              'gravatar30': user.gravatar30,
-              'gravatar50': user.gravatar50,
-              'gravatar80': user.gravatar80,
-              'gravatar100': user.gravatar100,
-              'online': user.online,
-              'root': user.root,
-              'accountVerified': user.accountVerified
-            }
-          });
+          var usersPrepared = usersFound.map(formatUser);
           response.status(200);
-          response.json({'page': 1, 'clients': usersPrepared});
+          response.json({'page': page, 'clients': usersPrepared});
         }
       });
   });
@@ -68,27 +69,7 @@ module.exports = exports = function (core) {
       } else {
         if (user) {
           response.status(200);
-          response.json({
-            'id': user.id,
-            'email': user.email,
-            'name': {
-              'familyName': user.name.familyName,
-              'givenName': user.name.givenName,
-              'middleName': user.name.middleName
-            },
-            'title': user.profile ? user.profile.title : 'Mr.',
-            'gravatar': user.gravatar,
-            'gravatar30': user.gravatar30,
-            'gravatar50': user.gravatar50,
-            'gravatar80': user.gravatar80,
-            'gravatar100': user.gravatar100,
-            'online': user.online,
-            'root': user.root,
-            'accountVerified': user.accountVerified,
-            'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : true,
-            'telefone': user.profile ? user.profile.telefone : '',
-            'localAddress': user.profile ? user.profile.localAddress : ''
-          });
+          response.json(formatUser(user));
         } else {
           response.status(404);
           response.json({
@@ -140,28 +121,7 @@ module.exports = exports = function (core) {
         } else {
           if (userFound) {
             response.status(202);
-            response.json({
-              'id': userFound.id,
-              'email': userFound.email,
-              'name': {
-                'givenName': userFound.name.givenName,
-                'middleName': userFound.name.middleName,
-                'familyName': userFound.name.familyName
-              },
-              'title': userFound.profile ? userFound.profile.title : '',
-              'telefone': userFound.profile ? userFound.profile.telefone : '',
-              'localAddress': userFound.profile ? userFound.profile.localAddress : '',
-              'profile': {
-                'needQuestionnaire': userFound.profile ? userFound.profile.needQuestionnaire : true
-              },
-              'gravatar': userFound.gravatar,
-              'gravatar30': userFound.gravatar30,
-              'gravatar50': userFound.gravatar50,
-              'gravatar80': userFound.gravatar80,
-              'gravatar100': userFound.gravatar100,
-              'root': false,
-              'accountVerified': userFound.accountVerified
-            });
+            response.json(formatUser(userFound));
           } else {
             response.status(404);
             response.json({
@@ -214,28 +174,7 @@ module.exports = exports = function (core) {
           throw error;
         } else {
           response.status(201);
-          response.json({
-            'id': userCreated.id,
-            'email': userCreated.email,
-            'name': {
-              'givenName': userCreated.name.givenName,
-              'middleName': userCreated.name.middleName,
-              'familyName': userCreated.name.familyName
-            },
-            'profile': {
-              'needQuestionnaire': userCreated.profile.needQuestionnaire
-            },
-            'title': userCreated.profile.title,
-            'telefone': userCreated.profile.telefone,
-            'localAddress': userCreated.profile.localAddress,
-            'root': false,
-            'accountVerified': true,
-            'gravatar': userCreated.gravatar,
-            'gravatar30': userCreated.gravatar30,
-            'gravatar50': userCreated.gravatar50,
-            'gravatar80': userCreated.gravatar80,
-            'gravatar100': userCreated.gravatar100
-          });
+          response.json(formatUser(userCreated));
         }
       });
     } else {
@@ -287,7 +226,11 @@ module.exports = exports = function (core) {
               throw err;
             } else {
               response.status(202);
-              response.json({'message': 'sent', 'user': userFound, 'welcomeLink': welcomeLink});
+              response.json({
+                'message': 'sent',
+                'user': formatUser(userFound),
+                'welcomeLink': welcomeLink
+                });
             }
           });
         }
@@ -332,7 +275,10 @@ module.exports = exports = function (core) {
               throw err;
             } else {
               response.status(202);
-              response.json({'message': 'sent', 'user': userFound, 'welcomeLink': welcomeLink});
+              response.json({
+                'message': 'sent',
+                'user': formatUser(userFound),
+                'welcomeLink': welcomeLink});
             }
           });
         }
