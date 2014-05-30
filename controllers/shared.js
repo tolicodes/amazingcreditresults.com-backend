@@ -27,7 +27,7 @@ module.exports = exports = function (core) {
           'seller': user.roles ? user.roles.seller : false,
           'buyer': user.roles ? user.roles.buyer : false
         },
-        'profile': user.profile
+        'profile': user.profile || {}
       });
     } else {
       response.status(400);

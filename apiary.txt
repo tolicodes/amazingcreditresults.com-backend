@@ -566,7 +566,7 @@ GET /api/v1/owner/products
 
 
 Get one product by id
-GET /api/v1/owner/products/{:id}
+GET /api/v1/owner/products/537e7a9567b9f6d7f81d13b6
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
 < Content-Type: application/json
@@ -580,6 +580,74 @@ GET /api/v1/owner/products/{:id}
         "bcRating":"None",
         "moRating":"None",
         "reportsToExperian":false
+    }
+}
++++++
+< 404
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 404,
+        "message": "Product with this id do not exists!"
+        }
+    ]
+}
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Authorization required!"
+        }
+    ]
+}
+
+
+Create new product
+POST /api/v1/owner/products
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+> Content-Type: application/json
+{
+    "name":"Visa Gemoroi 0",
+    "bank":"Sperbank (testing)",
+    "type":"MasterCard",
+    "ncRating":"None",
+    "bcRating":"None",
+    "moRating":"None",
+    "reportsToExperian":false,
+    "reportsToEquifax": false,
+    "reportsToTransunion": false
+}
+< 201
+< Content-Type: application/json
+{
+    "data": {
+        "name":"Visa Gemoroi 0",
+        "bank":"Sperbank (testing)",
+        "type":"MasterCard",
+        "ncRating":"None",
+        "bcRating":"None",
+        "moRating":"None",
+        "reportsToExperian":false,
+        "reportsToEquifax": false,
+        "reportsToTransunion": false
     }
 }
 +++++
@@ -623,7 +691,7 @@ PUT /api/v1/owner/products/{:id}
     "reportsToEquifax": false,
     "reportsToTransunion": false
 }
-< 201
+< 202
 < Content-Type: application/json
 {
     "data": {
@@ -844,6 +912,18 @@ GET /api/v1/owner/tradelines/:id
     "bcRating": "None",
     "moRating": "None"
     }
+}
++++++
+< 404
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 404,
+        "message": "Tradeline with this id do not exists!"
+        }
+    ]
 }
 +++++
 < 403

@@ -60,7 +60,7 @@ module.exports = exports = function (core) {
               'errors': [
                 {
                   'code': 404,
-                  'message': 'Tradeline with this id ' + request.params.id + ' do not exists!'
+                  'message': 'Tradeline with this id do not exists!'
                 }
               ]
             });
