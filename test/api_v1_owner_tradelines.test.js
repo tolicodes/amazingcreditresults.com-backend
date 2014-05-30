@@ -312,5 +312,35 @@ describe('/api/v1/owner/tradelines test', function(){
       }
     });
   });
-  it('owner can delete tradeline?');
+  it('owner can delete (set `active` to false) tradeline', function(done){
+    request({
+      'method':'DELETE',
+      'url':'http://localhost:'+port+'/api/v1/owner/tradelines/'+tradeLineId,
+      'headers': { 'huntKey':ownerHuntKey }
+    }, function(error, response, body){
+      if(error) {
+        done(error);
+      } else {
+        response.statusCode.should.be.equal(202);
+        var bodyParsed = JSON.parse(body);
+        bodyParsed.status.should.be.equal('Tradeline archived');
+
+        request({
+          'method':'GET',
+          'url':'http://localhost:'+port+'/api/v1/owner/tradelines/'+tradeLineId,
+          'headers': { 'huntKey':ownerHuntKey }
+        }, function(err, response1, body1){
+          if(err) {
+            done(error);
+          } else {
+            response1.statusCode.should.be.equal(200);
+            var bodyParsed = JSON.parse(body1);
+            bodyParsed.data.id.should.be.equal(tradeLineId);
+            bodyParsed.data.active.should.be.false;
+            done();
+          }
+        });
+      }
+    });
+  });
 });
