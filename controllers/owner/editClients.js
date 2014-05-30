@@ -16,7 +16,7 @@ module.exports = exports = function (core) {
     return (today.toLocaleDateString() + ' ' + h + ':' + m + ' ' + ampm + ' GMT');
   };
 
-  function formatUser = function(user){
+  function formatUser(user){
     return {
       'id': user.id,
       'email': user.email,

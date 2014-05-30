@@ -51,6 +51,9 @@ Hunt.extendApp(function(core){
 //loading different controllers for buyers
 Hunt.extendRoutes(require('./controllers/buyer/login.js'));
 Hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
+//loading controller for inventory table
+Hunt.extendRoutes(require('./controllers/buyer/tradelines.js'));
+
 
 //loading different controllers for owners
 Hunt.extendRoutes(require('./controllers/owner/login.js'));
@@ -58,11 +61,12 @@ Hunt.extendRoutes(require('./controllers/owner/editClients.js'));
 Hunt.extendRoutes(require('./controllers/owner/editProducts.js'));
 Hunt.extendRoutes(require('./controllers/owner/editTradelines.js'));
 
-//loading controller shared by owners and buyers
+//loading different controllers for sellers
+Hunt.extendRoutes(require('./controllers/seller/editTradelines.js'));
+
+//loading controller shared by all users
 Hunt.extendRoutes(require('./controllers/shared.js'));
 
-//loading controller for inventory table
-Hunt.extendRoutes(require('./controllers/buyer/tradelines.js'));
 
 //Development route to test error catcher middleware
 if(Hunt.config.env === 'development') {
@@ -91,7 +95,7 @@ Hunt.extendRoutes(function(core){
 Hunt.extendRoutes(function(core){
   core.app.use(function(error, request, response, next){
 //http://mongoosejs.com/docs/validation.html
-    if(error.name == 'ValidationError') {
+    if(error.name === 'ValidationError') {
       response.status(400);
       var errs=[];
       for (var x in error.errors){
