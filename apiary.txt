@@ -456,7 +456,7 @@ POST /api/v1/admin/clients/resetPassword/:id
 }
 
 
--- Owners' endpoint to create other owners--
+-- Owners' endpoint to create other owners --
 
 Owner can create other owners
 POST /api/v1/admin/createOwner
