@@ -104,7 +104,7 @@ describe('/api/v1/owner/clients API resource test', function(){
           } else {
             response.statusCode.should.be.equal(200);
             var bodyParsed = JSON.parse(body);
-            verifyClient(bodyParsed);
+            verifyClient(bodyParsed.data);
             done();
           }
         });
@@ -123,7 +123,7 @@ describe('/api/v1/owner/clients API resource test', function(){
       } else {
         response.statusCode.should.be.equal(200);
         var bodyParsed = JSON.parse(body);
-        verifyClient(bodyParsed);
+        verifyClient(bodyParsed.data);
         done();
       }
     });
@@ -141,8 +141,8 @@ describe('/api/v1/owner/clients API resource test', function(){
         response.statusCode.should.be.equal(200);
         var bodyParsed = JSON.parse(body);
         bodyParsed.page.should.be.equal(1);
-        Array.isArray(bodyParsed.clients).should.be.true;
-        bodyParsed.clients.map(verifyClient);
+        Array.isArray(bodyParsed.data).should.be.true;
+        bodyParsed.data.map(verifyClient);
         done();
       }
     });
@@ -181,8 +181,8 @@ describe('/api/v1/owner/clients API resource test', function(){
         } else {
           response.statusCode.should.be.equal(200);
           var bodyParsed = JSON.parse(body);
-          verifyClient(bodyParsed);
-          bodyParsed.localAddress.should.be.equal('City #'+clientId);
+          verifyClient(bodyParsed.data);
+          bodyParsed.data.localAddress.should.be.equal('City #'+clientId);
           done();
         }
       });
@@ -235,14 +235,14 @@ describe('/api/v1/owner/clients API resource test', function(){
         } else {
           response.statusCode.should.be.equal(200);
           var bodyParsed = JSON.parse(body);
-          verifyClient(bodyParsed);
-          bodyParsed.localAddress.should.be.equal('new_City #'+testId);
-          bodyParsed.email.should.be.equal('new_unitTestUser'+testId+'@mail.ru');
-          bodyParsed.name.givenName.should.be.equal('new_John'+testId);
-          bodyParsed.name.middleName.should.be.equal('new_Teodor'+testId);
-          bodyParsed.name.familyName.should.be.equal('new_Doe'+testId);
-          bodyParsed.telefone.should.be.equal('555-339'+testId);
-          bodyParsed.title.should.be.equal('Mr.');
+          verifyClient(bodyParsed.data);
+          bodyParsed.data.localAddress.should.be.equal('new_City #'+testId);
+          bodyParsed.data.email.should.be.equal('new_unitTestUser'+testId+'@mail.ru');
+          bodyParsed.data.name.givenName.should.be.equal('new_John'+testId);
+          bodyParsed.data.name.middleName.should.be.equal('new_Teodor'+testId);
+          bodyParsed.data.name.familyName.should.be.equal('new_Doe'+testId);
+          bodyParsed.data.telefone.should.be.equal('555-339'+testId);
+          bodyParsed.data.title.should.be.equal('Mr.');
           done();
         }
       });

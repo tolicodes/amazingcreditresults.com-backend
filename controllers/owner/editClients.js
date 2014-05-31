@@ -36,20 +36,25 @@ module.exports = exports = function (core) {
       'gravatar100': user.gravatar100,
       'online': user.online,
       'root': user.root,
-      'roles': user.roles,
+      'roles': {
+        'owner': user.roles ? user.roles.owner : false,
+        'buyer': user.roles ? user.roles.buyer : false,
+        'seller': user.roles ? user.roles.seller : false
+      },
       'accountVerified': user.accountVerified
     }
   }
 
   core.app.get('/api/v1/admin/clients', ensureOwner, function (request, response) {
     var page = request.query.page || 1,
-      order = request.query.order;
+      order = request.query.order || '+_id';
 
     request.model.User
       .find({
         //todo - parameters for limiting output
       })
       .limit(100)
+      .sort(order)
       .skip() //todo - pagination
       .exec(function (error, usersFound) {
         if (error) {
@@ -57,7 +62,7 @@ module.exports = exports = function (core) {
         } else {
           var usersPrepared = usersFound.map(formatUser);
           response.status(200);
-          response.json({'page': page, 'clients': usersPrepared});
+          response.json({'page': page, 'data': usersPrepared});
         }
       });
   });
@@ -69,7 +74,7 @@ module.exports = exports = function (core) {
       } else {
         if (user) {
           response.status(200);
-          response.json(formatUser(user));
+          response.json({'data':formatUser(user)});
         } else {
           response.status(404);
           response.json({
@@ -105,7 +110,21 @@ module.exports = exports = function (core) {
         patch['profile.' + b] = request.body[b];
       }
     });
+    if(request.body.roles) {
+      var roles = {},
+        rolesToSet=false;
 
+      ['seller','buyer'].map(function(role){
+        if(request.body.roles[role] === true || request.body.roles[role] === false) {
+          roles[role] = request.body.roles[role];
+          rolesToSet = true;
+        }
+      });
+
+      if(rolesToSet){
+        patch.roles = roles;
+      }
+    }
 
     request.model.User.findOneAndUpdate(
       {
@@ -167,6 +186,9 @@ module.exports = exports = function (core) {
           'telefone': request.body.telefone,
           'localAddress': request.body.localAddress,
           'title': request.body.title
+        },
+        'roles': {
+          'buyer': true
         },
         'root': false
       }, function (error, userCreated) {
