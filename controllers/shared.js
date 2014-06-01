@@ -36,5 +36,5 @@ module.exports = exports = function (core) {
   }
 
   core.app.all('/api/v1/myself', f4myself);
-  core.app.all('/auth/myself', f4myself);
+  core.app.all('/auth/myself', f4myself); //not used and can be deprecated
 };

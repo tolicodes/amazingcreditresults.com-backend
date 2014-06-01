@@ -18,7 +18,7 @@ var hunt = require('hunt'),
       'resetPassword': false,
       'sessionExpireAfterSeconds': 5*60, //plan 1.4
 //      'apiKeyOutdates': 5*24*60*60*1000 //ttl of api key for buyer to authorize - 5 dayes
-      'apiKeyOutdates': 1*24*60*60*1000 //ttl of api key for buyer to authorize - 1 day //https://oselot.atlassian.net/browse/ACR-20
+      'apiKeyOutdates': 24*60*60*1000 //ttl of api key for buyer to authorize - 1 day //https://oselot.atlassian.net/browse/ACR-20
     },
     'emailConfig' : process.env.AMAZING_AMAZON_USE_SES ? {
       host : 'email-smtp.us-east-1.amazonaws.com',
@@ -38,7 +38,7 @@ Hunt.extendModel('TradeLine',require('./models/TradeLine.model.js'));
 Hunt.extendModel('Facade',require('./models/Facade.model.js'));
 
 Hunt.extendApp(function(core){
-//*/
+/*/
 //setting up the css and javascripts to insert into layout
   core.app.locals.css.push({'href': '//yandex.st/bootstrap/3.1.1/css/bootstrap.min.css', 'media': 'screen'});
 
@@ -63,7 +63,7 @@ Hunt.extendRoutes(require('./controllers/owner/editProducts.js'));
 Hunt.extendRoutes(require('./controllers/owner/editTradelines.js'));
 
 //loading different controllers for sellers
-Hunt.extendRoutes(require('./controllers/seller/editTradelines.js'));
+Hunt.extendRoutes(require('./controllers/seller/editMyTradelines.js'));
 
 //loading controller shared by all users
 Hunt.extendRoutes(require('./controllers/shared.js'));

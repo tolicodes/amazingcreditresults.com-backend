@@ -57,7 +57,15 @@ module.exports = exports = function(core){
 
     } else {
       response.status(401);
-      response.json({'Code':'401', 'Error':'Authorization required!'});
+      response.json({
+        'status': 'Error',
+        'errors': [
+          {
+            'code': 401,
+            'message': 'Authorization required!'
+          }
+        ]
+      });
     }
   });
 };
