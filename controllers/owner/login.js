@@ -6,7 +6,7 @@ module.exports = exports = function(core){
         if(error){
           throw error;
         } else {
-          if(userFound && userFound.root && userFound.verifyPassword(request.body.password)){
+          if(userFound && (userFound.roles && userFound.roles.owner === true) && userFound.verifyPassword(request.body.password)){
             response.status(200);
             response.json({'Code':200, 'id':userFound.id,'huntKey':userFound.apiKey,'name':userFound.name})
           } else {

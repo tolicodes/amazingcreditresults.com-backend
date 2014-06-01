@@ -4,7 +4,7 @@
 
 exports.ensureOwner = function(request, response, next){
   if(request.user){
-      if (request.user.roles && (request.user.roles.owner || request.user.root)) {
+      if (request.user.roles && (request.user.roles.owner)) {
         next();
       } else {
         response.status(403);
