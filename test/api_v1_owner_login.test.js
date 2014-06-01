@@ -3,17 +3,17 @@ var request = require('request'),
   port = process.env.PORT || 3000,
   huntKeys = [];
 
-describe('/api/v1/owner/login API endpoint test', function(){
-  it('returns 200 && `huntKey` for correct password via application/x-www-form-urlencoded', function(done){
+describe('/api/v1/owner/login API endpoint test', function () {
+  it('returns 200 && `huntKey` for correct password via application/x-www-form-urlencoded', function (done) {
     request({
-      'method':'POST',
-      'url':'http://localhost:'+port+'/api/v1/owner/login',
-      'form' : {
-        'username':'owner@example.org',
-        'password':'test123'
+      'method': 'POST',
+      'url': 'http://localhost:' + port + '/api/v1/owner/login',
+      'form': {
+        'username': 'owner@example.org',
+        'password': 'test123'
       }
-    }, function(error, response, body){
-      if(error) {
+    }, function (error, response, body) {
+      if (error) {
         done(error);
       } else {
         response.statusCode.should.be.equal(200);
@@ -26,16 +26,16 @@ describe('/api/v1/owner/login API endpoint test', function(){
     });
   });
 
-  it('returns 200 && `huntKey` for correct password via application/json', function(done){
+  it('returns 200 && `huntKey` for correct password via application/json', function (done) {
     request({
-      'method':'POST',
-      'url':'http://localhost:'+port+'/api/v1/owner/login',
-      'json' : {
-        'username':'owner@example.org',
-        'password':'test123'
+      'method': 'POST',
+      'url': 'http://localhost:' + port + '/api/v1/owner/login',
+      'json': {
+        'username': 'owner@example.org',
+        'password': 'test123'
       }
-    }, function(error, response, body){
-      if(error) {
+    }, function (error, response, body) {
+      if (error) {
         done(error);
       } else {
         response.statusCode.should.be.equal(200);
@@ -48,22 +48,22 @@ describe('/api/v1/owner/login API endpoint test', function(){
     });
   });
 
-  it('returned the good huntKeys', function(){
+  it('returned the good huntKeys', function () {
     Array.isArray(huntKeys).should.be.true;
     huntKeys.length.should.be.equal(2);
     huntKeys[0].should.be.equal(huntKeys[1]);
   });
 
-  it('returns 403 && message for wrong password', function(done){
+  it('returns 403 && message for wrong password', function (done) {
     request({
-      'method':'POST',
-      'url':'http://localhost:'+port+'/api/v1/owner/login',
-      'json' : {
-        'username':'owner@example.org',
-        'password':'someWrongPassword'
+      'method': 'POST',
+      'url': 'http://localhost:' + port + '/api/v1/owner/login',
+      'json': {
+        'username': 'owner@example.org',
+        'password': 'someWrongPassword'
       }
-    }, function(error, response, body){
-      if(error) {
+    }, function (error, response, body) {
+      if (error) {
         done(error);
       } else {
         response.statusCode.should.be.equal(403);
@@ -76,16 +76,16 @@ describe('/api/v1/owner/login API endpoint test', function(){
     });
   });
 
-    it('returns 400 && message for absent username or password', function(done){
+  it('returns 400 && message for absent username or password', function (done) {
     request({
-      'method':'POST',
-      'url':'http://localhost:'+port+'/api/v1/owner/login',
-      'json' : {
-        'notAusername':'owner@example.org',
-        'notAPassword':'someWrongPassword'
+      'method': 'POST',
+      'url': 'http://localhost:' + port + '/api/v1/owner/login',
+      'json': {
+        'notAusername': 'owner@example.org',
+        'notAPassword': 'someWrongPassword'
       }
-    }, function(error, response, body){
-      if(error) {
+    }, function (error, response, body) {
+      if (error) {
         done(error);
       } else {
         response.statusCode.should.be.equal(400);
@@ -99,8 +99,8 @@ describe('/api/v1/owner/login API endpoint test', function(){
   });
 });
 
-function testingCallback(error, response, body, done){
-  if(error) {
+function testingCallback(error, response, body, done) {
+  if (error) {
     done(error);
   } else {
     response.statusCode.should.be.equal(200);
@@ -121,83 +121,90 @@ function testingCallback(error, response, body, done){
   }
 }
 
-describe('/api/v1/myself works for owner', function(){
-  it('works with `huntKey` as `GET` parameter', function(done){
-    request({
-      'method':'GET',
-      'url':'http://localhost:'+port+'/api/v1/myself?huntKey='+huntKeys[0]
-    }, function(error, response, body){
+describe('/api/v1/myself works for owner', function () {
+
+  describe('Using huntKey as query parameter', function () {
+    it('works with `huntKey` as `GET` parameter', function (done) {
+      request({
+        'method': 'GET',
+        'url': 'http://localhost:' + port + '/api/v1/myself?huntKey=' + huntKeys[0]
+      }, function (error, response, body) {
         testingCallback(error, response, body, done);
+      });
     });
   });
-  it('works with `huntKey` as `POST` parameter', function(done){
-    request({
-      'method':'POST',
-      'url':'http://localhost:'+port+'/api/v1/myself',
-      'form': {'huntKey':huntKeys[0]}
-    }, function(error, response, body){
+
+  describe('Using huntKey as form field', function () {
+    it('works with `huntKey` as `POST` form parameter', function (done) {
+      request({
+        'method': 'POST',
+        'url': 'http://localhost:' + port + '/api/v1/myself',
+        'form': {'huntKey': huntKeys[0]}
+      }, function (error, response, body) {
         testingCallback(error, response, body, done);
+      });
     });
-  });
 
-  it('works with `huntKey` as custom header for GET response', function(done){
-    request({
-      'method':'GET',
-      'url':'http://localhost:'+port+'/api/v1/myself',
-      'headers': {'huntKey':huntKeys[0]}
-    }, function(error, response, body){
+    it('works with `huntKey` as `PUT` form parameter', function (done) {
+      request({
+        'method': 'PUT',
+        'url': 'http://localhost:' + port + '/api/v1/myself',
+        'form': {'huntKey': huntKeys[0]}
+      }, function (error, response, body) {
         testingCallback(error, response, body, done);
+      });
     });
-  });
 
-  it('works with `huntKey` as custom header for POST response', function(done){
-    request({
-      'method':'POST',
-      'url':'http://localhost:'+port+'/api/v1/myself',
-      'headers': {'huntKey':huntKeys[0]}
-    }, function(error, response, body){
+    it('works with `huntKey` as `DELETE` form parameter', function (done) {
+      request({
+        'method': 'DELETE',
+        'url': 'http://localhost:' + port + '/api/v1/myself',
+        'form': {'huntKey': huntKeys[0]}
+      }, function (error, response, body) {
         testingCallback(error, response, body, done);
+      });
     });
   });
 
-  it('works with `huntKey` as custom header for PUT response', function(done){
-    request({
-      'method':'PUT',
-      'url':'http://localhost:'+port+'/api/v1/myself',
-      'headers': {'huntKey':huntKeys[0]}
-    }, function(error, response, body){
-      testingCallback(error, response, body, done);
-    });
-  });
-
-  it('works with `huntKey` as custom header for DELETE response', function(done){
-    request({
-      'method':'DELETE',
-      'url':'http://localhost:'+port+'/api/v1/myself',
-      'headers': {'huntKey':huntKeys[0]}
-    }, function(error, response, body){
-      testingCallback(error, response, body, done);
-    });
-  });
-
-  it('works with `huntKey` as custom header for PUT response', function(done){
-    request({
-      'method':'PUT',
-      'url':'http://localhost:'+port+'/api/v1/myself',
-      'headers': {'huntKey':huntKeys[0]}
-    }, function(error, response, body){
+  describe('Using huntKey as header', function () {
+    it('works with `huntKey` as custom header for GET response', function (done) {
+      request({
+        'method': 'GET',
+        'url': 'http://localhost:' + port + '/api/v1/myself',
+        'headers': {'huntKey': huntKeys[0]}
+      }, function (error, response, body) {
         testingCallback(error, response, body, done);
+      });
     });
-  });
 
-  it('works with `huntKey` as custom header for DELETE response', function(done){
-    request({
-      'method':'DELETE',
-      'url':'http://localhost:'+port+'/api/v1/myself',
-      'headers': {'huntKey':huntKeys[0]}
-    }, function(error, response, body){
+    it('works with `huntKey` as custom header for POST response', function (done) {
+      request({
+        'method': 'POST',
+        'url': 'http://localhost:' + port + '/api/v1/myself',
+        'headers': {'huntKey': huntKeys[0]}
+      }, function (error, response, body) {
         testingCallback(error, response, body, done);
+      });
+    });
+
+    it('works with `huntKey` as custom header for PUT response', function (done) {
+      request({
+        'method': 'PUT',
+        'url': 'http://localhost:' + port + '/api/v1/myself',
+        'headers': {'huntKey': huntKeys[0]}
+      }, function (error, response, body) {
+        testingCallback(error, response, body, done);
+      });
+    });
+
+    it('works with `huntKey` as custom header for DELETE response', function (done) {
+      request({
+        'method': 'DELETE',
+        'url': 'http://localhost:' + port + '/api/v1/myself',
+        'headers': {'huntKey': huntKeys[0]}
+      }, function (error, response, body) {
+        testingCallback(error, response, body, done);
+      });
     });
   });
-
 });
