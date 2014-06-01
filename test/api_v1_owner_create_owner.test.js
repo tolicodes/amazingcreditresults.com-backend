@@ -70,7 +70,7 @@ describe('Owners can create other owner', function () {
     });
   });
 
-  it('created realy created new Owner', function (done) {
+  it('really created new Owner', function (done) {
     request({
       'method': 'GET',
       'url': 'http://localhost:' + port + '/api/v1/myself',
