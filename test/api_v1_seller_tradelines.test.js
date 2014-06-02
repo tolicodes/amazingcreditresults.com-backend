@@ -7,7 +7,7 @@ describe('Seller editing his/her tradelines', function () {
   var sellerId,
     productId,
     sellerHuntKey,
-    tradelineId;
+    tradeLineId;
 
   before(function (done) {
     request({
@@ -167,7 +167,7 @@ describe('Seller editing his/her tradelines', function () {
           bodyParsed.moRating.should.be.equal('Silver');
           bodyParsed.cost.should.be.equal(1000);
           bodyParsed.notes.should.be.equal('Some notes');
-          tradelineId = bodyParsed.id;
+          tradeLineId = bodyParsed.id;
           done();
         }
       });
@@ -176,7 +176,7 @@ describe('Seller editing his/her tradelines', function () {
     it('returns proper data for GET one by id response', function (done) {
       request({
         'method': 'GET',
-        'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradelineId,
+        'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradeLineId,
         'headers': {'huntKey': sellerHuntKey}
       }, function (error, response, body) {
         if (error) {
@@ -240,8 +240,80 @@ describe('Seller editing his/her tradelines', function () {
       });
     });
 
-    it('seller can update one tradelines');
+    it('seller can update tradeline', function (done) {
+      request({
+        'method': 'PUT',
+        'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradeLineId,
+        'headers': { 'huntKey': sellerHuntKey },
+        'form': {
+          'product': productId,
+          'totalAus': 11,
+          'usedAus': 6,
+          'price': 1099,
+          'creditLimit': 9999,
+          'cashLimit': 9999,
+          'currentBalance': 9999,
+          'ncRating': 'None',
+          'bcRating': 'Bronze',
+          'moRating': 'Gold',
+          'cost': 999,
+          'notes': 'Some notes111'
+        }
+      }, function (error, response, body) {
+        if (error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(202);
+          var bodyParsed = JSON.parse(body);
+//        bodyParsed.data.product.should.be.equal(productId);
+//        bodyParsed.data.seller.should.be.equal(ownerId);
+          bodyParsed.data.totalAus.should.be.equal(11);
+          bodyParsed.data.usedAus.should.be.equal(6);
+          bodyParsed.data.price.should.be.equal(1099);
+          bodyParsed.data.creditLimit.should.be.equal(9999);
+          bodyParsed.data.cashLimit.should.be.equal(9999);
+          bodyParsed.data.currentBalance.should.be.equal(9999);
+          bodyParsed.data.ncRating.should.be.equal('None');
+          bodyParsed.data.bcRating.should.be.equal('Bronze');
+          bodyParsed.data.moRating.should.be.equal('Gold');
+          bodyParsed.data.cost.should.be.equal(999);
+          bodyParsed.data.notes.should.be.equal('Some notes111');
+          done();
+        }
+      });
+    });
 
-    it('seller can send to archive one tradeline');
+
+    it('owner can delete (set `active` to false) tradeline', function (done) {
+      request({
+        'method': 'DELETE',
+        'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradeLineId,
+        'headers': { 'huntKey': sellerHuntKey }
+      }, function (error, response, body) {
+        if (error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(202);
+          var bodyParsed = JSON.parse(body);
+          bodyParsed.status.should.be.equal('Tradeline archived');
+
+          request({
+            'method': 'GET',
+            'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradeLineId,
+            'headers': { 'huntKey': sellerHuntKey }
+          }, function (err, response1, body1) {
+            if (err) {
+              done(error);
+            } else {
+              response1.statusCode.should.be.equal(200);
+              var bodyParsed = JSON.parse(body1);
+              bodyParsed.data.id.should.be.equal(tradeLineId);
+              bodyParsed.data.active.should.be.false;
+              done();
+            }
+          });
+        }
+      });
+    });
   });
 });
