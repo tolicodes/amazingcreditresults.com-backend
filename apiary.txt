@@ -1129,3 +1129,70 @@ POST /api/v1/owner/tradelines
         }
     ]
 }
+
+
+-- Sellers API for editing his/her tradelines --
+
+List all products
+GET /api/v1/seller/products
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 200
+< Content-Type: application/json
+{
+    "metaData": {
+        "totalPages": 1,
+        "page": 1
+    },
+    "data": [
+        {
+            "id": "5387a705cbba46cbe7fdef4b",
+            "name": "Gemoroi 0",
+            "bank": "Sperbank (testing)",
+            "type": "MasterCard",
+            "ncRating": "None",
+            "bcRating": "None",
+            "moRating": "None",
+            "reportsToExperian": false,
+            "reportsToEquifax": false,
+            "reportsToTransunion": false
+        },
+        {
+            "id": "5387a705cbba46cbe7fdef4c",
+            "name": "Gemoroi 1",
+            "bank": "Sperbank (testing)",
+            "type": "MasterCard",
+            "ncRating": "None",
+            "bcRating": "None",
+            "moRating": "None",
+            "reportsToExperian": false,
+            "reportsToEquifax": false,
+            "reportsToTransunion": false
+        }
+    ]    
+}
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 401,
+        "message": "Authorization required!"
+        }
+    ]
+}
+
+

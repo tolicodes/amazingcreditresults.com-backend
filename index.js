@@ -63,6 +63,7 @@ Hunt.extendRoutes(require('./controllers/owner/editProducts.js'));
 Hunt.extendRoutes(require('./controllers/owner/editTradelines.js'));
 
 //loading different controllers for sellers
+Hunt.extendRoutes(require('./controllers/seller/listProducts.js'));
 Hunt.extendRoutes(require('./controllers/seller/editMyTradelines.js'));
 
 //loading controller shared by all users
