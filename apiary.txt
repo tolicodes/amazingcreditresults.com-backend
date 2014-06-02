@@ -1168,7 +1168,7 @@ GET /api/v1/seller/products
             "reportsToEquifax": false,
             "reportsToTransunion": false
         }
-    ]    
+    ]
 }
 +++++
 < 403
@@ -1195,4 +1195,170 @@ GET /api/v1/seller/products
     ]
 }
 
+
+List all tradelines, belonging to Seller authenticated
+GET /api/v1/seller/products
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 200
+< Content-Type: application/json
+{
+    "metaData": {},
+    "data": [
+        {
+            "id": "5387a705a95bbc6c1e3fbad4",
+            "totalAus": 15,
+            "usedAus": 0,
+            "creditLimit": 20000,
+            "cashLimit": 0,
+            "cost": 1000,
+            "price": 1100,
+            "notes": "Some notes",
+            "active": false,
+            "seller": "5387a705cbba46cbe7fdef48",
+            "dateOpen": "2014-05-29T21:30:44.347Z",
+            "product": {
+                "id": "5387a705cbba46cbe7fdef4b",
+                "name": "Gemoroi 0",
+                "bank": "Sperbank (testing)",
+                "reportsToExperian": false,
+                "reportsToEquifax": false,
+                "reportsToTransunion": false,
+                "ncRating": "None",
+                "bcRating": "None",
+                "moRating": "None",
+                "type": "MasterCard"
+            },
+            "ncRating": "Bronze",
+            "bcRating": "Bronze",
+            "moRating": "Bronze"
+        },
+        {
+            "id": "5387a705a95bbc6c1e3fbad2",
+            "totalAus": 15,
+            "usedAus": 0,
+            "creditLimit": 20000,
+            "cashLimit": 0,
+            "cost": 1000,
+            "price": 1100,
+            "notes": "Some notes",
+            "active": false,
+            "seller": "5387a705cbba46cbe7fdef48",
+            "dateOpen": "2014-05-29T21:30:44.347Z",
+            "product": {
+                "id": "5387a705cbba46cbe7fdef4b",
+                "name": "Gemoroi 0",
+                "bank": "Sperbank (testing)",
+                "reportsToExperian": false,
+                "reportsToEquifax": false,
+                "reportsToTransunion": false,
+                "ncRating": "None",
+                "bcRating": "None",
+                "moRating": "None",
+                "type": "MasterCard"
+            },
+            "ncRating": "Bronze",
+            "bcRating": "Bronze",
+            "moRating": "Bronze"
+        }
+    ]
+}
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 401,
+        "message": "Authorization required!"
+        }
+    ]
+}
+
+
+List one tradelines, belonging to Seller authenticated
+GET /api/v1/seller/products/5387a705a95bbc6c1e3fbad4
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 200
+< Content-Type: application/json
+{
+    "data": [
+        {
+            "id": "5387a705a95bbc6c1e3fbad4",
+            "totalAus": 15,
+            "usedAus": 0,
+            "creditLimit": 20000,
+            "cashLimit": 0,
+            "cost": 1000,
+            "price": 1100,
+            "notes": "Some notes",
+            "active": false,
+            "seller": "5387a705cbba46cbe7fdef48",
+            "dateOpen": "2014-05-29T21:30:44.347Z",
+            "product": {
+                "id": "5387a705cbba46cbe7fdef4b",
+                "name": "Gemoroi 0",
+                "bank": "Sperbank (testing)",
+                "reportsToExperian": false,
+                "reportsToEquifax": false,
+                "reportsToTransunion": false,
+                "ncRating": "None",
+                "bcRating": "None",
+                "moRating": "None",
+                "type": "MasterCard"
+            },
+            "ncRating": "Bronze",
+            "bcRating": "Bronze",
+            "moRating": "Bronze"
+        }
+    ]
+}
++++++
+< 404
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 404,
+        "message": "Tradeline with this id do not exists!"
+        }
+    ]
+}
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 401,
+        "message": "Authorization required!"
+        }
+    ]
+}
 
