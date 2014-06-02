@@ -1064,6 +1064,19 @@ PUT /api/v1/owner/tradelines/:id
         }
     ]
 }
++++++
+< 400
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 400,
+        "message": "Cost have to be bigger, than 0!",
+        "field":"cost"
+        }
+    ]
+}
 
 
 Create tradeline, ratings can be 'None','Bronze','Silver','Gold'
@@ -1104,6 +1117,66 @@ POST /api/v1/owner/tradelines
     "bcRating": "Bronze",
     "moRating": "Silver"
     }
+}
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 401,
+        "message": "Authorization required!"
+        }
+    ]
+}
++++++
+< 400
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 400,
+        "message": "Cost have to be bigger, than 0!",
+        "field":"cost"
+        }
+    ]
+}
+
+
+Send to archive one tradeline
+DELETE /api/v1/owner/tradelines/:id
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+> Content-Type: application/json
+< 202
+< Content-Type: application/json
+{
+  "status":"Tradeline archived"
+}
++++++
+< 404
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 404,
+        "message": "Tradeline with this ID do not exists!"
+        }
+    ]
 }
 +++++
 < 403
@@ -1362,3 +1435,203 @@ GET /api/v1/seller/products/5387a705a95bbc6c1e3fbad4
     ]
 }
 
+
+Create tradeline, ratings can be 'None','Bronze','Silver','Gold'
+POST /api/v1/seller/tradelines
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+> Content-Type: application/json
+{
+    "totalAus": 15,
+    "usedAus": 0,
+    "creditLimit": 0,
+    "cashLimit": 0,
+    "balance": 100,
+    "cost": 1000,
+    "price":1100,
+    "notes": "Some notes",
+     "product": "537e7a9567b9f6d7f81d13b6",
+    "ncRating": "None",
+    "bcRating": "Bronze",
+    "moRating": "Silver"
+}
+< 201
+< Content-Type: application/json
+{
+    "data": {
+    "id": "537e7a957ba2f24310e3ecb4",
+    "totalAus": 15,
+    "usedAus": 0,
+    "creditLimit": 0,
+    "cashLimit": 0,
+    "balance": 100,
+    "cost": 1000,
+    "price":1100,
+    "notes": "Some notes",
+    "product": "537e7a9567b9f6d7f81d13b6",
+    "ncRating": "None",
+    "bcRating": "Bronze",
+    "moRating": "Silver"
+    }
+}
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 401,
+        "message": "Authorization required!"
+        }
+    ]
+}
++++++
+< 400
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 400,
+        "message": "Cost have to be bigger, than 0!",
+        "field":"cost"
+        }
+    ]
+}
+
+
+Update (patch) one tradeline, ratings can be 'None','Bronze','Silver','Gold'
+PUT /api/v1/seller/tradelines/:id
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+> Content-Type: application/json
+{
+    "id": "537e7a957ba2f24310e3ecb4",
+    "totalAus": 15,
+    "usedAus": 0,
+    "creditLimit": 0,
+    "cashLimit": 0,
+    "balance": 100,
+    "cost": 1000,
+    "price":1100,
+    "notes": "Some notes",
+    "seller": "536bd8b988dfc8adc31a1c44",
+    "product": "537e7a9567b9f6d7f81d13b6",
+    "ncRating": "None",
+    "bcRating": "Bronze",
+    "moRating": "Silver"
+}
+< 201
+< Content-Type: application/json
+{
+    "data":{
+        "id": "537e7a957ba2f24310e3ecb4",
+        "totalAus": 15,
+        "usedAus": 0,
+        "creditLimit": 0,
+        "cashLimit": 0,
+        "balance": 100,
+        "cost": 1000,
+        "price":1100,
+        "notes": "Some notes",
+        "product": "537e7a9567b9f6d7f81d13b6",
+        "ncRating": "None",
+        "bcRating": "Bronze",
+        "moRating": "Silver"
+    }
+}
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 401,
+        "message": "Authorization required!"
+        }
+    ]
+}
++++++
+< 400
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 400,
+        "message": "Cost have to be bigger, than 0!",
+        "field":"cost"
+        }
+    ]
+}
+
+
+Send to archive one tradeline
+DELETE /api/v1/seller/tradelines/:id
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+> Content-Type: application/json
+< 202
+< Content-Type: application/json
+{
+  "status":"Tradeline archived"
+}
++++++
+< 404
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 404,
+        "message": "Tradeline with this ID do not exists!"
+        }
+    ]
+}
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 401,
+        "message": "Authorization required!"
+        }
+    ]
+}

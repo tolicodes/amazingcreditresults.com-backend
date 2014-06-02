@@ -143,8 +143,19 @@ module.exports = exports = function (core) {
           if(error){
             throw error;
           } else {
-            response.status(202);
-            response.json({'status':'Tradeline archived'});
+            if(tradeLineArchived) {
+              response.status(202);
+              response.json({'status':'Tradeline archived'});
+            } else {
+              response.status(404);
+              response.json({
+                "status": "Error",
+                "errors": [{
+                  "code": 404,
+                  "message": "Tradeline with this ID do not exists!"
+                }]
+              });
+            }
           }
         });
   });
