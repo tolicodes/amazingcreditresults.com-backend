@@ -13,7 +13,7 @@ module.exports = exports = function (core) {
 
   core.app.get('/api/v1/seller/tradelines', ensureSellerOrOwner, function (request, response) {
     var filter = {};
-    [ 'product', 'seller', 'totalAus', 'usedAus',
+    [ 'product', 'totalAus', 'usedAus',
       'creditLimit', 'cashLimit', 'currentBalance',
       '_ncRating', '_bcRating', '_moRating',
       'ncRating', 'bcRating', 'moRating',
@@ -73,7 +73,7 @@ module.exports = exports = function (core) {
   core.app.post('/api/v1/seller/tradelines', ensureSellerOrOwner, function (request, response) {
     var fields = {};
     [
-      'product', , 'totalAus', 'usedAus', 'price',
+      'product', 'totalAus', 'usedAus', 'price',
       'creditLimit', 'cashLimit', 'currentBalance', 'ncRating',
       'bcRating', 'moRating', 'cost', 'notes'
     ].map(function (field) {
