@@ -1,5 +1,5 @@
 //https://oselot.atlassian.net/browse/ACR-208
-var ensureSellerOrOwner = require('./../middleware.js').ensureOwner;
+var ensureSellerOrOwner = require('./../middleware.js').ensureSellerOrOwner;
 
 module.exports = exports = function (core) {
 
