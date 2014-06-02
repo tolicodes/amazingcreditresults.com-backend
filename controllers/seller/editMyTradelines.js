@@ -29,7 +29,6 @@ module.exports = exports = function (core) {
       .skip(request.query.skip || 0)
       .limit(request.query.limit || 30)
       .sort('+_id')
-      .populate('seller')
       .populate('product')
       .exec(function (error, tradeLines) {
         if (error) {
@@ -46,7 +45,6 @@ module.exports = exports = function (core) {
   core.app.get('/api/v1/seller/tradelines/:id', ensureSellerOrOwner, function (request, response) {
     request.model.TradeLine
       .findOne({'_id':request.params.id, 'seller' : request.user.id}) //very important!
-      .populate('seller')
       .populate('product')
       .exec(function (error, tradelineFound) {
         if (error) {
