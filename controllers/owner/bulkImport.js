@@ -40,6 +40,10 @@ module.exports = exports = function (core) {
     response.sendfile(__dirname + '/clientsExample.csv');
   });
 
+  core.app.get('/owner/bulkImport', ensureUserIsOwnerMiddleware, function (request, response) {
+    response.render('owner/bulkImport',{'title':'Bulk import of clients'});
+  });
+
   core.app.get('/api/v1/owner/bulkImport', ensureUserIsOwnerMiddleware, function (request, response) {
     response.send('ok?');
   });

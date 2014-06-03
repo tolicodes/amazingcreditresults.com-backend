@@ -38,7 +38,7 @@ Hunt.extendModel('TradeLine',require('./models/TradeLine.model.js'));
 Hunt.extendModel('Facade',require('./models/Facade.model.js'));
 
 Hunt.extendApp(function(core){
-/*/
+//*/
 //setting up the css and javascripts to insert into layout
   core.app.locals.css.push({'href': '//yandex.st/bootstrap/3.1.1/css/bootstrap.min.css', 'media': 'screen'});
 
@@ -137,7 +137,7 @@ Hunt.on('start', function(evnt){
 //*/
 });
 
-/*/
+//*/
 //Some sort of logging. npm module of `forever` can output this all to files.
 Hunt.on('httpSuccess', console.log);
 Hunt.on('httpError', console.error);
