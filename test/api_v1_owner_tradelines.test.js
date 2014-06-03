@@ -312,6 +312,7 @@ describe('/api/v1/owner/tradelines test', function(){
       }
     });
   });
+
   it('owner can delete (set `active` to false) tradeline', function(done){
     request({
       'method':'DELETE',
