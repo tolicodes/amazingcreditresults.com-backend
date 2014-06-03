@@ -37,7 +37,6 @@ function formatUser(user){
 }
 module.exports = exports = function (core) {
   core.app.get('/api/v1/owner/clientsExample.csv', ensureUserIsOwnerMiddleware, function (request, response) {
-    console.log(__dirname + '/clientsExample.csv');
     response.sendfile(__dirname + '/clientsExample.csv');
   });
 
