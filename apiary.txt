@@ -215,10 +215,18 @@ GET /api/v1/tradelines
 
 Endpoint to retrieve huntKey
 POST /api/v1/owner/login
-> Content-Type: application/json; charset=utf-8 application | application/json; charset=utf-8
+> Content-Type: application/json; charset=utf-8
 { "username":"owner@example.org", "password":"test123" }
 < 200
-{ "Code":200, "huntKey":"someRealyLongString" }
+{
+    "Code":200,
+    "huntKey":"someRealyLongString",
+    "name": {
+        "familyName": "Doe",
+        "givenName": "John",
+        "middleName": ""
+    }
+}
 +++++
 < 403
 { "Code":403, "Error":"Unable to authorize Owner with this credentials!" }
@@ -348,7 +356,7 @@ GET /api/v1/admin/clients/{:id}
 Owner updates buyer. The behavior is actually patch - the fields mentioned in accepted request are only updated. https://oselot.atlassian.net/browse/ACR-108
 PUT /api/v1/admin/clients/{:id}
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
-> Content-Type: application/json; charset=utf-8 application | application/json; charset=utf-8
+> Content-Type: application/json; charset=utf-8
 {"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org","telefone":"555-339-69-72","localAddress":"Gothem city","needQuestionnaire":true, "title":"Mr."}
 < 201
 < Content-Type: application/json
@@ -380,7 +388,7 @@ PUT /api/v1/admin/clients/{:id}
 Create new client
 POST /api/v1/admin/clients
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
-> Content-Type: application/json; charset=utf-8 application | application/json; charset=utf-8
+> Content-Type: application/json; charset=utf-8
 {"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org","telefone":"555-339-69-72","localAddress":"Gothem city","title":"Mr.","needQuestionnaire":true}
 < 202
 < Content-Type: application/json
@@ -431,7 +439,7 @@ POST /api/v1/admin/clients/welcome/:id
 Owner resets clients password and sends notification email with welcome link
 POST /api/v1/admin/clients/resetPassword/:id
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
-> Content-Type: application/json; charset=utf-8 application | application/json; charset=utf-8
+> Content-Type: application/json; charset=utf-8
 < 201
 < Content-Type: application/json
 {
@@ -461,7 +469,7 @@ POST /api/v1/admin/clients/resetPassword/:id
 Owner can create other owners
 POST /api/v1/admin/createOwner
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
-> Content-Type: application/json; charset=utf-8 application | application/json; charset=utf-8
+> Content-Type: application/json; charset=utf-8
 {"email":"owner123@example.org", "password":"lalala"}
 < 201
 < Content-Type: application/json
