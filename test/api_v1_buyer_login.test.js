@@ -38,9 +38,11 @@ describe('Unit test for user authorization by welcome link', function () {
         'headers': {'huntKey': ownerHuntKey},
         'form': {
           'email': 'unitTestUser' + testId + '@mail.ru',
-          'givenName': 'John' + testId,
-          'middleName': 'Teodor' + testId,
-          'familyName': 'Doe' + testId,
+          'name': {
+            'givenName': 'John' + testId,
+            'middleName': 'Teodor' + testId,
+            'familyName': 'Doe' + testId
+          },
           'needQuestionnaire': true,
           'telefone': '555-339' + testId,
           'localAddress': 'Some Address',
@@ -51,6 +53,7 @@ describe('Unit test for user authorization by welcome link', function () {
           done(error);
         } else {
           var bodyParsed = JSON.parse(body);
+          console.log(bodyParsed);
           response.statusCode.should.be.equal(201);
           userId = bodyParsed.id;
           done();

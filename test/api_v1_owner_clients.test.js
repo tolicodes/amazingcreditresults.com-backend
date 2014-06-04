@@ -65,9 +65,11 @@ describe('/api/v1/owner/clients API resource test', function(){
       'headers': {'huntKey':huntKey},
       'form':{
         'email': 'unitTestUser'+testId+'@mail.ru',
-        'givenName': 'John'+testId,
-        'middleName': 'Teodor'+testId,
-        'familyName': 'Doe'+testId,
+        'name': {
+          'givenName': 'John' + testId,
+          'middleName': 'Teodor' + testId,
+          'familyName': 'Doe' + testId
+        },
         'needQuestionnaire': true,
         'telefone': '555-339'+testId,
         'localAddress': 'Some Address',
@@ -197,9 +199,11 @@ describe('/api/v1/owner/clients API resource test', function(){
         'form':{
           'localAddress':'new_City #'+testId,
           'email': 'new_unitTestUser'+testId+'@mail.ru',
-          'givenName': 'new_John'+testId,
-          'middleName': 'new_Teodor'+testId,
-          'familyName': 'new_Doe'+testId,
+          'name':{
+            'givenName': 'new_John'+testId,
+            'middleName': 'new_Teodor'+testId,
+            'familyName': 'new_Doe'+testId
+          },
           'needQuestionnaire': true,
           'telefone': '555-339'+testId,
           'title': 'Mr.'

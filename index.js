@@ -137,7 +137,7 @@ Hunt.on('start', function(evnt){
 //*/
 });
 
-//*/
+/*/
 //Some sort of logging. npm module of `forever` can output this all to files.
 Hunt.on('httpSuccess', console.log);
 Hunt.on('httpError', console.error);

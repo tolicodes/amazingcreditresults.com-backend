@@ -344,6 +344,7 @@ GET /api/v1/admin/clients/{:id}
       "telefone":"555-339-69-72",
       "localAddress":"Gothem city",
       "title":"Mr.",
+      "needQuestionnaire":true,
       "roles":{
         "owner":false,
         "buyer":true,
@@ -357,7 +358,17 @@ Owner updates buyer. The behavior is actually patch - the fields mentioned in ac
 PUT /api/v1/admin/clients/{:id}
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json; charset=utf-8
-{"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org","telefone":"555-339-69-72","localAddress":"Gothem city","needQuestionnaire":true, "title":"Mr."}
+{
+    "name":{
+      "familyName" : "Doe",
+      "givenName" : "John",
+      "middleName" : "Theodor"
+    }
+    "email":"johndoe@example.org",
+    "telefone":"555-339-69-72",
+    "localAddress":"Gothem city",
+    "needQuestionnaire":true,
+    "title":"Mr."}
 < 201
 < Content-Type: application/json
 {

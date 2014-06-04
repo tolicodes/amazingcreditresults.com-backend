@@ -101,8 +101,8 @@ module.exports = exports = function (core) {
     }
 
     ['familyName', 'givenName', 'middleName'].map(function (a) {
-      if (request.body[a]) {
-        patch['name.' + a] = request.body[a];
+      if (request.body.name && request.body.name[a]) {
+        patch['name.' + a] = request.body.name[a];
       }
     });
     ['title', 'localAddress', 'telefone', 'needQuestionnaire'].map(function (b) {
@@ -160,26 +160,32 @@ module.exports = exports = function (core) {
   core.app.post('/api/v1/admin/clients', ensureOwner, function (request, response) {
     var isOk,
       missed;
+
+    if(!request.body.email){
+      isOk = false;
+      missed = 'email';
+    }
+
     [
-      'email',
       'familyName',
       'givenName'
-      //  'middleName' //not mandatory for now
+      //'middleName' //not mandatory for now
     ].map(function (s) {
-        if (request.body[s] && typeof request.body[s] === 'string') {
+        if (request.body.name && request.body.name[s] && typeof request.body.name[s] === 'string') {
           isOk = true;
         } else {
           isOk = false;
           missed = s;
         }
       });
+
     if (isOk) {
       request.model.User.create({
         'email': request.body.email,
         'name': {
-          'givenName': request.body.givenName,
-          'middleName': request.body.middleName,
-          'familyName': request.body.familyName
+          'givenName': request.body.name.givenName,
+          'middleName': request.body.name.middleName,
+          'familyName': request.body.name.familyName
         },
         'profile': {
           'needQuestionnaire': request.body.Questionnaire ? true : false,
