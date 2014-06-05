@@ -94,18 +94,27 @@ module.exports = exports = function (core) {
       }
     });
 
+  TradeLineSchema.virtual('availableAus')
+    .get(function(){
+      return (this.totalAus - this.usedAus);
+    })
+    .set(function(val){
+      return;
+    });
+
   TradeLineSchema.methods.toJSON = function () {
     return {
       'id': this._id,
+      'active': this.active,
       'totalAus': this.totalAus,
       'usedAus': this.usedAus,
+      'availableAus': this.availableAus,
       'creditLimit': this.creditLimit,
       'cashLimit': this.cashLimit,
       'currentBalance': this.currentBalance,
       'cost': this.cost,
       'price': this.price,
       'notes': this.notes,
-      'active': this.active,
       'seller': this.seller,
       'statementDate': this.statementDate,
       'dateOpen': this.dateOpen,

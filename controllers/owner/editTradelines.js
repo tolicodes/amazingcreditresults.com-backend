@@ -73,7 +73,7 @@ module.exports = exports = function (core) {
     var fields = {};
     [
       'product', 'seller', 'totalAus', 'usedAus', 'price',
-      'creditLimit', 'cashLimit', 'currentBalance', 'ncRating',
+      'creditLimit', 'cashLimit', 'currentBalance', 'ncRating', 'statementDate',
       'bcRating', 'moRating', 'cost', 'notes'
     ].map(function (field) {
         if (request.body[field]) {
@@ -99,7 +99,7 @@ module.exports = exports = function (core) {
         if (tradeLineFound) {
           [
             'product', 'seller', 'totalAus', 'usedAus', 'price',
-            'creditLimit', 'cashLimit', 'currentBalance', 'ncRating',
+            'creditLimit', 'cashLimit', 'currentBalance', 'ncRating', 'statementDate',
             'bcRating', 'moRating', 'cost', 'notes'
           ].map(function (field) {
               if (request.body[field]) {

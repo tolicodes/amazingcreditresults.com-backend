@@ -27,6 +27,7 @@ module.exports = exports = function(core){
                 'seller': t.seller,
                 'statementDate': t.statementDate,
                 'dateOpen': t.dateOpen,
+                'availableAus': t.availableAus,
                 'product': {
                   'id':t.product.id,
                   'name':t.product.name,

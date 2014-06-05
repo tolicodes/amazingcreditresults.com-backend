@@ -144,8 +144,7 @@ describe('Seller editing his/her tradelines', function () {
           'ncRating': 'Silver',
           'bcRating': 'Silver',
           'moRating': 'Silver',
-          'cost': 1000,
-          'notes': 'Some notes'
+          'cost': 1000
         }
       }, function (error, response, body) {
         if (error) {
@@ -166,7 +165,6 @@ describe('Seller editing his/her tradelines', function () {
           bodyParsed.bcRating.should.be.equal('Silver');
           bodyParsed.moRating.should.be.equal('Silver');
           bodyParsed.cost.should.be.equal(1000);
-          bodyParsed.notes.should.be.equal('Some notes');
           tradeLineId = bodyParsed.id;
           done();
         }
@@ -196,7 +194,7 @@ describe('Seller editing his/her tradelines', function () {
           bodyParsed.bcRating.should.be.equal('Silver');
           bodyParsed.moRating.should.be.equal('Silver');
           bodyParsed.cost.should.be.equal(1000);
-          bodyParsed.notes.should.be.equal('Some notes');
+          should.not.exist(bodyParsed.notes);
           done();
         }
       });
@@ -224,7 +222,7 @@ describe('Seller editing his/her tradelines', function () {
 //          tradeline.currentBalance.should.be.below(1000000);
             tradeline.cost.should.be.a.Number;
             tradeline.price.should.be.a.Number;
-            tradeline.notes.should.be.a.String;
+            should.not.exist(tradeline.notes);
             tradeline.seller.should.be.a.String;
             tradeline.seller.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
             tradeline.seller.should.be.equal(sellerId);
@@ -256,8 +254,7 @@ describe('Seller editing his/her tradelines', function () {
           'ncRating': 'None',
           'bcRating': 'Bronze',
           'moRating': 'Gold',
-          'cost': 999,
-          'notes': 'Some notes111'
+          'cost': 999
         }
       }, function (error, response, body) {
         if (error) {
@@ -277,7 +274,6 @@ describe('Seller editing his/her tradelines', function () {
           bodyParsed.data.bcRating.should.be.equal('Bronze');
           bodyParsed.data.moRating.should.be.equal('Gold');
           bodyParsed.data.cost.should.be.equal(999);
-          bodyParsed.data.notes.should.be.equal('Some notes111');
           done();
         }
       });

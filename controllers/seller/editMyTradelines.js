@@ -7,14 +7,42 @@ module.exports = exports = function (core) {
     return product;
   }
 
-  function formatTradeline(product) {
-    return product;
+  function formatTradeline(t) {
+    return {
+      'id': t._id,
+      'totalAus': t.totalAus,
+      'usedAus': t.usedAus,
+      'creditLimit': t.creditLimit,
+      'cashLimit': t.cashLimit,
+      'currentBalance': t.currentBalance,
+      'cost': t.cost,
+      'seller': t.seller,
+      'statementDate': t.statementDate,
+      'dateOpen': t.dateOpen,
+      'availableAus': t.availableAus,
+      'product': {
+        'id':t.product.id,
+        'name':t.product.name,
+        'bank':t.product.bank,
+        'reportsToExperian':t.product.reportsToExperian,
+        'reportsToEquifax':t.product.reportsToEquifax,
+        'reportsToTransunion':t.product.reportsToTransunion,
+        'ncRating': t.product.ncRating,
+        'bcRating': t.product.bcRating,
+        'moRating': t.product.moRating,
+        'type': t.product.type
+      },
+      'price': t.price,
+      'ncRating': t.ncRating,
+      'bcRating': t.bcRating,
+      'moRating': t.moRating
+    }
   }
 
   core.app.get('/api/v1/seller/tradelines', ensureSellerOrOwner, function (request, response) {
     var filter = {};
     [ 'product', 'totalAus', 'usedAus',
-      'creditLimit', 'cashLimit', 'currentBalance',
+      'creditLimit', 'cashLimit', 'currentBalance', 'statementDate',
       '_ncRating', '_bcRating', '_moRating',
       'ncRating', 'bcRating', 'moRating',
       'cost', 'price', 'active'].map(function (field) {
@@ -72,8 +100,8 @@ module.exports = exports = function (core) {
     var fields = {};
     [
       'product', 'totalAus', 'usedAus', 'price',
-      'creditLimit', 'cashLimit', 'currentBalance', 'ncRating',
-      'bcRating', 'moRating', 'cost', 'notes'
+      'creditLimit', 'cashLimit', 'currentBalance', 'ncRating', 'statementDate',
+      'bcRating', 'moRating', 'cost'
     ].map(function (field) {
         if (request.body[field]) {
           fields[field] = request.body[field];
@@ -99,8 +127,8 @@ module.exports = exports = function (core) {
         if (tradeLineFound) {
           [
             'product', 'totalAus', 'usedAus', 'price',
-            'creditLimit', 'cashLimit', 'currentBalance', 'ncRating',
-            'bcRating', 'moRating', 'cost', 'notes'
+            'creditLimit', 'cashLimit', 'currentBalance', 'ncRating', 'statementDate',
+            'bcRating', 'moRating', 'cost'
           ].map(function (field) {
               if (request.body[field]) {
                 tradeLineFound[field] = request.body[field];
