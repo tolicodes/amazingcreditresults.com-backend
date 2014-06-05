@@ -11,13 +11,48 @@ module.exports = exports = function(core){
             response.json({'Code':200, 'id':userFound.id,'huntKey':userFound.apiKey,'name':userFound.name})
           } else {
             response.status(403);
-            response.json({'Code':403,'Error':'Unable to authorize Owner with this credentials!'});
+            response.json({
+              'status': 'Error',
+              'errors': [
+                {
+                  'code': 403,
+                  'message': 'Unable to authorize Owner with this credentials!',
+                  'field':'username'
+                }
+              ]
+            });
           }
         }
       });
     } else {
       response.status(400);
-      response.json({'Code':400,'Error':'The values of `username` or `password` are not provided!'});
+      var errors = [];
+
+      if(!request.body.username){
+        errors.push([
+          {
+            'code': 400,
+            'message': 'Username is not provided!',
+            'field':'username'
+          }
+        ])
+      }
+
+      if(!request.body.password){
+        errors.push([
+          {
+            'code': 400,
+            'message': 'Password is not provided!',
+            'field':'password'
+          }
+        ])
+      }
+
+      response.json({
+        'status': 'Error',
+        'errors': errors
+      });
+
     }
   });
 };
