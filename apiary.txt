@@ -161,11 +161,12 @@ GET /api/v1/tradelines
     },
     "data": [
         {
-            "id": "5387bff4db5aaf0b36d05aa8",
-            "seller": "536cfc8a886fcbba14d07dd5",
-            "dateOpen": "2014-05-29T23:17:08.252Z",
+            "id": "5387c1c7a1e6fd5948e266cc",
+            "seller": "5370a4fa25777db9531ffa91",
+            "dateOpen": "2014-05-29T23:24:55.294Z",
+            "availableAus": 15,
             "product": {
-                "id": "53876d8d18547d20333926fb",
+                "id": "53876e1e6b7719ef3102521e",
                 "name": "Gemoroi 0",
                 "bank": "Sperbank (testing)",
                 "reportsToExperian": false,
@@ -182,19 +183,20 @@ GET /api/v1/tradelines
             "moRating": "Bronze"
         },
         {
-            "id": "5387bff4db5aaf0b36d05aa9",
-            "seller": "536cfc8a886fcbba14d07dd5",
-            "dateOpen": "2014-05-29T23:17:08.252Z",
+            "id": "5387c1c7a1e6fd5948e266cd",
+            "seller": "5370a4fa25777db9531ffa91",
+            "dateOpen": "2014-05-29T23:24:55.294Z",
+            "availableAus": 15,
             "product": {
-                "id": "53876d8d18547d20333926fb",
+                "id": "53876e1e6b7719ef3102521e",
                 "name": "Gemoroi 0",
                 "bank": "Sperbank (testing)",
                 "reportsToExperian": false,
                 "reportsToEquifax": false,
                 "reportsToTransunion": false,
-                "ncRating": "Gold",
-                "bcRating": "Gold",
-                "moRating": "Gold",
+                "ncRating": "None",
+                "bcRating": "None",
+                "moRating": "None",
                 "type": "MasterCard"
             },
             "price": 1100,
@@ -202,7 +204,7 @@ GET /api/v1/tradelines
             "bcRating": "Bronze",
             "moRating": "Bronze"
         }
-    ]
+   ]
 }
 +++++
 < 401
@@ -844,8 +846,9 @@ GET /api/v1/owner/tradelines
     "data": [
         {
             "id": "537e7a957ba2f24310e3ecb5",
-            "totalAus": 100,
+            "totalAus": 15,
             "usedAus": 0,
+            "availableAus": 15,
             "creditLimit": 0,
             "cashLimit": 0,
             "balance": 100,
@@ -879,8 +882,9 @@ GET /api/v1/owner/tradelines
         },
         {
             "id": "537e7a957ba2f24310e3ecb4",
-            "totalAus": 100,
+            "totalAus": 15,
             "usedAus": 0,
+            "availableAus": 15,
             "creditLimit": 0,
             "cashLimit": 0,
             "balance": 100,
@@ -1297,20 +1301,18 @@ GET /api/v1/seller/products
     "metaData": {},
     "data": [
         {
-            "id": "5387a705a95bbc6c1e3fbad4",
+            "id": "53876e1e3b12c0f945c4987c",
             "totalAus": 15,
             "usedAus": 0,
             "creditLimit": 20000,
             "cashLimit": 0,
             "cost": 1000,
-            "price": 1100,
-            "notes": "Some notes",
-            "active": false,
-            "seller": "5387a705cbba46cbe7fdef48",
-            "dateOpen": "2014-05-29T21:30:44.347Z",
+            "seller": "5370a4fa25777db9531ffa91",
+            "dateOpen": "2014-05-29T17:27:58.243Z",
+            "availableAus": 15,
             "product": {
-                "id": "5387a705cbba46cbe7fdef4b",
-                "name": "Gemoroi 0",
+                "id": "53876e1e6b7719ef31025220",
+                "name": "Gemoroi 2",
                 "bank": "Sperbank (testing)",
                 "reportsToExperian": false,
                 "reportsToEquifax": false,
@@ -1320,25 +1322,24 @@ GET /api/v1/seller/products
                 "moRating": "None",
                 "type": "MasterCard"
             },
+            "price": 1100,
             "ncRating": "Bronze",
             "bcRating": "Bronze",
             "moRating": "Bronze"
         },
         {
-            "id": "5387a705a95bbc6c1e3fbad2",
+            "id": "53876e1e3b12c0f945c4987a",
             "totalAus": 15,
             "usedAus": 0,
             "creditLimit": 20000,
             "cashLimit": 0,
             "cost": 1000,
-            "price": 1100,
-            "notes": "Some notes",
-            "active": false,
-            "seller": "5387a705cbba46cbe7fdef48",
-            "dateOpen": "2014-05-29T21:30:44.347Z",
+            "seller": "5370a4fa25777db9531ffa91",
+            "dateOpen": "2014-05-29T17:27:58.243Z",
+            "availableAus": 15,
             "product": {
-                "id": "5387a705cbba46cbe7fdef4b",
-                "name": "Gemoroi 0",
+                "id": "53876e1e6b7719ef31025220",
+                "name": "Gemoroi 2",
                 "bank": "Sperbank (testing)",
                 "reportsToExperian": false,
                 "reportsToEquifax": false,
@@ -1348,6 +1349,7 @@ GET /api/v1/seller/products
                 "moRating": "None",
                 "type": "MasterCard"
             },
+            "price": 1100,
             "ncRating": "Bronze",
             "bcRating": "Bronze",
             "moRating": "Bronze"
@@ -1386,36 +1388,35 @@ GET /api/v1/seller/products/5387a705a95bbc6c1e3fbad4
 < 200
 < Content-Type: application/json
 {
-    "data": [
-        {
-            "id": "5387a705a95bbc6c1e3fbad4",
-            "totalAus": 15,
-            "usedAus": 0,
-            "creditLimit": 20000,
-            "cashLimit": 0,
-            "cost": 1000,
-            "price": 1100,
-            "notes": "Some notes",
-            "active": false,
-            "seller": "5387a705cbba46cbe7fdef48",
-            "dateOpen": "2014-05-29T21:30:44.347Z",
-            "product": {
-                "id": "5387a705cbba46cbe7fdef4b",
-                "name": "Gemoroi 0",
-                "bank": "Sperbank (testing)",
-                "reportsToExperian": false,
-                "reportsToEquifax": false,
-                "reportsToTransunion": false,
-                "ncRating": "None",
-                "bcRating": "None",
-                "moRating": "None",
-                "type": "MasterCard"
-            },
-            "ncRating": "Bronze",
-            "bcRating": "Bronze",
-            "moRating": "Bronze"
-        }
-    ]
+    "data": {
+        "id": "5387a705a95bbc6c1e3fbad4",
+        "active": false,
+        "totalAus": 15,
+        "usedAus": 0,
+        "availableAus": 15,
+        "creditLimit": 20000,
+        "cashLimit": 0,
+        "cost": 1000,
+        "price": 1100,
+        "notes": "Some notes",
+        "seller": "5370a4fa25777db9531ffa91",
+        "dateOpen": "2014-05-29T17:27:58.243Z",
+        "product": {
+            "id": "53876e1e6b7719ef31025220",
+            "name": "Gemoroi 2",
+            "bank": "Sperbank (testing)",
+            "reportsToExperian": false,
+            "reportsToEquifax": false,
+            "reportsToTransunion": false,
+            "ncRating": "None",
+            "bcRating": "None",
+            "moRating": "None",
+            "type": "MasterCard"
+        },
+        "ncRating": "Bronze",
+        "bcRating": "Bronze",
+        "moRating": "Bronze"
+    }
 }
 +++++
 < 404
@@ -1467,8 +1468,7 @@ POST /api/v1/seller/tradelines
     "balance": 100,
     "cost": 1000,
     "price":1100,
-    "notes": "Some notes",
-     "product": "537e7a9567b9f6d7f81d13b6",
+    "product": "537e7a9567b9f6d7f81d13b6",
     "ncRating": "None",
     "bcRating": "Bronze",
     "moRating": "Silver"
@@ -1480,12 +1480,11 @@ POST /api/v1/seller/tradelines
     "id": "537e7a957ba2f24310e3ecb4",
     "totalAus": 15,
     "usedAus": 0,
+    "availableAus": 15,
     "creditLimit": 0,
     "cashLimit": 0,
     "balance": 100,
     "cost": 1000,
-    "price":1100,
-    "notes": "Some notes",
     "product": "537e7a9567b9f6d7f81d13b6",
     "ncRating": "None",
     "bcRating": "Bronze",
@@ -1544,7 +1543,6 @@ PUT /api/v1/seller/tradelines/:id
     "balance": 100,
     "cost": 1000,
     "price":1100,
-    "notes": "Some notes",
     "seller": "536bd8b988dfc8adc31a1c44",
     "product": "537e7a9567b9f6d7f81d13b6",
     "ncRating": "None",
@@ -1558,12 +1556,12 @@ PUT /api/v1/seller/tradelines/:id
         "id": "537e7a957ba2f24310e3ecb4",
         "totalAus": 15,
         "usedAus": 0,
+        "availableAus": 15,
         "creditLimit": 0,
         "cashLimit": 0,
         "balance": 100,
         "cost": 1000,
         "price":1100,
-        "notes": "Some notes",
         "product": "537e7a9567b9f6d7f81d13b6",
         "ncRating": "None",
         "bcRating": "Bronze",
