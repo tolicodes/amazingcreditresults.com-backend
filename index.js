@@ -35,6 +35,7 @@ var hunt = require('hunt'),
 //loading models
 Hunt.extendModel('Product',require('./models/Product.model.js'));
 Hunt.extendModel('TradeLine',require('./models/TradeLine.model.js'));
+Hunt.extendModel('TradeLineChange',require('./models/TradeLineChange.model.js'));
 Hunt.extendModel('Facade',require('./models/Facade.model.js'));
 
 Hunt.extendApp(function(core){
@@ -102,12 +103,14 @@ Hunt.extendRoutes(function(core){
       response.status(400);
       var errs=[];
       for (var x in error.errors){
-        errs.push({
-          'code':400,
-          'message': error.errors[x].message,
-          'field': error.errors[x].path,
-          'value': error.errors[x].value,
-        });
+        if(error.errors.hasOwnProperty(x)){
+          errs.push({
+            'code':400,
+            'message': error.errors[x].message,
+            'field': error.errors[x].path,
+            'value': error.errors[x].value
+          });
+        }
       }
       response.json({
         "status": "Error",
@@ -117,7 +120,7 @@ Hunt.extendRoutes(function(core){
       response.status(500);
       response.json({
         "status": "Error",
-        "errors": [ {
+        "errors": [{
           "code": 500,
           "message": error.message
         }]
