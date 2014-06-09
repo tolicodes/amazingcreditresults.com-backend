@@ -215,7 +215,7 @@ describe('/api/v1/owner/tradelines test', function(){
 //          tradeline.currentBalance.should.be.below(1000000);
           tradeline.cost.should.be.a.Number;
           tradeline.price.should.be.a.Number;
-          tradeline.notes.should.be.a.String;
+//          tradeline.notes.should.be.a.String;
           tradeline.seller.id.should.be.a.String;
           tradeline.seller.id.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
           tradeline.dateOpen.should.be.a.Date;

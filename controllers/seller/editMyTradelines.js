@@ -214,35 +214,5 @@ module.exports = exports = function (core) {
     });
   });
 
-  /*/
-   //todo - implement versioning too?
-   core.app.delete('/api/v1/seller/tradelines/:id', ensureSellerOrOwner, function (request, response) {
-    request.model.TradeLine.findOneAndUpdate(
-   {'_id': request.params.id, 'seller': request.user.id},
-   { 'active': false },
-   {'upsert': false},
-   function (error, tradeLineArchived) {
-   if (error) {
-   throw error;
-   } else {
-   if (tradeLineArchived) {
-   response.status(202);
-   response.json({'status': 'Tradeline archived'});
-   } else {
-   response.status(404);
-   response.json({
-   "status": "Error",
-   "errors": [
-   {
-   "code": 404,
-                  "message": "Tradeline with this ID do not exists!"
-   }
-   ]
-   });
-   }
-   }
-   });
-   });
-   //*/
 };
 
