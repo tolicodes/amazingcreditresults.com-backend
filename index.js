@@ -8,23 +8,23 @@ var hunt = require('hunt'),
     'disableCsrf': true, //strongly not recommended for production!!!
     'enableMongoose': true,
     'enableMongooseUsers': true,
-    'public': __dirname+'/public/',
-    'views': __dirname+'/views/',
+    'public': __dirname + '/public/',
+    'views': __dirname + '/views/',
     'maxWorkers': 2, //for production use - 1 per CPU core
-    'passport':{
+    'passport': {
       'local': false,
       'signUpByEmail': false,
       'verifyEmail': false,
       'resetPassword': false,
-      'sessionExpireAfterSeconds': 5*60, //plan 1.4
+      'sessionExpireAfterSeconds': 5 * 60, //plan 1.4
 //      'apiKeyOutdates': 5*24*60*60*1000 //ttl of api key for buyer to authorize - 5 dayes
-      'apiKeyOutdates': 24*60*60*1000 //ttl of api key for buyer to authorize - 1 day //https://oselot.atlassian.net/browse/ACR-20
+      'apiKeyOutdates': 24 * 60 * 60 * 1000 //ttl of api key for buyer to authorize - 1 day //https://oselot.atlassian.net/browse/ACR-20
     },
-    'emailConfig' : process.env.AMAZING_AMAZON_USE_SES ? {
-      host : 'email-smtp.us-east-1.amazonaws.com',
-      port : 587,
-      name : 'dev.amazingcreditresults.com',//'54.86.168.135',
-      fromEmailAddr : process.env.AMAZING_AMAZON_SES_SMTP_FROM || 'anatolij@oselot.com',
+    'emailConfig': process.env.AMAZING_AMAZON_USE_SES ? {
+      host: 'email-smtp.us-east-1.amazonaws.com',
+      port: 587,
+      name: 'dev.amazingcreditresults.com',//'54.86.168.135',
+      fromEmailAddr: process.env.AMAZING_AMAZON_SES_SMTP_FROM || 'anatolij@oselot.com',
       auth: {
         user: process.env.AMAZING_AMAZON_SES_SMTP_USERNAME || 'AKIAJ2ZQ6HBUVUQCRUIQ',
         pass: process.env.AMAZING_AMAZON_SES_SMTP_PASSWORD || 'AuJw3HgKNWp+vpERHTnBmbl7LmPe7GXZfJnj4zK0zQKm'
@@ -33,12 +33,12 @@ var hunt = require('hunt'),
   });
 
 //loading models
-Hunt.extendModel('Product',require('./models/Product.model.js'));
-Hunt.extendModel('TradeLine',require('./models/TradeLine.model.js'));
-Hunt.extendModel('TradeLineChange',require('./models/TradeLineChange.model.js'));
-Hunt.extendModel('Facade',require('./models/Facade.model.js'));
+Hunt.extendModel('Product', require('./models/Product.model.js'));
+Hunt.extendModel('TradeLine', require('./models/TradeLine.model.js'));
+Hunt.extendModel('TradeLineChange', require('./models/TradeLineChange.model.js'));
+Hunt.extendModel('Facade', require('./models/Facade.model.js'));
 
-Hunt.extendApp(function(core){
+Hunt.extendApp(function (core) {
 //*/
 //setting up the css and javascripts to insert into layout
   core.app.locals.css.push({'href': '//yandex.st/bootstrap/3.1.1/css/bootstrap.min.css', 'media': 'screen'});
@@ -73,7 +73,7 @@ Hunt.extendRoutes(require('./controllers/shared.js'));
 
 
 //Development route to test error catcher middleware
-if(Hunt.config.env === 'development') {
+if (Hunt.config.env === 'development') {
   Hunt.extendRoutes(function (core) {
     core.app.get('/testError', function (request, response) {
       throw new Error('Test error!');
@@ -81,34 +81,36 @@ if(Hunt.config.env === 'development') {
   });
 }
 
-Hunt.extendRoutes(function(core){
-  core.app.all('*', function(request,response){
+Hunt.extendRoutes(function (core) {
+  core.app.all('*', function (request, response) {
     response.status(404);
     response.json({
       "status": "Error",
-      "errors": [ {
-        "code": 404,
-        "message": 'This API endpoint do not exists!'
-      }]
+      "errors": [
+        {
+          "code": 404,
+          "message": 'This API endpoint do not exists!'
+        }
+      ]
     });
   });
 });
 
 //JSON error reporter middleware.
 //https://oselot.atlassian.net/browse/ACR-105
-Hunt.extendRoutes(function(core){
-  core.app.use(function(error, request, response, next){
+Hunt.extendRoutes(function (core) {
+  core.app.use(function (error, request, response, next) {
 //http://mongoosejs.com/docs/validation.html
-    if(core.config.env === 'development') {
+    if (core.config.env === 'development') {
       console.error(error);
     }
-    if(error.name === 'ValidationError') {
+    if (error.name === 'ValidationError') {
       response.status(400);
-      var errs=[];
-      for (var x in error.errors){
-        if(error.errors.hasOwnProperty(x)){
+      var errs = [];
+      for (var x in error.errors) {
+        if (error.errors.hasOwnProperty(x)) {
           errs.push({
-            'code':400,
+            'code': 400,
             'message': error.errors[x].message,
             'field': error.errors[x].path,
             'value': error.errors[x].value
@@ -123,24 +125,26 @@ Hunt.extendRoutes(function(core){
       response.status(500);
       response.json({
         "status": "Error",
-        "errors": [{
-          "code": 500,
-          "message": error.message
-        }]
+        "errors": [
+          {
+            "code": 500,
+            "message": error.message
+          }
+        ]
       });
     }
   });
 });
 
-Hunt.on('start', function(evnt){
+Hunt.on('start', function (evnt) {
 //populating database with test data in development environment!
-  if(Hunt.config.env === 'development') {
+  if (Hunt.config.env === 'development') {
     require('./lib/populateDatabase.js')(Hunt); //uncomment to repopulate database on every start
   }
-/*/
-//testing amazon SES
-  Hunt.sendEmail('anatolij@oselot.com','SES works','YRA!', console.error);
-//*/
+  /*/
+   //testing amazon SES
+   Hunt.sendEmail('anatolij@oselot.com','SES works','YRA!', console.error);
+   //*/
 });
 
 
@@ -150,9 +154,14 @@ Hunt.on('start', function(evnt){
 //Hunt.on('httpError', console.error);
 
 //starting
-if(Hunt.config.env === 'development'){
-  Hunt.startWebServer();
+if (module.parent) {
+//https://oselot.atlassian.net/browse/ACR-255
+  module.exports = exports = Hunt;
 } else {
-  Hunt.startWebCluster();
+  if (Hunt.config.env === 'development') {
+    Hunt.startWebServer();
+  } else {
+    Hunt.startWebCluster();
+  }
 }
 
