@@ -74,12 +74,22 @@ module.exports = exports = function (core) {
     request.model.TradeLine
       .findOne({'_id':request.params.id, 'seller' : request.user.id}) //very important!
       .populate('product')
-      .exec(function (error, tradelineFound) {
+      .exec(function (error, tradeLineFound) {
         if (error) {
           throw error;
         } else {
-          if (tradelineFound) {
-            response.json({'data': tradelineFound});
+          if (tradeLineFound) {
+            request.model.TradeLineChange
+              .find({'tradeLine':tradeLineFound.id})
+              .sort('-id')
+              .exec(function(error, tradeLineChanges){
+                if(error){
+                  throw error;
+                } else {
+                  tradeLineFound.changes = tradeLineChanges;
+                  response.json({'data': tradeLineFound});
+                }
+              });
           } else {
             response.status(404);
             response.json({

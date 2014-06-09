@@ -22,7 +22,7 @@ module.exports = exports = function (core) {
       'active': {type: Boolean, default: false},
 
 //for versioning
-      'tradeline': { type: core.mongoose.Schema.Types.ObjectId, ref: 'TradeLine', required: true },
+      'tradeLine': { type: core.mongoose.Schema.Types.ObjectId, ref: 'TradeLine', required: true },
       'createdAt': {type: Date, default: Date.now()},
       'issuer': { type: core.mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
       'reviewer': { type: core.mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
@@ -37,7 +37,7 @@ module.exports = exports = function (core) {
 
 
   TradeLineChangesSchema.index({
-    tradeline: 1
+    tradeLine: 1
   });
 
   TradeLineChangesSchema.path('product').validate(function (value, respond) {
@@ -60,7 +60,7 @@ module.exports = exports = function (core) {
     });
   }, 'Unable to find corresponding Seller among the Users!');
 
-  TradeLineChangesSchema.path('tradeline').validate(function (value, respond) {
+  TradeLineChangesSchema.path('tradeLine').validate(function (value, respond) {
     return core.model.TradeLine.findById(value, function (error, userFound) {
       if (error) {
         throw error;
@@ -78,7 +78,7 @@ module.exports = exports = function (core) {
         respond(userFound ? true : false);
       }
     });
-  }, 'Unable to find corresponding Issuer for this tradeline among the Users!');
+  }, 'Unable to find corresponding Issuer for this tradeLine among the Users!');
 
   TradeLineChangesSchema.path('reviewer').validate(function (value, respond) {
     return core.model.User.findById(value, function (error, userFound) {
@@ -88,7 +88,7 @@ module.exports = exports = function (core) {
         respond(userFound ? true : false);
       }
     });
-  }, 'Unable to find corresponding Reviewer for this tradeline among the Users!');
+  }, 'Unable to find corresponding Reviewer for this tradeLine among the Users!');
 
 
   TradeLineChangesSchema.virtual('ncRating')
@@ -156,7 +156,7 @@ module.exports = exports = function (core) {
     if (user && user.roles && user.roles.owner === true) {
       switch (status) {
         case 1:
-          core.model.TradeLines.findById(change.tradeline, function (error, TradeLineFound) {
+          core.model.TradeLines.findById(change.tradeLine, function (error, TradeLineFound) {
             if (error) {
               callback(error);
             } else {
@@ -192,7 +192,7 @@ module.exports = exports = function (core) {
                   }
                 });
               } else {
-                callback(new Error('Unable to find tradeline'));
+                callback(new Error('Unable to find tradeLine'));
               }
             }
           });
@@ -208,7 +208,7 @@ module.exports = exports = function (core) {
           callback(new Error('Wrong status - it have to be 1(`approved`) or 2(`denied`)'));
       }
     } else {
-      callback(new Error('Unable to approve tradeline on behalf of this user! User is not a Owner or wrong object'));
+      callback(new Error('Unable to approve tradeLine on behalf of this user! User is not a Owner or wrong object'));
     }
   }
 

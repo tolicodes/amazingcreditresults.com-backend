@@ -99,6 +99,9 @@ Hunt.extendRoutes(function(core){
 Hunt.extendRoutes(function(core){
   core.app.use(function(error, request, response, next){
 //http://mongoosejs.com/docs/validation.html
+    if(core.config.env === 'development') {
+      console.error(error);
+    }
     if(error.name === 'ValidationError') {
       response.status(400);
       var errs=[];
@@ -140,11 +143,11 @@ Hunt.on('start', function(evnt){
 //*/
 });
 
-/*/
+
 //Some sort of logging. npm module of `forever` can output this all to files.
-Hunt.on('httpSuccess', console.log);
-Hunt.on('httpError', console.error);
-//*/
+
+//Hunt.on('httpSuccess', console.log);
+//Hunt.on('httpError', console.error);
 
 //starting
 if(Hunt.config.env === 'development'){
