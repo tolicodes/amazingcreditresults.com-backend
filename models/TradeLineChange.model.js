@@ -26,7 +26,7 @@ module.exports = exports = function (core) {
       'createdAt': {type: Date, default: Date.now()},
       'issuer': { type: core.mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
       'reviewer': { type: core.mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
-      '_status': { type: Number, min: 0, max: 2},
+      '_status': { type: Number, min: 0, max: 2, default: 0},
       'notes': String
     },
     {

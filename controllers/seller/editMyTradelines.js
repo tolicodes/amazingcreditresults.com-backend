@@ -128,7 +128,7 @@ module.exports = exports = function (core) {
       }
     });
   });
-
+/*/
   core.app.put('/api/v1/seller/tradelines/:id', ensureSellerOrOwner, function (request, response) {
     request.model.TradeLine.findOne({'_id':request.params.id, 'seller' : request.user.id}, function (error, tradeLineFound) {
       if (error) {
@@ -151,6 +151,54 @@ module.exports = exports = function (core) {
             } else {
               response.status(202);
               response.json({data: tradeLineSaved});
+            }
+          });
+
+        } else {
+          response.status(404);
+          response.json({
+            'status': 'Error',
+            'errors': [
+              {
+                'code': 404,
+                'message': 'Tradeline with this id ' + request.params.id + ' do not exists!'
+              }
+            ]
+          });
+        }
+      }
+    });
+  });
+//*/
+  core.app.put('/api/v1/seller/tradelines/:id', ensureSellerOrOwner, function (request, response) {
+    request.model.TradeLine.findOne({'_id':request.params.id, 'seller' : request.user.id}, function (error, tradeLineFound) {
+      if (error) {
+        throw error;
+      } else {
+        if (tradeLineFound) {
+          var changeset = new request.model.TradeLineChange;
+
+
+          [
+            'product', 'totalAus', 'usedAus', 'price',
+            'creditLimit', 'cashLimit', 'currentBalance', 'ncRating', 'statementDate',
+            'bcRating', 'moRating', 'cost'
+          ].map(function (field) {
+              if (request.body[field]) {
+                changeset[field] = request.body[field];
+              }
+            });
+
+          changeset.tradeLine = tradeLineFound.id;
+          changeset.issuer = request.user.id;
+          changeset.seller = request.user.id;
+
+          changeset.save(function (err, tradeLineChangeSaved) {
+            if (err) {
+              throw err;
+            } else {
+              response.status(202);
+              response.json({data: tradeLineChangeSaved});
             }
           });
 
