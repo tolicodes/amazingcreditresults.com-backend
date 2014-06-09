@@ -53,12 +53,12 @@ module.exports = exports = function (core) {
         } else {
           if (tradeLineFound) {
             request.model.TradeLineChange
-              .find({'tradeLine':tradeLineFound.id})
+              .find({'tradeLine': tradeLineFound.id})
               .sort('-id')
               .populate('issuer')
               .populate('reviewer')
-              .exec(function(error, tradeLineChanges){
-                if(error){
+              .exec(function (error, tradeLineChanges) {
+                if (error) {
                   throw error;
                 } else {
                   tradeLineFound.changes = tradeLineChanges;
@@ -146,27 +146,29 @@ module.exports = exports = function (core) {
 
   core.app.delete('/api/v1/owner/tradelines/:id', ensureUserIsOwnerMiddleware, function (request, response) {
     request.model.TradeLine.findOneAndUpdate(
-        {'_id': request.params.id},
-        { 'active': false },
-        {'upsert': false},
-        function (error, tradeLineArchived) {
-          if(error){
-            throw error;
+      {'_id': request.params.id},
+      { 'active': false },
+      {'upsert': false},
+      function (error, tradeLineArchived) {
+        if (error) {
+          throw error;
+        } else {
+          if (tradeLineArchived) {
+            response.status(202);
+            response.json({'status': 'Tradeline archived'});
           } else {
-            if(tradeLineArchived) {
-              response.status(202);
-              response.json({'status':'Tradeline archived'});
-            } else {
-              response.status(404);
-              response.json({
-                "status": "Error",
-                "errors": [{
+            response.status(404);
+            response.json({
+              "status": "Error",
+              "errors": [
+                {
                   "code": 404,
                   "message": "Tradeline with this ID do not exists!"
-                }]
-              });
-            }
+                }
+              ]
+            });
           }
-        });
+        }
+      });
   });
 };

@@ -21,12 +21,12 @@ module.exports = exports = function (core) {
       'dateOpen': t.dateOpen,
       'availableAus': t.availableAus,
       'product': {
-        'id':t.product.id,
-        'name':t.product.name,
-        'bank':t.product.bank,
-        'reportsToExperian':t.product.reportsToExperian,
-        'reportsToEquifax':t.product.reportsToEquifax,
-        'reportsToTransunion':t.product.reportsToTransunion,
+        'id': t.product.id,
+        'name': t.product.name,
+        'bank': t.product.bank,
+        'reportsToExperian': t.product.reportsToExperian,
+        'reportsToEquifax': t.product.reportsToEquifax,
+        'reportsToTransunion': t.product.reportsToTransunion,
         'ncRating': t.product.ncRating,
         'bcRating': t.product.bcRating,
         'moRating': t.product.moRating,
@@ -72,7 +72,7 @@ module.exports = exports = function (core) {
 
   core.app.get('/api/v1/seller/tradelines/:id', ensureSellerOrOwner, function (request, response) {
     request.model.TradeLine
-      .findOne({'_id':request.params.id, 'seller' : request.user.id}) //very important!
+      .findOne({'_id': request.params.id, 'seller': request.user.id}) //very important!
       .populate('product')
       .exec(function (error, tradeLineFound) {
         if (error) {
@@ -80,10 +80,10 @@ module.exports = exports = function (core) {
         } else {
           if (tradeLineFound) {
             request.model.TradeLineChange
-              .find({'tradeLine':tradeLineFound.id})
+              .find({'tradeLine': tradeLineFound.id})
               .sort('-id')
-              .exec(function(error, tradeLineChanges){
-                if(error){
+              .exec(function (error, tradeLineChanges) {
+                if (error) {
                   throw error;
                 } else {
                   tradeLineFound.changes = tradeLineChanges;
@@ -128,50 +128,9 @@ module.exports = exports = function (core) {
       }
     });
   });
-/*/
-  core.app.put('/api/v1/seller/tradelines/:id', ensureSellerOrOwner, function (request, response) {
-    request.model.TradeLine.findOne({'_id':request.params.id, 'seller' : request.user.id}, function (error, tradeLineFound) {
-      if (error) {
-        throw error;
-      } else {
-        if (tradeLineFound) {
-          [
-            'product', 'totalAus', 'usedAus', 'price',
-            'creditLimit', 'cashLimit', 'currentBalance', 'ncRating', 'statementDate',
-            'bcRating', 'moRating', 'cost'
-          ].map(function (field) {
-              if (request.body[field]) {
-                tradeLineFound[field] = request.body[field];
-              }
-            });
 
-          tradeLineFound.save(function (err, tradeLineSaved) {
-            if (err) {
-              throw err;
-            } else {
-              response.status(202);
-              response.json({data: tradeLineSaved});
-            }
-          });
-
-        } else {
-          response.status(404);
-          response.json({
-            'status': 'Error',
-            'errors': [
-              {
-                'code': 404,
-                'message': 'Tradeline with this id ' + request.params.id + ' do not exists!'
-              }
-            ]
-          });
-        }
-      }
-    });
-  });
-//*/
   core.app.put('/api/v1/seller/tradelines/:id', ensureSellerOrOwner, function (request, response) {
-    request.model.TradeLine.findOne({'_id':request.params.id, 'seller' : request.user.id}, function (error, tradeLineFound) {
+    request.model.TradeLine.findOne({'_id': request.params.id, 'seller': request.user.id}, function (error, tradeLineFound) {
       if (error) {
         throw error;
       } else {
@@ -182,7 +141,7 @@ module.exports = exports = function (core) {
           [
             'product', 'totalAus', 'usedAus', 'price',
             'creditLimit', 'cashLimit', 'currentBalance', 'ncRating', 'statementDate',
-            'bcRating', 'moRating', 'cost'
+            'bcRating', 'moRating', 'cost', 'active'
           ].map(function (field) {
               if (request.body[field]) {
                 changeset[field] = request.body[field];
@@ -218,29 +177,72 @@ module.exports = exports = function (core) {
     });
   });
 
+
   core.app.delete('/api/v1/seller/tradelines/:id', ensureSellerOrOwner, function (request, response) {
-    request.model.TradeLine.findOneAndUpdate(
-        {'_id': request.params.id, 'seller' : request.user.id},
-        { 'active': false },
-        {'upsert': false},
-        function (error, tradeLineArchived) {
-          if(error){
-            throw error;
-          } else {
-            if(tradeLineArchived) {
-              response.status(202);
-              response.json({'status':'Tradeline archived'});
+    request.model.TradeLine.findOne({'_id': request.params.id, 'seller': request.user.id}, function (error, tradeLineFound) {
+      if (error) {
+        throw error;
+      } else {
+        if (tradeLineFound) {
+          var changeset = new request.model.TradeLineChange;
+          changeset.active = false;
+          changeset.tradeLine = tradeLineFound.id;
+          changeset.issuer = request.user.id;
+          changeset.seller = request.user.id;
+          changeset.save(function (err, tradeLineChangeSaved) {
+            if (err) {
+              throw err;
             } else {
-              response.status(404);
-              response.json({
-                "status": "Error",
-                "errors": [{
-                  "code": 404,
-                  "message": "Tradeline with this ID do not exists!"
-                }]
-              });
+              response.status(202);
+              response.json({data: tradeLineChangeSaved});
             }
-          }
-        });
+          });
+
+        } else {
+          response.status(404);
+          response.json({
+            'status': 'Error',
+            'errors': [
+              {
+                'code': 404,
+                'message': 'Tradeline with this id ' + request.params.id + ' do not exists!'
+              }
+            ]
+          });
+        }
+      }
+    });
   });
+
+  /*/
+   //todo - implement versioning too?
+   core.app.delete('/api/v1/seller/tradelines/:id', ensureSellerOrOwner, function (request, response) {
+    request.model.TradeLine.findOneAndUpdate(
+   {'_id': request.params.id, 'seller': request.user.id},
+   { 'active': false },
+   {'upsert': false},
+   function (error, tradeLineArchived) {
+   if (error) {
+   throw error;
+   } else {
+   if (tradeLineArchived) {
+   response.status(202);
+   response.json({'status': 'Tradeline archived'});
+   } else {
+   response.status(404);
+   response.json({
+   "status": "Error",
+   "errors": [
+   {
+   "code": 404,
+                  "message": "Tradeline with this ID do not exists!"
+   }
+   ]
+   });
+   }
+   }
+   });
+   });
+   //*/
 };
+

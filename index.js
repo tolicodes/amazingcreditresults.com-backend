@@ -61,7 +61,7 @@ Hunt.extendRoutes(require('./controllers/owner/login.js'));
 Hunt.extendRoutes(require('./controllers/owner/createOwner.js'));
 Hunt.extendRoutes(require('./controllers/owner/editClients.js'));
 Hunt.extendRoutes(require('./controllers/owner/editProducts.js'));
-Hunt.extendRoutes(require('./controllers/owner/editTradelines.js'));
+Hunt.extendRoutes(require('./controllers/owner/editAllTradelines.js'));
 Hunt.extendRoutes(require('./controllers/owner/bulkImport.js'));
 
 //loading different controllers for sellers
