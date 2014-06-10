@@ -224,7 +224,7 @@ module.exports = exports = function (core) {
         throw error;
       } else {
         var welcomeLink = welcomeLinkGenerator();
-        if (userFound.root) {
+        if (userFound.roles && userFound.roles.owner === true) {
           response.status(400); //not sure about js with it
           response.json({'error': 'Unable to send welcome link to owner!'});
         } else {
@@ -272,7 +272,7 @@ module.exports = exports = function (core) {
         throw error;
       } else {
         var welcomeLink = welcomeLinkGenerator();
-        if (userFound.root) {
+        if (userFound.roles && userFound.roles.owner === true) {
           response.status(400); //not sure about js with it
           response.json({'error': 'Unable to send password reset link to owner!'});
         } else {
