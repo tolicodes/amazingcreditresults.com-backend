@@ -220,6 +220,34 @@ module.exports = exports = function (core) {
     changeStatus(this, user, 2, callback);
   };
 
+  TradeLineChangesSchema.methods.toJSON = function () {
+    return {
+      'id': this._id,
+      'active': this.active,
+      'totalAus': this.totalAus,
+      'usedAus': this.usedAus,
+      'availableAus': this.availableAus,
+      'creditLimit': this.creditLimit,
+      'cashLimit': this.cashLimit,
+      'currentBalance': this.currentBalance,
+      'cost': this.cost,
+      'price': this.price,
+      'notes': this.notes,
+      'seller': this.seller,
+      'statementDate': this.statementDate,
+      'dateOpen': this.dateOpen,
+      'product': this.product,
+      'ncRating': this.ncRating,
+      'bcRating': this.bcRating,
+      'moRating': this.moRating,
+      'tradeLine': this.tradeLine,
+      'createdAt': this.createdAt,
+      'issuer': this.issuer,
+      'reviewer': this.reviewer,
+      'status': this.status
+    }
+  };
+
   return core.mongoConnection.model('TradeLineChanges', TradeLineChangesSchema);
 };
 
