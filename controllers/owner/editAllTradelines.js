@@ -61,8 +61,10 @@ module.exports = exports = function (core) {
                 if (error) {
                   throw error;
                 } else {
-                  tradeLineFound.changes = tradeLineChanges;
-                  response.json({'data': tradeLineFound});
+//                  console.log(tradeLineChanges);
+                  tradeLineFound.changes = tradeLineChanges || [];
+//                  console.log(tradeLineFound);
+                  response.json({'data': tradeLineFound, 'changes': tradeLineChanges});
                 }
               });
           } else {
@@ -173,7 +175,7 @@ module.exports = exports = function (core) {
   });
 
 //ACR-254
-  core.app.get(/^\/api\/v1\/owner\/tradelines\/([a-f0-9]+)\/changeset\/([a-f0-9]+)\/approve/, function (request, response) {
+  core.app.post(/^\/api\/v1\/owner\/tradelines\/([a-f0-9]+)\/changeset\/([a-f0-9]+)\/approve/, function (request, response) {
     var tradeLineId = request.params[0],
       changeId = request.params[1];
     core.async.parallel({
@@ -216,7 +218,7 @@ module.exports = exports = function (core) {
     });
   });
 
-  core.app.get(/^\/api\/v1\/owner\/tradelines\/([a-f0-9]+)\/changeset\/([a-f0-9]+)\/deny/, function (request, response) {
+  core.app.post(/^\/api\/v1\/owner\/tradelines\/([a-f0-9]+)\/changeset\/([a-f0-9]+)\/deny/, function (request, response) {
     var tradeLineId = request.params[0],
       changeId = request.params[1];
     core.async.parallel({

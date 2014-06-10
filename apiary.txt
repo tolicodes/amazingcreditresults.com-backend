@@ -951,39 +951,84 @@ GET /api/v1/owner/tradelines/:id
 < Content-Type: application/json
 {
     "data": {
-    "id": "537e7a957ba2f24310e3ecb4",
-    "totalAus": 15,
-    "usedAus": 0,
-    "creditLimit": 0,
-    "cashLimit": 0,
-    "balance": 100,
-    "cost": 1000,
-    "price":1100,
-    "notes": "Some notes",
-    "seller": {
-        "id": "536bd8b988dfc8adc31a1c44",
-        "name": {},
-        "gravatar": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
-        "gravatar30": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
-        "gravatar50": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
-        "gravatar80": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
-        "gravatar100": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=100&d=wavatar&r=g",
-        "online": true
+        "id": "539600305d26169409f1b51c",
+        "active": false,
+        "totalAus": 10,
+        "usedAus": 5,
+        "availableAus": 5,
+        "creditLimit": 10000,
+        "cashLimit": 10000,
+        "currentBalance": 1000,
+        "cost": 1000,
+        "price": 1100,
+        "seller": {
+            "id": "5396002cb5282e71211d4f77",
+            "name": {},
+            "gravatar": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+            "gravatar30": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=30&d=wavatar&r=g",
+            "gravatar50": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=50&d=wavatar&r=g",
+            "gravatar80": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+            "gravatar100": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=100&d=wavatar&r=g",
+            "online": false
+        },
+        "dateOpen": "2014-06-09T18:42:52.387Z",
+        "product": {
+            "id": "5396002f5d26169409f1b517",
+            "name": "SuperMega593",
+            "bank": "SuperMegaBank593",
+            "reportsToExperian": false,
+            "reportsToEquifax": false,
+            "reportsToTransunion": false,
+            "ncRating": "None",
+            "bcRating": "Bronze",
+            "moRating": "Silver",
+            "type": "MasterCard"
+        },
+        "ncRating": "Silver",
+        "bcRating": "Silver",
+        "moRating": "Silver"
     },
-    "product": {
-        "id": "537e7a9567b9f6d7f81d13b6",
-        "name": "Visa Gemoroi 0",
-        "bank": "Sperbank (testing)",
-        "reportsToExperian": false,
-        "ncRating": "None",
-        "bcRating": "None",
-        "moRating": "None",
-        "type": "MasterCard"
-    },
-    "ncRating": "None",
-    "bcRating": "None",
-    "moRating": "None"
-    }
+    "changes": [
+        {
+            "seller":{
+                 "id": "5396002cb5282e71211d4f77",
+                "name": {},
+                "gravatar": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+                "gravatar30": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=30&d=wavatar&r=g",
+                "gravatar50": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=50&d=wavatar&r=g",
+                "gravatar80": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+                "gravatar100": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=100&d=wavatar&r=g",
+                "online": false
+            },
+            "issuer": {
+                "id": "5396002cb5282e71211d4f77",
+                "name": {},
+                "gravatar": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+                "gravatar30": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=30&d=wavatar&r=g",
+                "gravatar50": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=50&d=wavatar&r=g",
+                "gravatar80": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+                "gravatar100": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=100&d=wavatar&r=g",
+                "online": false
+            },
+            "tradeLine": "539600305d26169409f1b51c",
+            "cost": 999,
+            "currentBalance": 9999,
+            "cashLimit": 9999,
+            "creditLimit": 9999,
+            "price": 1099,
+            "usedAus": 6,
+            "totalAus": 11,
+            "product": "5396002f5d26169409f1b517",
+            "createdAt": "2014-06-09T18:42:52.392Z",
+            "active": false,
+            "status": "pending",
+            "availableAus": 5,
+            "moRating": "Gold",
+            "bcRating": "Bronze",
+            "ncRating": "None",
+            "id": "539600305d26169409f1b51d"
+        }
+    ]
 }
 +++++
 < 404
@@ -1383,40 +1428,90 @@ GET /api/v1/seller/products
 
 
 List one tradelines, belonging to Seller authenticated
-GET /api/v1/seller/products/5387a705a95bbc6c1e3fbad4
+GET /api/v1/seller/tradeline/5387a705a95bbc6c1e3fbad4
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
 < Content-Type: application/json
 {
     "data": {
-        "id": "5387a705a95bbc6c1e3fbad4",
+        "id": "539600305d26169409f1b51c",
         "active": false,
-        "totalAus": 15,
-        "usedAus": 0,
-        "availableAus": 15,
-        "creditLimit": 20000,
-        "cashLimit": 0,
+        "totalAus": 10,
+        "usedAus": 5,
+        "availableAus": 5,
+        "creditLimit": 10000,
+        "cashLimit": 10000,
+        "currentBalance": 1000,
         "cost": 1000,
         "price": 1100,
-        "notes": "Some notes",
-        "seller": "5370a4fa25777db9531ffa91",
-        "dateOpen": "2014-05-29T17:27:58.243Z",
+        "seller": {
+            "id": "5396002cb5282e71211d4f77",
+            "name": {},
+            "gravatar": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+            "gravatar30": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=30&d=wavatar&r=g",
+            "gravatar50": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=50&d=wavatar&r=g",
+            "gravatar80": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+            "gravatar100": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=100&d=wavatar&r=g",
+            "online": false
+        },
+        "dateOpen": "2014-06-09T18:42:52.387Z",
         "product": {
-            "id": "53876e1e6b7719ef31025220",
-            "name": "Gemoroi 2",
-            "bank": "Sperbank (testing)",
+            "id": "5396002f5d26169409f1b517",
+            "name": "SuperMega593",
+            "bank": "SuperMegaBank593",
             "reportsToExperian": false,
             "reportsToEquifax": false,
             "reportsToTransunion": false,
             "ncRating": "None",
-            "bcRating": "None",
-            "moRating": "None",
+            "bcRating": "Bronze",
+            "moRating": "Silver",
             "type": "MasterCard"
         },
-        "ncRating": "Bronze",
-        "bcRating": "Bronze",
-        "moRating": "Bronze"
-    }
+        "ncRating": "Silver",
+        "bcRating": "Silver",
+        "moRating": "Silver"
+    },
+    "changes": [
+        {
+            "seller": {
+                "id": "5396002cb5282e71211d4f77",
+                "name": {},
+                "gravatar": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+                "gravatar30": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=30&d=wavatar&r=g",
+                "gravatar50": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=50&d=wavatar&r=g",
+                "gravatar80": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+                "gravatar100": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=100&d=wavatar&r=g",
+                "online": false
+            },
+            "issuer": {
+                "id": "5396002cb5282e71211d4f77",
+                "name": {},
+                "gravatar": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+                "gravatar30": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=30&d=wavatar&r=g",
+                "gravatar50": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=50&d=wavatar&r=g",
+                "gravatar80": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+                "gravatar100": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=100&d=wavatar&r=g",
+                "online": false
+            },
+            "tradeLine": "539600305d26169409f1b51c",
+            "cost": 999,
+            "currentBalance": 9999,
+            "cashLimit": 9999,
+            "creditLimit": 9999,
+            "price": 1099,
+            "usedAus": 6,
+            "totalAus": 11,
+            "product": "5396002f5d26169409f1b517",
+            "createdAt": "2014-06-09T18:42:52.392Z",
+            "active": false,
+            "status": "pending",
+            "availableAus": 5,
+            "moRating": "Gold",
+            "bcRating": "Bronze",
+            "ncRating": "None",
+            "id": "539600305d26169409f1b51d"
+        }
+    ]
 }
 +++++
 < 404

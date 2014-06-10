@@ -86,8 +86,7 @@ module.exports = exports = function (core) {
                 if (error) {
                   throw error;
                 } else {
-                  tradeLineFound.changes = tradeLineChanges;
-                  response.json({'data': tradeLineFound});
+                  response.json({'data': tradeLineFound, 'changes': tradeLineChanges});
                 }
               });
           } else {
