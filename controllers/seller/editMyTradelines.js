@@ -185,16 +185,19 @@ module.exports = exports = function (core) {
       } else {
         if (tradeLineFound) {
           var changeset = new request.model.TradeLineChange;
+          for (var x in tradeLineFound) {
+            if (tradeLineFound.hasOwnProperty(x)) {
+              changeset[x] = tradeLineFound[x];
+            }
+          }
           changeset.active = false;
-          changeset.tradeLine = tradeLineFound.id;
           changeset.issuer = request.user.id;
-          changeset.seller = request.user.id;
           changeset.save(function (err, tradeLineChangeSaved) {
             if (err) {
               throw err;
             } else {
               response.status(202);
-              response.json({data: tradeLineChangeSaved});
+              response.json({'status': 'Tradeline archived'});
             }
           });
 
