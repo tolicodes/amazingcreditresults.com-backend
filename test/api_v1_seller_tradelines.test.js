@@ -280,7 +280,7 @@ describe('Seller editing his/her tradelines', function () {
     });
 
 
-    it('owner can delete (set `active` to false) tradeline', function (done) {
+    it('seller can delete (set `active` to false) tradeline', function (done) {
       request({
         'method': 'DELETE',
         'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradeLineId,

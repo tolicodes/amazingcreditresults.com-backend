@@ -1,39 +1,42 @@
 module.exports = exports = function (core) {
-  var ranks = ['None','Bronze', 'Silver', 'Gold'],
+  var ranks = ['None', 'Bronze', 'Silver', 'Gold'],
     types = ['MasterCard', 'Visa', 'American Express', 'Discover'];
 
   var ProductSchema = new core.mongoose.Schema({
-    'name': {type: String, required: true},
-    'bank': {type: String, required: true},
-    '_ncRating': { type: Number, min: 0, max: 3, default: 0 },
-    '_bcRating': { type: Number, min: 0, max: 3, default: 0 },
-    '_moRating': { type: Number, min: 0, max: 3, default: 0 },
-    '_type': { type: Number, min: 0, max: 3, default: 0 },
-    'reportsToExperian': Boolean,
-    'reportsToEquifax': Boolean,
-    'reportsToTransunion': Boolean,
-    'notes': String,
-    'maximumAus': { type: Number, min: 0, max: 15 }
-  },
-  {
-    toObject: { getters: true, virtuals: true },
-    toJSON: { getters: true, virtuals: true }
-  });
+      'name': {type: String, required: true},
+      'bank': {type: String, required: true},
+      '_ncRating': { type: Number, min: 0, max: 3, default: 0 },
+      '_bcRating': { type: Number, min: 0, max: 3, default: 0 },
+      '_moRating': { type: Number, min: 0, max: 3, default: 0 },
+      '_type': { type: Number, min: 0, max: 3, default: 0 },
+      'reportsToExperian': Boolean,
+      'reportsToEquifax': Boolean,
+      'reportsToTransunion': Boolean,
+      'notes': String,
+      'maximumAus': { type: Number, min: 0, max: 15 },
+      '_improvingShortCreditHistory': { type: Number, min: 0, max: 3, default: 0 },
+      '_improvingBadCreditScore': { type: Number, min: 0, max: 3, default: 0 },
+      '_improvingMaxedOutCredit': { type: Number, min: 0, max: 3, default: 0 }
+    },
+    {
+      toObject: { getters: true, virtuals: true },
+      toJSON: { getters: true, virtuals: true }
+    });
 
   ProductSchema.index({
     name: 1 //todo - more indexes? depends on workflow...
   });
 
-  ProductSchema.pre('remove', function(next){
+  ProductSchema.pre('remove', function (next) {
     var t = this;
-    core.model.TradeLine.count({'product':t._id}, function(error, tradeLinesFound){
-      if(error) {
+    core.model.TradeLine.count({'product': t._id}, function (error, tradeLinesFound) {
+      if (error) {
         next(error);
       } else {
-        if(tradeLinesFound === 0){
+        if (tradeLinesFound === 0) {
           next();
         } else {
-          next(new Error('Unable to remove this Product. It is used by '+tradeLinesFound+' tradelines!'));
+          next(new Error('Unable to remove this Product. It is used by ' + tradeLinesFound + ' tradelines!'));
         }
       }
     });
@@ -72,6 +75,39 @@ module.exports = exports = function (core) {
       }
     });
 
+  ProductSchema.virtual('improvingShortCreditHistory')
+    .get(function () {
+      return ranks[this._improvingShortCreditHistory];
+    })
+    .set(function (val) {
+      var i = ranks.indexOf(val);
+      if (i !== -1) {
+        this._improvingShortCreditHistory = i;
+      }
+    });
+
+  ProductSchema.virtual('improvingBadCreditScore')
+    .get(function () {
+      return ranks[this._improvingBadCreditScore];
+    })
+    .set(function (val) {
+      var i = ranks.indexOf(val);
+      if (i !== -1) {
+        this._improvingBadCreditScore = i;
+      }
+    });
+
+  ProductSchema.virtual('improvingMaxedOutCredit')
+    .get(function () {
+      return ranks[this._improvingMaxedOutCredit];
+    })
+    .set(function (val) {
+      var i = ranks.indexOf(val);
+      if (i !== -1) {
+        this._improvingMaxedOutCredit = i;
+      }
+    });
+
   ProductSchema.virtual('type')
     .get(function () {
       return types[this._type];
@@ -93,15 +129,18 @@ module.exports = exports = function (core) {
       'ncRating': this.ncRating,
       'bcRating': this.bcRating,
       'moRating': this.moRating,
-/*/
-      '_ncRating': this._ncRating,
-      '_bcRating': this._bcRating,
-      '_moRating': this._moRating,
-
-//*/
+      /*/
+       '_ncRating': this._ncRating,
+       '_bcRating': this._bcRating,
+       '_moRating': this._moRating,
+       //*/
+      'improvingShortCreditHistory': this.improvingShortCreditHistory,
+      'improvingBadCreditScore': this.improvingBadCreditScore,
+      'improvingMaxedOutCredit': this.improvingMaxedOutCredit,
       'reportsToExperian': this.reportsToExperian,
       'reportsToEquifax': this.reportsToEquifax,
-      'reportsToTransunion': this.reportsToTransunion
+      'reportsToTransunion': this.reportsToTransunion,
+      'notes': this.notes
     }
   };
 

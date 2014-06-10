@@ -61,7 +61,10 @@ module.exports = exports = function (core) {
     [
       'name', 'bank', 'type', 'ncRating', 'bcRating',
       'moRating', 'reportsToExperian',
-      'reportsToEquifax', 'reportsToTransunion'
+      'reportsToEquifax', 'reportsToTransunion',
+      'improvingShortCreditHistory', 'improvingBadCreditScore', 'improvingMaxedOutCredit',
+      'reportsToExperian', 'reportsToEquifax', 'reportsToTransunion',
+      'notes'
     ].map(function (n) {
         if (request.body[n]) {
           params[n] = request.body[n];
@@ -92,7 +95,10 @@ module.exports = exports = function (core) {
           [
             'name', 'bank', 'type', 'ncRating', 'bcRating',
             'moRating', 'reportsToExperian',
-            'reportsToEquifax', 'reportsToTransunion'
+            'reportsToEquifax', 'reportsToTransunion',
+            'improvingShortCreditHistory', 'improvingBadCreditScore', 'improvingMaxedOutCredit',
+            'reportsToExperian', 'reportsToEquifax', 'reportsToTransunion',
+            'notes'
           ].map(function (n) {
               if (request.body[n]) {
                 productFound[n] = request.body[n];
