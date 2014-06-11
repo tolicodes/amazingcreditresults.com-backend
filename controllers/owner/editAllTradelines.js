@@ -114,6 +114,7 @@ module.exports = exports = function (core) {
           var tradeLineChange = new request.model.TradeLineChange;
           tradeLineChange.tradeLine = tradeLineFound.id;
           tradeLineChange.issuer = request.user.id;
+          tradeLineChange._status = 1;
 
           [
             'product', 'seller', 'totalAus', 'usedAus', 'price',
