@@ -287,7 +287,7 @@ describe('Seller editing his/her tradelines', function () {
             } else {
               response.statusCode.should.be.equal(200);
               var bodyParsed = JSON.parse(body);
-              console.log(bodyParsed);
+//              console.log(bodyParsed);
               bodyParsed.data.product.id.should.be.equal(productId);
               bodyParsed.data.seller.should.be.equal(sellerId);
               bodyParsed.data.totalAus.should.be.equal(10);
@@ -313,6 +313,8 @@ describe('Seller editing his/her tradelines', function () {
               changes.bcRating.should.be.equal('Bronze');
               changes.moRating.should.be.equal('Gold');
               changes.cost.should.be.equal(999);
+              changes.status.should.be.equal('pending');
+              changes.issuer.should.be.equal(bodyParsed.data.seller);
               done();
             }
           });
