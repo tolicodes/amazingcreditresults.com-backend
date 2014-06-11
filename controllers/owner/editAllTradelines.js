@@ -19,10 +19,10 @@ module.exports = exports = function (core) {
       '_ncRating', '_bcRating', '_moRating',
       'ncRating', 'bcRating', 'moRating',
       'cost', 'price', 'active'].map(function (field) {
-        if (request.query[field]) {
-          filter[field] = request.query[field];
-        }
-      });
+      if (request.query[field]) {
+        filter[field] = request.query[field];
+      }
+    });
     request.model.TradeLine
       .find(filter)
       .skip(request.query.skip || 0)
@@ -90,10 +90,10 @@ module.exports = exports = function (core) {
       'creditLimit', 'cashLimit', 'currentBalance', 'ncRating', 'statementDate',
       'bcRating', 'moRating', 'cost', 'notes'
     ].map(function (field) {
-        if (request.body[field]) {
-          fields[field] = request.body[field];
-        }
-      });
+      if (request.body[field]) {
+        fields[field] = request.body[field];
+      }
+    });
     var newTradeLine = new request.model.TradeLine(fields);
     newTradeLine.save(function (error, tradelineCreated) {
       if (error) {
@@ -111,7 +111,7 @@ module.exports = exports = function (core) {
         throw error;
       } else {
         if (tradeLineFound) {
-          var tradeLineChange = new request.model.TradeLineChange;
+          var tradeLineChange = new request.model.TradeLineChange();
           tradeLineChange.tradeLine = tradeLineFound.id;
           tradeLineChange.issuer = request.user.id;
           tradeLineChange._status = 1;
@@ -121,11 +121,11 @@ module.exports = exports = function (core) {
             'creditLimit', 'cashLimit', 'currentBalance', 'ncRating', 'statementDate',
             'bcRating', 'moRating', 'cost', 'notes'
           ].map(function (field) {
-              if (request.body[field]) {
-                tradeLineFound[field] = request.body[field];
-                tradeLineChange[field] = request.body[field];
-              }
-            });
+            if (request.body[field]) {
+              tradeLineFound[field] = request.body[field];
+              tradeLineChange[field] = request.body[field];
+            }
+          });
           core.async.parallel({
             'tradeline': function (cb) {
               tradeLineFound.save(cb);
@@ -173,17 +173,18 @@ module.exports = exports = function (core) {
           } else {
             response.status(404);
             response.json({
-              "status": "Error",
-              "errors": [
+              'status': 'Error',
+              'errors': [
                 {
-                  "code": 404,
-                  "message": "Tradeline with this ID do not exists!"
+                  'code': 404,
+                  'message': 'Tradeline with this ID do not exists!'
                 }
               ]
             });
           }
         }
-      });
+      }
+    );
   });
 
 //ACR-254
@@ -216,11 +217,11 @@ module.exports = exports = function (core) {
         } else {
           response.status(404);
           response.json({
-            "status": "Error",
-            "errors": [
+            'status': 'Error',
+            'errors': [
               {
-                "code": 404,
-                "message": "Tradeline or TradelineChange with this IDs do not exists!"
+                'code': 404,
+                'message': 'Tradeline or TradelineChange with this IDs do not exists!'
               }
             ]
           });
@@ -259,11 +260,11 @@ module.exports = exports = function (core) {
         } else {
           response.status(404);
           response.json({
-            "status": "Error",
-            "errors": [
+            'status': 'Error',
+            'errors': [
               {
-                "code": 404,
-                "message": "Tradeline or TradelineChange with this IDs do not exists!"
+                'code': 404,
+                'message': 'Tradeline or TradelineChange with this IDs do not exists!'
               }
             ]
           });

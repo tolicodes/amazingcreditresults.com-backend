@@ -25,7 +25,7 @@ module.exports = exports = function (core) {
       'ncRating': t.ncRating,
       'bcRating': t.bcRating,
       'moRating': t.moRating
-    }
+    };
   }
 
   core.app.get('/api/v1/seller/tradelines', ensureSellerOrOwner, function (request, response) {
@@ -35,10 +35,10 @@ module.exports = exports = function (core) {
       '_ncRating', '_bcRating', '_moRating',
       'ncRating', 'bcRating', 'moRating',
       'cost', 'price', 'active'].map(function (field) {
-        if (request.query[field]) {
-          filter[field] = request.query[field];
-        }
-      });
+      if (request.query[field]) {
+        filter[field] = request.query[field];
+      }
+    });
 
     filter.seller = request.user.id;//very important!
     request.model.TradeLine
@@ -101,10 +101,10 @@ module.exports = exports = function (core) {
       'creditLimit', 'cashLimit', 'currentBalance', 'ncRating', 'statementDate',
       'bcRating', 'moRating', 'cost'
     ].map(function (field) {
-        if (request.body[field]) {
-          fields[field] = request.body[field];
-        }
-      });
+      if (request.body[field]) {
+        fields[field] = request.body[field];
+      }
+    });
     fields.seller = request.user.id;//very important!
     var newTradeLine = new request.model.TradeLine(fields);
     newTradeLine.save(function (error, tradelineCreated) {
@@ -123,18 +123,16 @@ module.exports = exports = function (core) {
         throw error;
       } else {
         if (tradeLineFound) {
-          var changeset = new request.model.TradeLineChange;
-
-
+          var changeset = new request.model.TradeLineChange();
           [
             'product', 'totalAus', 'usedAus', 'price',
             'creditLimit', 'cashLimit', 'currentBalance', 'ncRating', 'statementDate',
             'bcRating', 'moRating', 'cost', 'active'
           ].map(function (field) {
-              if (request.body[field]) {
-                changeset[field] = request.body[field];
-              }
-            });
+            if (request.body[field]) {
+              changeset[field] = request.body[field];
+            }
+          });
 
           changeset.tradeLine = tradeLineFound.id;
           changeset.issuer = request.user.id;

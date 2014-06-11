@@ -6,7 +6,7 @@ module.exports = exports = function (core) {
 
   var frmDt = function (today) {
     var h = today.getHours(),
-     m = today.getMinutes();
+      m = today.getMinutes();
 
     h = h % 12;
     h = h ? h : 12; // the hour '0' should be '12'
@@ -16,7 +16,7 @@ module.exports = exports = function (core) {
     return (today.toLocaleDateString() + ' ' + h + ':' + m + ' ' + ampm + ' GMT');
   };
 
-  function formatUser(user){
+  function formatUser(user) {
     return {
       'id': user.id,
       'email': user.email,
@@ -74,15 +74,17 @@ module.exports = exports = function (core) {
       } else {
         if (user) {
           response.status(200);
-          response.json({'data':formatUser(user)});
+          response.json({'data': formatUser(user)});
         } else {
           response.status(404);
           response.json({
             'status': 'Error',
-            'errors': [{
-              'code': 404,
-              'message': 'User with this id do not exists!'
-            }]
+            'errors': [
+              {
+                'code': 404,
+                'message': 'User with this id do not exists!'
+              }
+            ]
           });
         }
       }
@@ -91,12 +93,15 @@ module.exports = exports = function (core) {
 
   core.app.put('/api/v1/admin/clients/:id', ensureOwner, function (request, response) {
 //https://oselot.atlassian.net/browse/ACR-108
-    var patch = {};
+    var patch = {},
+      roles = {},
+      rolesToSet = false;
+
     if (request.body.email) {
       patch['keychain.email'] = request.body.email;
     }
 
-    if (request.body.accountVerified == true || request.body.accountVerified == false) {
+    if (request.body.accountVerified === true || request.body.accountVerified === false) {
       patch['accountVerified'] = request.body.accountVerified;
     }
 
@@ -110,18 +115,15 @@ module.exports = exports = function (core) {
         patch['profile.' + b] = request.body[b];
       }
     });
-    if(request.body.roles) {
-      var roles = {},
-        rolesToSet=false;
-
-      ['seller','buyer'].map(function(role){
-        if(request.body.roles[role] === true || request.body.roles[role] === false) {
+    if (request.body.roles) {
+      ['seller', 'buyer'].map(function (role) {
+        if (request.body.roles[role] === true || request.body.roles[role] === false) {
           roles[role] = request.body.roles[role];
           rolesToSet = true;
         }
       });
 
-      if(rolesToSet){
+      if (rolesToSet) {
         patch.roles = roles;
       }
     }
@@ -134,7 +136,8 @@ module.exports = exports = function (core) {
       patch,
       {
         'upsert': false // important!
-      }, function (error, userFound) {
+      },
+      function (error, userFound) {
         if (error) {
           throw error;
         } else {
@@ -145,10 +148,12 @@ module.exports = exports = function (core) {
             response.status(404);
             response.json({
               'status': 'Error',
-              'errors': [{
-                'code': 404,
-                'message': 'User with this ID do not exists!'
-              }]
+              'errors': [
+                {
+                  'code': 404,
+                  'message': 'User with this ID do not exists!'
+                }
+              ]
             });
           }
         }
@@ -161,7 +166,7 @@ module.exports = exports = function (core) {
     var isOk,
       missed;
 
-    if(!request.body.email){
+    if (!request.body.email) {
       isOk = false;
       missed = 'email';
     }
@@ -171,13 +176,13 @@ module.exports = exports = function (core) {
       'givenName'
       //'middleName' //not mandatory for now
     ].map(function (s) {
-        if (request.body.name && request.body.name[s] && typeof request.body.name[s] === 'string') {
-          isOk = true;
-        } else {
-          isOk = false;
-          missed = s;
-        }
-      });
+      if (request.body.name && request.body.name[s] && typeof request.body.name[s] === 'string') {
+        isOk = true;
+      } else {
+        isOk = false;
+        missed = s;
+      }
+    });
 
     if (isOk) {
       request.model.User.create({
@@ -209,10 +214,12 @@ module.exports = exports = function (core) {
       response.status(400);
       response.json({
         'status': 'Error',
-        'errors': [{
-          'code': 400,
-          'message': 'Required value of ' + missed + ' is missed!'
-        }]
+        'errors': [
+          {
+            'code': 400,
+            'message': 'Required value of ' + missed + ' is missed!'
+          }
+        ]
       });
     }
   });
@@ -265,7 +272,7 @@ module.exports = exports = function (core) {
                 'message': 'sent',
                 'user': formatUser(userFound),
                 'welcomeLink': welcomeLink
-                });
+              });
             }
           });
         }
@@ -313,7 +320,8 @@ module.exports = exports = function (core) {
               response.json({
                 'message': 'sent',
                 'user': formatUser(userFound),
-                'welcomeLink': welcomeLink});
+                'welcomeLink': welcomeLink
+              });
             }
           });
         }

@@ -1,5 +1,5 @@
 var ensureOwner = require('./../middleware.js').ensureOwner;
-module.exports = exports = function(core){
+module.exports = exports = function (core) {
 //https://oselot.atlassian.net/browse/ACR-58
   core.app.post('/api/v1/admin/createOwner', ensureOwner, function (request, response) {
     if (request.body.username && request.body.password) {

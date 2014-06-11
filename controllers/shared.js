@@ -31,7 +31,7 @@ module.exports = exports = function (core) {
       });
     } else {
       response.status(400);
-      response.json({'Error': 'Authorization required!'})
+      response.json({'Error': 'Authorization required!'});
     }
   }
 

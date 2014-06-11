@@ -7,7 +7,7 @@ var csv = require('fast-csv'),
   }),
   ensureUserIsOwnerMiddleware = require('./../middleware.js').ensureOwner;
 
-function formatUser(user){
+function formatUser(user) {
   return {
     'id': user.id,
     'email': user.email,
@@ -33,7 +33,7 @@ function formatUser(user){
       'seller': user.roles ? user.roles.seller : false
     },
     'accountVerified': user.accountVerified
-  }
+  };
 }
 module.exports = exports = function (core) {
   core.app.get('/api/v1/owner/clientsExample.csv', ensureUserIsOwnerMiddleware, function (request, response) {
@@ -41,7 +41,7 @@ module.exports = exports = function (core) {
   });
 
   core.app.get('/owner/bulkImport', ensureUserIsOwnerMiddleware, function (request, response) {
-    response.render('owner/bulkImport',{'title':'Bulk import of clients'});
+    response.render('owner/bulkImport', {'title': 'Bulk import of clients'});
   });
 
   core.app.get('/api/v1/owner/bulkImport', ensureUserIsOwnerMiddleware, function (request, response) {
@@ -58,7 +58,7 @@ module.exports = exports = function (core) {
           data.push(client);
         })
         .on('end', function () {
-          core.async.map(data, 
+          core.async.map(data,
             function (user, cb) {
               core.model.User.findOneAndUpdate(
                 { 'keychain.email': user.email },
@@ -70,7 +70,7 @@ module.exports = exports = function (core) {
                   },
                   'apiKey': core.rack(),
                   'email': user.email,
-                  'roles':{
+                  'roles': {
                     'owner': null,
                     'seller': null,
                     'buyer': true
@@ -84,12 +84,12 @@ module.exports = exports = function (core) {
                 cb);
             },
             function (error, clientsCreated) {
-              if(error){
+              if (error) {
                 throw error;
               } else {
-                response.json({'data':clientsCreated.map(formatUser)});
+                response.json({'data': clientsCreated.map(formatUser)});
               }
-          });
+            });
         });
 
       rs.pipe(csvStream);
