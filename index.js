@@ -85,11 +85,11 @@ Hunt.extendRoutes(function (core) {
   core.app.all('*', function (request, response) {
     response.status(404);
     response.json({
-      "status": "Error",
-      "errors": [
+      'status': 'Error',
+      'errors': [
         {
-          "code": 404,
-          "message": 'This API endpoint do not exists!'
+          'code': 404,
+          'message': 'This API endpoint do not exists!'
         }
       ]
     });
@@ -118,17 +118,17 @@ Hunt.extendRoutes(function (core) {
         }
       }
       response.json({
-        "status": "Error",
-        "errors": errs
+        'status': 'Error',
+        'errors': errs
       });
     } else {
       response.status(500);
       response.json({
-        "status": "Error",
-        "errors": [
+        'status': 'Error',
+        'errors': [
           {
-            "code": 500,
-            "message": error.message
+            'code': 500,
+            'message': error.message
           }
         ]
       });

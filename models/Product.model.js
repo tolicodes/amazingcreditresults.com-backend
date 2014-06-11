@@ -141,7 +141,7 @@ module.exports = exports = function (core) {
       'reportsToEquifax': this.reportsToEquifax,
       'reportsToTransunion': this.reportsToTransunion,
       'notes': this.notes
-    }
+    };
   };
 
   return core.mongoConnection.model('Product', ProductSchema);

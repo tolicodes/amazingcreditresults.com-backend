@@ -133,7 +133,7 @@ module.exports = exports = function (core) {
       'ncRating': this.ncRating,
       'bcRating': this.bcRating,
       'moRating': this.moRating
-    }
+    };
   };
 
   return core.mongoConnection.model('TradeLine', TradeLineSchema);

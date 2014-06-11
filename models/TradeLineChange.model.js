@@ -245,7 +245,7 @@ module.exports = exports = function (core) {
       'issuer': this.issuer,
       'reviewer': this.reviewer,
       'status': this.status
-    }
+    };
   };
 
   return core.mongoConnection.model('TradeLineChanges', TradeLineChangesSchema);
