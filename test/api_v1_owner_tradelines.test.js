@@ -331,6 +331,8 @@ describe('/api/v1/owner/tradelines test', function () {
             bodyParsed.data.moRating.should.be.equal('Gold');
             bodyParsed.data.cost.should.be.equal(999);
             bodyParsed.data.notes.should.be.equal('Some notes111');
+            bodyParsed.changes.should.be.an.Array;
+            bodyParsed.changes.length.should.be.above(0);
             var changes = bodyParsed.changes[0];
             changes.totalAus.should.be.equal(11);
             changes.usedAus.should.be.equal(6);
