@@ -111,6 +111,10 @@ module.exports = exports = function (core) {
         throw error;
       } else {
         if (tradeLineFound) {
+          var tradeLineChange = new request.model.TradeLineChange;
+          tradeLineChange.tradeLine = tradeLineFound.id;
+          tradeLineChange.issuer = request.user.id;
+
           [
             'product', 'seller', 'totalAus', 'usedAus', 'price',
             'creditLimit', 'cashLimit', 'currentBalance', 'ncRating', 'statementDate',
@@ -118,15 +122,22 @@ module.exports = exports = function (core) {
           ].map(function (field) {
               if (request.body[field]) {
                 tradeLineFound[field] = request.body[field];
+                tradeLineChange[field] = request.body[field];
               }
             });
-
-          tradeLineFound.save(function (err, tradeLineSaved) {
+          core.async.parallel({
+            'tradeline': function (cb) {
+              tradeLineFound.save(cb);
+            },
+            'change': function (cb) {
+              tradeLineChange.save(cb);
+            }
+          }, function (err, obj) {
             if (err) {
               throw err;
             } else {
               response.status(202);
-              response.json({data: tradeLineSaved});
+              response.json({data: tradeLineFound });
             }
           });
 

@@ -294,6 +294,7 @@ describe('/api/v1/owner/tradelines test', function(){
         done(error);
       } else {
         response.statusCode.should.be.equal(202);
+//        console.log(body);
         var bodyParsed = JSON.parse(body);
 //        bodyParsed.data.product.should.be.equal(productId);
 //        bodyParsed.data.seller.should.be.equal(ownerId);
