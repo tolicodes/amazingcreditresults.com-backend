@@ -237,9 +237,16 @@ module.exports = exports = function (core) {
             function (newApiKey, cb) {
 //              welcomeLink = core.config.hostUrl+'buyer/welcome/'+welcomeLink;
               welcomeLink = core.config.hostUrl + '#login/' + welcomeLink;
+              var tpl = 'emails/welcomeBuyer';
+              if (userFound.roles.buyer) {
+                tpl = 'emails/welcomeBuyer';
+              }
+              if (userFound.roles.seller) {
+                tpl = 'emails/welcomeSeller';
+              }
               userFound.notifyByEmail({
                 'layout': false,
-                'template': 'emails/welcome',
+                'template': tpl,
                 'subject': 'Site access hyperlink to enter site',//todo - change to something more meaningfull
                 'name': userFound.name,
                 'welcomeLink': welcomeLink,
