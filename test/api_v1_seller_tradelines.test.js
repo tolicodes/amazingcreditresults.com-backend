@@ -181,20 +181,22 @@ describe('Seller editing his/her tradelines', function () {
           done(error);
         } else {
           response.statusCode.should.be.equal(200);
-          var bodyParsed = JSON.parse(body).data;
-          bodyParsed.product.id.should.be.equal(productId);
-          bodyParsed.seller.should.be.equal(sellerId);
-          bodyParsed.totalAus.should.be.equal(10);
-          bodyParsed.usedAus.should.be.equal(5);
-          bodyParsed.price.should.be.equal(1100);
-          bodyParsed.creditLimit.should.be.equal(10000);
-          bodyParsed.cashLimit.should.be.equal(10000);
-          bodyParsed.currentBalance.should.be.equal(1000);
-          bodyParsed.ncRating.should.be.equal('Silver');
-          bodyParsed.bcRating.should.be.equal('Silver');
-          bodyParsed.moRating.should.be.equal('Silver');
-          bodyParsed.cost.should.be.equal(1000);
-          should.not.exist(bodyParsed.notes);
+          var bodyParsed = JSON.parse(body);
+//          console.log(bodyParsed);
+          bodyParsed.data.product.id.should.be.equal(productId);
+          bodyParsed.data.seller.should.be.equal(sellerId);
+          bodyParsed.data.totalAus.should.be.equal(10);
+          bodyParsed.data.usedAus.should.be.equal(5);
+          bodyParsed.data.price.should.be.equal(1100);
+          bodyParsed.data.creditLimit.should.be.equal(10000);
+          bodyParsed.data.cashLimit.should.be.equal(10000);
+          bodyParsed.data.currentBalance.should.be.equal(1000);
+          bodyParsed.data.ncRating.should.be.equal('Silver');
+          bodyParsed.data.bcRating.should.be.equal('Silver');
+          bodyParsed.data.moRating.should.be.equal('Silver');
+          bodyParsed.data.cost.should.be.equal(1000);
+          should.not.exist(bodyParsed.data.notes);
+          bodyParsed.changes.should.be.an.Array;
           done();
         }
       });
@@ -274,7 +276,46 @@ describe('Seller editing his/her tradelines', function () {
           bodyParsed.data.bcRating.should.be.equal('Bronze');
           bodyParsed.data.moRating.should.be.equal('Gold');
           bodyParsed.data.cost.should.be.equal(999);
-          done();
+
+          request({
+            'method': 'GET',
+            'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradeLineId,
+            'headers': {'huntKey': sellerHuntKey}
+          }, function (error, response, body) {
+            if (error) {
+              done(error);
+            } else {
+              response.statusCode.should.be.equal(200);
+              var bodyParsed = JSON.parse(body);
+              console.log(bodyParsed);
+              bodyParsed.data.product.id.should.be.equal(productId);
+              bodyParsed.data.seller.should.be.equal(sellerId);
+              bodyParsed.data.totalAus.should.be.equal(10);
+              bodyParsed.data.usedAus.should.be.equal(5);
+              bodyParsed.data.price.should.be.equal(1100);
+              bodyParsed.data.creditLimit.should.be.equal(10000);
+              bodyParsed.data.cashLimit.should.be.equal(10000);
+              bodyParsed.data.currentBalance.should.be.equal(1000);
+              bodyParsed.data.ncRating.should.be.equal('Silver');
+              bodyParsed.data.bcRating.should.be.equal('Silver');
+              bodyParsed.data.moRating.should.be.equal('Silver');
+              bodyParsed.data.cost.should.be.equal(1000);
+              should.not.exist(bodyParsed.data.notes);
+              bodyParsed.changes.should.be.an.Array;
+              var changes = bodyParsed.changes[0];
+              changes.totalAus.should.be.equal(11);
+              changes.usedAus.should.be.equal(6);
+              changes.price.should.be.equal(1099);
+              changes.creditLimit.should.be.equal(9999);
+              changes.cashLimit.should.be.equal(9999);
+              changes.currentBalance.should.be.equal(9999);
+              changes.ncRating.should.be.equal('None');
+              changes.bcRating.should.be.equal('Bronze');
+              changes.moRating.should.be.equal('Gold');
+              changes.cost.should.be.equal(999);
+              done();
+            }
+          });
         }
       });
     });
@@ -296,20 +337,20 @@ describe('Seller editing his/her tradelines', function () {
           done();
           /*/
            request({
-            'method': 'GET',
-            'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradeLineId,
-            'headers': { 'huntKey': sellerHuntKey }
-          }, function (err, response1, body1) {
-            if (err) {
-              done(error);
-            } else {
-              response1.statusCode.should.be.equal(200);
-              var bodyParsed = JSON.parse(body1);
-              bodyParsed.data.id.should.be.equal(tradeLineId);
-              bodyParsed.data.active.should.be.false;
-              done();
-            }
-          });
+           'method': 'GET',
+           'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradeLineId,
+           'headers': { 'huntKey': sellerHuntKey }
+           }, function (err, response1, body1) {
+           if (err) {
+           done(error);
+           } else {
+           response1.statusCode.should.be.equal(200);
+           var bodyParsed = JSON.parse(body1);
+           bodyParsed.data.id.should.be.equal(tradeLineId);
+           bodyParsed.data.active.should.be.false;
+           done();
+           }
+           });
            //*/
         }
       });
