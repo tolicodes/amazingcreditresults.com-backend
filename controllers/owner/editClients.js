@@ -19,6 +19,7 @@ module.exports = exports = function (core) {
   function formatUser(user) {
     return {
       'id': user.id,
+      'huntKey': user.apiKey,
       'email': user.email,
       'name': {
         'familyName': user.name.familyName, //http://schema.org/familyName
@@ -199,7 +200,8 @@ module.exports = exports = function (core) {
           'title': request.body.title
         },
         'roles': {
-          'buyer': true
+          'buyer': request.body.roles ? request.body.roles.buyer : true,
+          'seller': request.body.roles ? request.body.roles.seller : false
         },
         'root': false
       }, function (error, userCreated) {
