@@ -120,15 +120,65 @@ POST /api/v1/buyer/login
 +++++
 < 403
 < Content-Type: application/json; charset=utf-8
-{ "Code":403, "Error":"Unable to authorize - wrong password!"}
+{
+    "status": "Error",
+    "errors": [{
+        "code": 403,
+        "message": "Unable to authorize - wrong password!",
+        "field":"password"
+    }]
+}
 +++++
 < 403
 < Content-Type: application/json; charset=utf-8
-{ "Code":403, "Error":"Unable to authorize - wrong welcome link!"}
+{
+    "status": "Error",
+    "errors": [{
+        "code": 403,
+        "message": "Unable to authorize - wrong welcome link!",
+        "field":"password"
+    }]
+}
 +++++
 < 400
 < Content-Type: application/json; charset=utf-8
-{ "Code":400, "Error":"Missed parameter - `apiKey` or `password`!"}
+{
+    "status": "Error",
+    "errors": [{
+        "code": 400,
+        "message": "Missed parameter - `password`",
+        "field":"password"
+    },
+    {
+        "code": 400,
+        "message": "Missed parameter - `apiKey`",
+        "field":"password"
+    }]
+}
++++++
+< 400
+< Content-Type: application/json; charset=utf-8
+{
+    "status": "Error",
+    "errors": [
+    {
+        "code": 400,
+        "message": "Missed parameter - `apiKey`",
+        "field":"password"
+    }]
+}
++++++
+< 400
+< Content-Type: application/json; charset=utf-8
+{
+    "status": "Error",
+    "errors": [{
+        "code": 400,
+        "message": "Missed parameter - `password`",
+        "field":"password"
+    }]
+}
+
 
 
 -- Buyer/Owner profile json --
