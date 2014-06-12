@@ -104,6 +104,17 @@ Hunt.extendRoutes(function (core) {
     if (core.config.env === 'development') {
       console.error(error);
     }
+
+    if (error.code === 11000) {
+      response.json({
+        'status': 'Error',
+        'errors': {
+          'code': 400,
+          'message': 'Duplicate entry!'
+        }
+      });
+      return;
+    }
     if (error.name === 'ValidationError') {
       response.status(400);
       var errs = [];
@@ -121,18 +132,21 @@ Hunt.extendRoutes(function (core) {
         'status': 'Error',
         'errors': errs
       });
-    } else {
-      response.status(500);
-      response.json({
-        'status': 'Error',
-        'errors': [
-          {
-            'code': 500,
-            'message': error.message
-          }
-        ]
-      });
+      return;
     }
+
+
+    response.status(500);
+    response.json({
+      'status': 'Error',
+      'errors': [
+        {
+          'code': 500,
+          'message': error.message
+        }
+      ]
+    });
+
   });
 });
 
