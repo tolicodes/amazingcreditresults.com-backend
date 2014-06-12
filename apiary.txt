@@ -231,11 +231,51 @@ POST /api/v1/owner/login
 }
 +++++
 < 403
-{ "Code":403, "Error":"Unable to authorize Owner with this credentials!" }
+{
+"status": "Error",
+"errors": [{
+  "code": 403,
+  "message": "Unable to authorize Owner with this credentials",
+  }
+ ]
+}
 +++++
 < 400
-{ "Code":400, "Error":"The values of `username` or `password` are not provided!" }
-
+{
+"status": "Error",
+"errors": [
+    {
+    "code": 400,
+    "message": "Username is not provideds,
+    },
+    {
+    "code": 400,
+    "message": "Password is not provideds"
+    }
+ ]
+}
++++++
+< 400
+{
+"status": "Error",
+"errors": [
+    {
+    "code": 400,
+    "message": "Username is not provideds,
+    }
+ ]
+}
++++++
+< 400
+{
+"status": "Error",
+"errors": [
+    {
+    "code": 400,
+    "message": "Password is not provideds"
+    }
+ ]
+}
 
 -- Owner resource to edit clients --
 
@@ -1854,7 +1894,7 @@ GET /api/v1/owner/products/537e7a9567b9f6d7f81d13b6
         "moRating":"None",
         "improvingShortCreditHistory": "None",
         "improvingBadCreditScore": "None",
-        "improvingMaxedOutCredit": "None",        
+        "improvingMaxedOutCredit": "None",
         "reportsToExperian":false
     }
 }
@@ -1974,7 +2014,7 @@ PUT /api/v1/owner/products/{:id}
     "reportsToTransunion": false,
     "improvingShortCreditHistory": "None",
     "improvingBadCreditScore": "Silver",
-    "improvingMaxedOutCredit": "Gold"    
+    "improvingMaxedOutCredit": "Gold"
 }
 < 202
 < Content-Type: application/json
@@ -1991,7 +2031,7 @@ PUT /api/v1/owner/products/{:id}
         "reportsToTransunion": false,
         "improvingShortCreditHistory": "None",
         "improvingBadCreditScore": "Silver",
-        "improvingMaxedOutCredit": "Gold" 
+        "improvingMaxedOutCredit": "Gold"
     }
 }
 +++++
@@ -2817,7 +2857,7 @@ POST /api/v1/seller/tradelines
     "id": "537e7a957ba2f24310e3ecb4",
     "totalAus": 15,
     "usedAus": 0,
-    "availableAus": 15,    
+    "availableAus": 15,
     "creditLimit": 0,
     "cashLimit": 0,
     "balance": 100,
@@ -2893,7 +2933,7 @@ PUT /api/v1/seller/tradelines/:id
         "id": "537e7a957ba2f24310e3ecb4",
         "totalAus": 15,
         "usedAus": 0,
-        "availableAus": 15,        
+        "availableAus": 15,
         "creditLimit": 0,
         "cashLimit": 0,
         "balance": 100,
