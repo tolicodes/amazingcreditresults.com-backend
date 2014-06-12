@@ -30,11 +30,24 @@ GET /api/v1/buyer/needToSetPassword/:welcomeLink
 +++++
 < 400
 < Content-Type: application/json; charset=utf-8
-{"Code":400,"Error":"Link is outdated!"}
+{
+    "status": "Error",
+    "errors": [{
+        "code": 400,
+        "message": "Link is outdated!"
+    }]
+}
 +++++
 < 404
 < Content-Type: application/json; charset=utf-8
-{"Code":404,"Error":"Link is not valid!"}
+{
+    "status": "Error",
+    "errors": [{
+        "code": 404,
+        "message": "Link is not valid!"
+    }]
+}
+
 
 
 Set password on first time, when new Buyer follows the link in email message
@@ -47,11 +60,54 @@ POST /api/v1/buyer/setPassword
 +++++
 < 400
 < Content-Type: application/json; charset=utf-8
-{ "Code":400, "Error":"Wrong or outdated welcome link! Please, contact support for a new one!" }
+{
+    "status": "Error",
+    "errors": [{
+        "code": 400,
+        "message": "Wrong or outdated welcome link! Please, contact support for a new one!"
+    }]
+}
 +++++
 < 400
 < Content-Type: application/json; charset=utf-8
-{ "Code":400, "Error":"Missed parameter - `apiKey` or `password`!" }
+{
+    "status": "Error",
+    "errors": [{
+        "code": 400,
+        "message": "Missed parameter - `apiKey`",
+        "field":"apiKey"
+    },
+    {
+        "code": 400,
+        "message": "Missed parameter - `password`",
+        "field":"password"
+    }
+    ]
+}
++++++
+< 400
+< Content-Type: application/json; charset=utf-8
+{
+    "status": "Error",
+    "errors": [{
+        "code": 400,
+        "message": "Missed parameter - `apiKey`",
+        "field":"apiKey"
+    }
+    ]
+}
++++++
+< 400
+< Content-Type: application/json; charset=utf-8
+{
+    "status": "Error",
+    {
+        "code": 400,
+        "message": "Missed parameter - `password`",
+        "field":"password"
+    }
+    ]
+}
 
 
 Authorize Buyer with password
@@ -1953,6 +2009,7 @@ POST /api/v1/owner/products
     "improvingShortCreditHistory": "None",
     "improvingBadCreditScore": "Silver",
     "improvingMaxedOutCredit": "Gold",
+    "notes":"Some notes seen only by Owners"
 }
 < 201
 < Content-Type: application/json
@@ -1969,7 +2026,8 @@ POST /api/v1/owner/products
         "reportsToTransunion": false,
         "improvingShortCreditHistory": "None",
         "improvingBadCreditScore": "Silver",
-        "improvingMaxedOutCredit": "Gold"
+        "improvingMaxedOutCredit": "Gold",
+        "notes":"Some notes seen only by Owners"
     }
 }
 +++++
