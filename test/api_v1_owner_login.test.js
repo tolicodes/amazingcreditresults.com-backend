@@ -71,7 +71,6 @@ describe('/api/v1/owner/login API endpoint test', function () {
         bodyParsed.status.should.be.equal('Error');
         bodyParsed.errors[0].code.should.be.equal(403);
         bodyParsed.errors[0].message.should.be.equal('Unable to authorize Owner with this credentials!');
-        bodyParsed.errors[0].field.should.be.equal('username');
         should.not.exist(bodyParsed.huntKey);
         done();
       }
@@ -97,14 +96,14 @@ describe('/api/v1/owner/login API endpoint test', function () {
           {
             'code': 400,
             'message': 'Username is not provided!',
-            'field':'username'
-         });
+            'field': 'username'
+          });
 
         bodyParsed.errors.should.containEql(
           {
             'code': 400,
             'message': 'Password is not provided!',
-            'field':'password'
+            'field': 'password'
           });
 
         should.not.exist(bodyParsed.huntKey);
