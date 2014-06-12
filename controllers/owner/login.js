@@ -17,7 +17,7 @@ module.exports = exports = function (core) {
                 {
                   'code': 403,
                   'message': 'Unable to authorize Owner with this credentials!',
-                  'field': 'username'
+                  //'field': 'username' //https://oselot.atlassian.net/browse/ACR-304#
                 }
               ]
             });
