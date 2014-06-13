@@ -49,6 +49,26 @@ Hunt.extendApp(function (core) {
 //*/
 });
 
+Hunt.extendMiddleware(
+  function (core) {
+    return function (request, response, next) {
+      if (request.user && request.user.isBanned) {
+        response.status(403);
+        response.json({
+          'status': 'Error',
+          'errors': [
+            {
+              'code': 403,
+              'message': 'Access denied! You user account is banned!'
+            }
+          ]
+        });
+      } else {
+        next();
+      }
+    }
+  });
+
 //loading different controllers for buyers
 Hunt.extendRoutes(require('./controllers/buyer/login.js'));
 Hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
