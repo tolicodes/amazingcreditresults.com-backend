@@ -532,7 +532,8 @@ GET /api/v1/admin/clients
         "owner":false,
         "buyer":true,
         "seller":false
-      }
+      },
+      "isBanned":false
     },
     {
       "id": "536cfc8a886fcbba14d07dd7",
@@ -558,27 +559,7 @@ GET /api/v1/admin/clients
         "buyer":true,
         "seller":false
       }
-    },
-    {
-      "id": "536cfc8a886fcbba14d07dd5",
-      "email": "owner@example.org",
-      "name": {},
-      "gravatar": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
-      "gravatar30": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
-      "gravatar50": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
-      "gravatar80": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
-      "gravatar100": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=100&d=wavatar&r=g",
-      "root": true,
-      "accountVerified": false,
-      "telefone":"555-339-69-72",
-      "localAddress":"Gothem city",
-      "needQuestionnaire":true,
-      "title":"Mr.",
-      "roles":{
-        "owner":false,
-        "buyer":true,
-        "seller":false
-      }
+      "isBanned":true
     }
   ]
 }
@@ -613,7 +594,8 @@ GET /api/v1/admin/clients/{:id}
         "owner":false,
         "buyer":true,
         "seller":false
-      }
+      },
+      "isBanned":false
   }
 }
 
@@ -632,7 +614,8 @@ PUT /api/v1/admin/clients/{:id}
     "telefone":"555-339-69-72",
     "localAddress":"Gothem city",
     "needQuestionnaire":true,
-    "title":"Mr."
+    "title":"Mr.",
+    "isBanned":false
 }
 < 201
 < Content-Type: application/json
@@ -650,7 +633,8 @@ PUT /api/v1/admin/clients/{:id}
   "title":"Mr.",
   "telefone":"555-339-69-72",
   "localAddress":"Gothem city",
-  "root": false
+  "root": false,
+  "isBanned":false
 }
 +++++
 < 404
