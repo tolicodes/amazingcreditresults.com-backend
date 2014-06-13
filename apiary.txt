@@ -383,6 +383,122 @@ POST /api/v1/owner/login
  ]
 }
 
+
+-- Owner resource to edit owners
+List all owners
+GET /api/v1/admin/owners
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 200
+< Content-Type: application/json
+{
+    "data": [
+        {
+            "id": "5396002cb5282e71211d4f74",
+            "name": {
+              "familyName": "Zorg",
+              "middleName": "Emmanuele",
+              "givenName": "Jean Batist"
+            },
+            "root": true,
+            "email": "owner@example.org",
+            "roles": {
+                "owner": true
+            },
+            "isBanned": false
+        },
+        {
+            "id": "5396002f5d26169409f1b515",
+            "name": {},
+            "root": false,
+            "email": "owner4906@example.org",
+            "roles": {
+                "owner": true
+            },
+            "isBanned": false
+        }
+    ]
+}
+
+
+List one of Owners
+GET /api/v1/admin/owners/5396002cb5282e71211d4f74
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 200
+< Content-Type: application/json
+{
+    "data": {
+        "id":"5396002cb5282e71211d4f74",
+        "name":{
+            "familyName":"Zorg",
+            "middleName":"Emmanuele",
+            "givenName":"Jean Batist"
+        },
+        "root":true,
+        "email":"owner@example.org",
+        "roles": {
+         "owner":true
+        },
+        "isBanned":false
+    }
+}
+
+
+Update one of Owners. Is user is root, he can update other users, not myself only!!!
+PUT /api/v1/admin/owners/5396002cb5282e71211d4f74
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebs
+> Content-Type: application/json; charset=utf-8
+{
+    "name":{
+      "familyName" : "Doe",
+      "givenName" : "John",
+      "middleName" : "Theodor"
+    }
+    "password":"somehardtoguestnewpassword",
+}
+< 202
+< Content-Type: application/json
+{
+    "data": {
+        "id":"5396002cb5282e71211d4f74",
+        "name":{
+            "familyName":"Zorg",
+            "middleName":"Emmanuele",
+            "givenName":"Jean Batist"
+        },
+        "root":true,
+        "email":"owner@example.org",
+        "roles": {
+         "owner":true
+        },
+        "isBanned":false
+    }
+}
+
+
+Ban(delete) one of Owners. Only accessible by root user.
+DELETE /api/v1/admin/owners/5396002cb5282e71211d4f74
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebs
+> Content-Type: application/json; charset=utf-8
+< 202
+< Content-Type: application/json
+{
+    "data": {
+        "id":"5396002cb5282e71211d4f74",
+        "name":{
+            "familyName":"Zorg",
+            "middleName":"Emmanuele",
+            "givenName":"Jean Batist"
+        },
+        "root":true,
+        "email":"owner@example.org",
+        "roles": {
+         "owner":true
+        },
+        "isBanned":true
+    }
+}
+
+
 -- Owner resource to edit clients --
 
 List all clients in JSON format
@@ -516,7 +632,8 @@ PUT /api/v1/admin/clients/{:id}
     "telefone":"555-339-69-72",
     "localAddress":"Gothem city",
     "needQuestionnaire":true,
-    "title":"Mr."}
+    "title":"Mr."
+}
 < 201
 < Content-Type: application/json
 {

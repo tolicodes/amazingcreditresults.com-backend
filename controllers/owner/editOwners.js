@@ -1,6 +1,20 @@
 var ensureOwner = require('./../middleware.js').ensureOwner;
 //https://oselot.atlassian.net/browse/ACR-313
 module.exports = exports = function (core) {
+  function formatOwner(owner) {
+    return {
+      'id': owner.id,
+      'name': {
+        'familyName': owner.name.familyName,
+        'middleName': owner.name.middleName,
+        'givenName': owner.name.givenName
+      },
+      'root': owner.root,
+      'email': owner.email,
+      'roles': owner.roles,
+      'isBanned': owner.isBanned
+    };
+  }
 
   core.app.get('/api/v1/admin/owners', ensureOwner, function (request, response) {
     request.model.User.find({'$or': [
@@ -12,30 +26,19 @@ module.exports = exports = function (core) {
         if (error) {
           throw error;
         } else {
-          response.json(
-            {
-              'data': owners.map(function (owner) {
-                return {
-                  'id': owner.id,
-                  'name': owner.name,
-                  'root': owner.root,
-                  'email': owner.email,
-                  'roles': owner.roles,
-                  'isBanned': owner.isBanned
-                };
-              })
-            }
-          );
+          response.json({
+            'data': owners.map(formatOwner)
+          });
         }
       });
   });
 
   core.app.get('/api/v1/admin/owners/:id', ensureOwner, function (request, response) {
     request.model.User.findOne({
-      'id': request.params.id,
+      '_id': request.params.id,
       '$or': [
         {'roles.owner': true},
-        {root: true}
+        {'root': true}
       ]})
       .exec(function (error, owner) {
         if (error) {
@@ -43,14 +46,7 @@ module.exports = exports = function (core) {
         } else {
           if (owner) {
             response.json({
-              'data': {
-                'id': owner.id,
-                'name': owner.name,
-                'root': owner.root,
-                'email': owner.email,
-                'roles': owner.roles,
-                'isBanned': owner.isBanned
-              }
+              'data': formatOwner(owner)
             });
           } else {
             response.status(404);
@@ -83,7 +79,7 @@ module.exports = exports = function (core) {
               throw err;
             } else {
               response.status(201);
-              response.json(userCreated);
+              response.json({'data': formatOwner(userCreated)});
             }
           });
         }
@@ -116,7 +112,7 @@ module.exports = exports = function (core) {
     var id = request.params.id;
     if (request.user.root || request.user.id === id) {
       request.model.User.findOne({
-          'id': id,
+          '_id': id,
           '$or': [
             {'roles.owner': true},
             {'root': true}
@@ -188,7 +184,7 @@ module.exports = exports = function (core) {
     var id = request.params.id;
     if (request.user.root || request.user.id === id) {
       request.model.User.findOne({
-          'id': id,
+          '_id': id,
           '$or': [
             {'roles.owner': true},
             {'root': true}
