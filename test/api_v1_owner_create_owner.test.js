@@ -28,10 +28,10 @@ describe('Owners can create other owner', function () {
     });
   });
 
-  it('returns correct response for POST /api/v1/admin/createOwner', function (done) {
+  it('returns correct response for POST /api/v1/admin/owners', function (done) {
     request({
       'method': 'POST',
-      'url': 'http://localhost:' + port + '/api/v1/admin/createOwner',
+      'url': 'http://localhost:' + port + '/api/v1/admin/owners',
       'headers': {'huntKey': ownerHuntKey1},
       'form': {
         'username': 'owner' + testId + '@example.org',
