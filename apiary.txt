@@ -724,6 +724,30 @@ POST /api/v1/admin/clients/resetPassword/:id
 }
 
 
+Ban(delete) one of Buyers. Accessible by Owners.
+DELETE /api/v1/admin/clients/5396002cb5282e71211d4f74
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebs
+> Content-Type: application/json; charset=utf-8
+< 202
+< Content-Type: application/json
+{
+    "data": {
+        "id":"5396002cb5282e71211d4f74",
+        "name":{
+            "familyName":"Zorg",
+            "middleName":"Emmanuele",
+            "givenName":"Jean Batist"
+        },
+        "root":true,
+        "email":"owner@example.org",
+        "roles": {
+         "owner":true
+        },
+        "isBanned":true
+    }
+}
+
+
 -- Owners' endpoint to create other owners --
 
 Owner can create other owners
