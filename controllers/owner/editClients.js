@@ -42,7 +42,8 @@ module.exports = exports = function (core) {
         'buyer': user.roles ? user.roles.buyer : false,
         'seller': user.roles ? user.roles.seller : false
       },
-      'accountVerified': user.accountVerified
+      'accountVerified': user.accountVerified,
+      'isBanned': user.isBanned
     }
   }
 
@@ -104,6 +105,10 @@ module.exports = exports = function (core) {
 
     if (request.body.accountVerified === true || request.body.accountVerified === false) {
       patch['accountVerified'] = request.body.accountVerified;
+    }
+
+    if (request.body.accountVerified === true || request.body.accountVerified === false) {
+      patch['isBanned'] = request.body.isBanned;
     }
 
     ['familyName', 'givenName', 'middleName'].map(function (a) {
@@ -329,6 +334,50 @@ module.exports = exports = function (core) {
         }
       }
     });
+  });
+
+  core.app.delete('/api/v1/admin/clients/:id', ensureOwner, function (request, response) {
+    if (request.params.id) {
+      request.model.User.findOne({
+        '_id': request.params.id,
+        '$or': [
+          {'roles.buyer': true},
+          {'roles.seller': true}
+        ]
+      }, function (error, userFound) {
+        if (error) {
+          throw error;
+        } else {
+          if (userFound) {
+            userFound.isBanned = true;
+            response.status(201);
+            response.json({'data': formatUser(userFound)});
+          } else {
+            response.status(404);
+            response.json({
+              'status': 'Error',
+              'errors': [
+                {
+                  'code': 404,
+                  'message': 'User with this ID do not exists!'
+                }
+              ]
+            });
+          }
+        }
+      });
+    } else {
+      response.status(400);
+      response.json({
+        'status': 'Error',
+        'errors': [
+          {
+            'code': 400,
+            'message': 'ID is missed!'
+          }
+        ]
+      });
+    }
   });
 };
 
