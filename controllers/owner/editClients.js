@@ -1,5 +1,6 @@
 //controller for owner users to edit the clients list
 var welcomeLinkGenerator = require('./../../lib/welcome.js'),
+  formatUser = require('./../formater.js').formatUserForOwner,
   ensureOwner = require('./../middleware.js').ensureOwner;
 
 module.exports = exports = function (core) {
@@ -15,37 +16,6 @@ module.exports = exports = function (core) {
     m = m < 10 ? '0' + m : m;
     return (today.toLocaleDateString() + ' ' + h + ':' + m + ' ' + ampm + ' GMT');
   };
-
-  function formatUser(user) {
-    return {
-      'id': user.id,
-      'huntKey': user.apiKey,
-      'email': user.email,
-      'name': {
-        'familyName': user.name.familyName, //http://schema.org/familyName
-        'givenName': user.name.givenName, //http://schema.org/givenName
-        'middleName': user.name.middleName //http://schema.org/middleName - at least the google oauth has this structure!
-      },
-      'title': user.profile ? (user.profile.title || 'Mr.') : 'Mr.',
-      'telefone': user.profile ? (user.profile.telefone || '') : '',
-      'localAddress': user.profile ? (user.profile.localAddress || '') : '',
-      'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : true,
-      'gravatar': user.gravatar,
-      'gravatar30': user.gravatar30,
-      'gravatar50': user.gravatar50,
-      'gravatar80': user.gravatar80,
-      'gravatar100': user.gravatar100,
-      'online': user.online,
-      'root': user.root,
-      'roles': {
-        'owner': user.roles ? user.roles.owner : false,
-        'buyer': user.roles ? user.roles.buyer : false,
-        'seller': user.roles ? user.roles.seller : false
-      },
-      'accountVerified': user.accountVerified,
-      'isBanned': user.isBanned
-    }
-  }
 
   core.app.get('/api/v1/admin/clients', ensureOwner, function (request, response) {
     var page = request.query.page || 1,
@@ -104,7 +74,7 @@ module.exports = exports = function (core) {
     }
 
     if (request.body.accountVerified === true || request.body.accountVerified === false) {
-      patch['accountVerified'] = request.body.accountVerified;
+      patch.accountVerified = request.body.accountVerified;
     }
 
     if (request.body.accountVerified === true || request.body.accountVerified === false) {
@@ -116,7 +86,7 @@ module.exports = exports = function (core) {
         patch['name.' + a] = request.body.name[a];
       }
     });
-    ['title', 'localAddress', 'telefone', 'needQuestionnaire'].map(function (b) {
+    ['title', 'localAddress', 'phone', 'altPhone', 'state', 'city', 'zip', 'needQuestionnaire'].map(function (b) {
       if (request.body[b]) {
         patch['profile.' + b] = request.body[b];
       }
@@ -200,7 +170,7 @@ module.exports = exports = function (core) {
         },
         'profile': {
           'needQuestionnaire': request.body.Questionnaire ? true : false,
-          'telefone': request.body.telefone,
+          'phone': request.body.phone,
           'localAddress': request.body.localAddress,
           'title': request.body.title
         },
@@ -264,7 +234,7 @@ module.exports = exports = function (core) {
                 'subject': 'Site access hyperlink to enter site',//todo - change to something more meaningfull
                 'name': userFound.name,
                 'welcomeLink': welcomeLink,
-                'telefone': userFound.profile.telefone,
+                'phone': userFound.profile.phone,
                 'localAddress': userFound.profile.localAddress,
                 'date': frmDt(new Date())
               });
@@ -313,7 +283,7 @@ module.exports = exports = function (core) {
                 'subject': 'Site access hyperlink to reset password', //todo - change to somethig more meaningfull
                 'name': userFound.name,
                 'welcomeLink': welcomeLink,
-                'telefone': userFound.profile ? userFound.profile.telefone : null,
+                'phone': userFound.profile ? userFound.profile.phone : null,
                 'localAddress': userFound.profile ? userFound.profile.localAddress : null,
                 'date': frmDt(new Date())
               });

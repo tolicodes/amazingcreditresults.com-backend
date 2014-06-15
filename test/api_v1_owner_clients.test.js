@@ -30,7 +30,7 @@ function verifyClient(client){
     if(client.needQuestionnaire){
       //client.needQuestionnaire.should.be.true; //strange?
     }
-    client.telefone.should.be.a.String;
+    client.phone.should.be.a.String;
     client.localAddress.should.be.a.String;
     client.title.should.be.a.String
 };
@@ -71,7 +71,7 @@ describe('/api/v1/owner/clients API resource test', function(){
           'familyName': 'Doe' + testId
         },
         'needQuestionnaire': true,
-        'telefone': '555-339'+testId,
+        'phone': '555-339'+testId,
         'localAddress': 'Some Address',
         'title': 'Mr.'
       }
@@ -91,7 +91,7 @@ describe('/api/v1/owner/clients API resource test', function(){
         bodyParsed.name.middleName.should.be.equal('Teodor'+testId);
         bodyParsed.name.familyName.should.be.equal('Doe'+testId);
         bodyParsed.title.should.be.equal('Mr.');
-        bodyParsed.telefone.should.be.equal('555-339'+testId);
+        bodyParsed.phone.should.be.equal('555-339'+testId);
         bodyParsed.localAddress.should.be.equal('Some Address');
         bodyParsed.email.should.be.equal('unitTestUser'+testId+'@mail.ru');
         bodyParsed.root.should.be.a.false;
@@ -205,7 +205,7 @@ describe('/api/v1/owner/clients API resource test', function(){
             'familyName': 'new_Doe'+testId
           },
           'needQuestionnaire': true,
-          'telefone': '555-339'+testId,
+          'phone': '555-339'+testId,
           'title': 'Mr.'
         },
         'headers': {'huntKey':huntKey}
@@ -221,7 +221,7 @@ describe('/api/v1/owner/clients API resource test', function(){
           bodyParsed.name.givenName.should.be.equal('new_John'+testId);
           bodyParsed.name.middleName.should.be.equal('new_Teodor'+testId);
           bodyParsed.name.familyName.should.be.equal('new_Doe'+testId);
-          bodyParsed.telefone.should.be.equal('555-339'+testId);
+          bodyParsed.phone.should.be.equal('555-339'+testId);
           bodyParsed.title.should.be.equal('Mr.');
           done();
         }
@@ -245,7 +245,7 @@ describe('/api/v1/owner/clients API resource test', function(){
           bodyParsed.data.name.givenName.should.be.equal('new_John'+testId);
           bodyParsed.data.name.middleName.should.be.equal('new_Teodor'+testId);
           bodyParsed.data.name.familyName.should.be.equal('new_Doe'+testId);
-          bodyParsed.data.telefone.should.be.equal('555-339'+testId);
+          bodyParsed.data.phone.should.be.equal('555-339'+testId);
           bodyParsed.data.title.should.be.equal('Mr.');
           done();
         }

@@ -384,7 +384,8 @@ POST /api/v1/owner/login
 }
 
 
--- Owner resource to edit owners
+-- Owner/Super-Owner resource to edit owners
+
 List all owners
 GET /api/v1/admin/owners
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
@@ -442,6 +443,29 @@ GET /api/v1/admin/owners/5396002cb5282e71211d4f74
     }
 }
 
+Owner can create other owners
+POST /api/v1/admin/owners
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+> Content-Type: application/json; charset=utf-8
+{"email":"owner123@example.org", "password":"lalala"}
+< 201
+< Content-Type: application/json
+{
+  "id": "536cfc8a886fcbba14d07dd6",
+  "email":"owner123@example.org",
+  "name": {
+    "familyName": "",
+    "givenName": "",
+    "middleName": ""
+  },
+  "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+  "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
+  "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
+  "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+  "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
+  "root": true,
+  "accountVerified": true
+}
 
 Update one of Owners. Is user is root, he can update other users, not myself only!!!
 PUT /api/v1/admin/owners/5396002cb5282e71211d4f74
@@ -747,32 +771,6 @@ DELETE /api/v1/admin/clients/5396002cb5282e71211d4f74
     }
 }
 
-
--- Owners' endpoint to create other owners --
-
-Owner can create other owners
-POST /api/v1/admin/createOwner
-> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
-> Content-Type: application/json; charset=utf-8
-{"email":"owner123@example.org", "password":"lalala"}
-< 201
-< Content-Type: application/json
-{
-  "id": "536cfc8a886fcbba14d07dd6",
-  "email":"owner123@example.org",
-  "name": {
-    "familyName": "",
-    "givenName": "",
-    "middleName": ""
-  },
-  "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
-  "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
-  "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
-  "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
-  "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
-  "root": true,
-  "accountVerified": true
-}
 
 
 -- Owner resource to edit products --
