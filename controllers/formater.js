@@ -32,7 +32,8 @@ exports.formatUserForOwner = function (user) {
       'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : true,
       'answer1': user.profile ? user.profile.answer1 : '',
       'answer2': user.profile ? user.profile.answer2 : '',
-      'answer3': user.profile ? user.profile.answer3 : '',
-    }
+      'answer3': user.profile ? user.profile.answer3 : ''
+    },
+    'isBanned': user.isBanned
   };
-}
+};
