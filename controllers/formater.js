@@ -15,7 +15,6 @@ exports.formatUserForOwner = function (user) {
     'city': user.profile ? (user.profile.city || '') : '',
     'zip': user.profile ? (user.profile.zip || '') : '',
     'localAddress': user.profile ? (user.profile.localAddress || '') : '',
-    'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : true,
     'gravatar': user.gravatar,
     'gravatar30': user.gravatar30,
     'gravatar50': user.gravatar50,
@@ -28,6 +27,12 @@ exports.formatUserForOwner = function (user) {
       'buyer': user.roles ? user.roles.buyer : false,
       'seller': user.roles ? user.roles.seller : false
     },
-    'accountVerified': user.accountVerified
+    'accountVerified': user.accountVerified,
+    'profile': {
+      'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : true,
+      'answer1': user.profile ? user.profile.answer1 : '',
+      'answer2': user.profile ? user.profile.answer2 : '',
+      'answer3': user.profile ? user.profile.answer3 : '',
+    }
   };
 }

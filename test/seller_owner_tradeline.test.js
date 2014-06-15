@@ -45,7 +45,7 @@ describe('Owner creates new seller', function () {
           'familyName': 'Doe' + testId
         },
         'needQuestionnaire': true,
-        'telefone': '555-339' + testId,
+        'phone': '555-339' + testId,
         'localAddress': 'Some Address',
         'title': 'Mr.',
         'roles': {
@@ -68,7 +68,7 @@ describe('Owner creates new seller', function () {
         bodyParsed.name.middleName.should.be.equal('Teodor' + testId);
         bodyParsed.name.familyName.should.be.equal('Doe' + testId);
         bodyParsed.title.should.be.equal('Mr.');
-        bodyParsed.telefone.should.be.equal('555-339' + testId);
+        bodyParsed.phone.should.be.equal('555-339' + testId);
         bodyParsed.localAddress.should.be.equal('Some Address');
         bodyParsed.email.should.be.equal('unitTestSeller' + testId + '@mail.ru');
         bodyParsed.root.should.be.a.false;
