@@ -78,13 +78,13 @@ describe('Owner creates new seller', function () {
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + sellerId,
           'headers': {'huntKey': ownerHuntKey}
-        }, function (error, response, body) {
+        }, function (error, response, body1) {
           if (error) {
             done(error);
           } else {
             response.statusCode.should.be.equal(200);
-            var bodyParsed = JSON.parse(body);
-            bodyParsed.data.id.should.be.equal(sellerId);
+            var bodyParsed1 = JSON.parse(body1);
+            bodyParsed1.data.id.should.be.equal(sellerId);
             done();
           }
         });
@@ -93,7 +93,7 @@ describe('Owner creates new seller', function () {
   });
 
   describe('seller do things', function () {
-    it('seller logins', function(done){
+    it('seller logins', function (done) {
       request({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/myself',
