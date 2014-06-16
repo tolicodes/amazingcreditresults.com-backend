@@ -171,6 +171,10 @@ module.exports = exports = function (core) {
         'profile': {
           'needQuestionnaire': request.body.Questionnaire ? true : false,
           'phone': request.body.phone,
+          'altPhone': request.body.altPhone,
+          'state': request.body.state,
+          'city': request.body.city,
+          'zip': request.body.zip,
           'localAddress': request.body.localAddress,
           'title': request.body.title
         },
