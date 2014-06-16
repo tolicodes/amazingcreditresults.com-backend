@@ -126,6 +126,7 @@ Hunt.extendRoutes(function (core) {
     }
 
     if (error.code === 11000) {
+      response.status(400);
       response.json({
         'status': 'Error',
         'errors': {
