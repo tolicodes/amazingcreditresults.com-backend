@@ -442,6 +442,29 @@ GET /api/v1/admin/owners/5396002cb5282e71211d4f74
     }
 }
 
+Owner can create other owners
+POST /api/v1/admin/owners
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+> Content-Type: application/json; charset=utf-8
+{"email":"owner123@example.org", "password":"lalala"}
+< 201
+< Content-Type: application/json
+{
+  "id": "536cfc8a886fcbba14d07dd6",
+  "email":"owner123@example.org",
+  "name": {
+    "familyName": "",
+    "givenName": "",
+    "middleName": ""
+  },
+  "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+  "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
+  "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
+  "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+  "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
+  "root": true,
+  "accountVerified": true
+}
 
 Update one of Owners. Is user is root, he can update other users, not myself only!!!
 PUT /api/v1/admin/owners/5396002cb5282e71211d4f74
@@ -507,61 +530,79 @@ GET /api/v1/admin/clients
 < 200
 < Content-Type: application/json
 {
-  "page": 1,
-  "data": [
-    {
-      "id": "536cfc8a886fcbba14d07dd6",
-      "email": "johndoe@example.org",
-      "name": {
-        "familyName": "Doe",
-        "givenName": "John",
-        "middleName": ""
-      },
-      "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
-      "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
-      "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
-      "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
-      "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
-      "root": false,
-      "accountVerified": false,
-      "telefone":"555-339-69-72",
-      "localAddress":"Gothem city",
-      "needQuestionnaire":true,
-      "title":"Mr.",
-      "roles":{
-        "owner":false,
-        "buyer":true,
-        "seller":false
-      },
-      "isBanned":false
-    },
-    {
-      "id": "536cfc8a886fcbba14d07dd7",
-      "email": "janedoe@example.org",
-      "name": {
-        "familyName": "Doe",
-        "givenName": "Jane",
-        "middleName": ""
-      },
-      "gravatar": "https://secure.gravatar.com/avatar/b7fc86f9d03e399ccc5aeec8ebbba013.jpg?s=80&d=wavatar&r=g",
-      "gravatar30": "https://secure.gravatar.com/avatar/b7fc86f9d03e399ccc5aeec8ebbba013.jpg?s=30&d=wavatar&r=g",
-      "gravatar50": "https://secure.gravatar.com/avatar/b7fc86f9d03e399ccc5aeec8ebbba013.jpg?s=50&d=wavatar&r=g",
-      "gravatar80": "https://secure.gravatar.com/avatar/b7fc86f9d03e399ccc5aeec8ebbba013.jpg?s=80&d=wavatar&r=g",
-      "gravatar100": "https://secure.gravatar.com/avatar/b7fc86f9d03e399ccc5aeec8ebbba013.jpg?s=100&d=wavatar&r=g",
-      "root": false,
-      "accountVerified": true,
-      "telefone":"555-339-69-72",
-      "localAddress":"Gothem city",
-      "needQuestionnaire":true,
-      "title":"Mr.",
-      "roles":{
-        "owner":false,
-        "buyer":true,
-        "seller":false
-      }
-      "isBanned":true
-    }
-  ]
+    "page": 1,
+    "data": [
+        {
+            "id": "538b612c7f61bdb5eadffe22",
+            "huntKey": "d10899484b00263d062e5e1a1d79394fb7c893110ae2cc64d4bc8c508be3d7aff728058ea4ebb17afbf84be618a0708edab3f1f8e881d8a305b31ae48c1e99a4",
+            "email": "johndoe@example.org",
+            "name": {
+                "familyName": "Doe",
+                "givenName": "John",
+                "middleName": "Theodor"
+            },
+            "title": "Mr.",
+            "phone": "",
+            "altPhone": "",
+            "state": "",
+            "city": "",
+            "zip": "",
+            "localAddress": "",
+            "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+            "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
+            "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
+            "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+            "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
+            "root": false,
+            "roles": {
+                "owner": false,
+                "buyer": true,
+                "seller": false
+            },
+            "accountVerified": false,
+            "isBanned": true,
+            "profile": {
+                "needQuestionnaire": true,
+                "answer1": "",
+                "answer2": "",
+                "answer3": ""
+            }
+        },
+        {
+            "id": "538b612c7f61bdb5eadffe21",
+            "huntKey": "iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv",
+            "email": "owner@example.org",
+            "name": {
+                "familyName": "Zorg",
+                "givenName": "Jean Batist",
+                "middleName": "Emmanuele"
+            },
+            "title": "Mr.",
+            "phone": "",
+            "altPhone": "",
+            "state": "",
+            "city": "",
+            "zip": "",
+            "localAddress": "",
+            "gravatar": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
+            "gravatar30": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
+            "gravatar50": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
+            "gravatar80": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
+            "gravatar100": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=100&d=wavatar&r=g",
+            "root": true,
+            "roles": {
+                "owner": true
+            },
+            "accountVerified": false,
+            "profile": {
+                "needQuestionnaire": true,
+                "answer1": "",
+                "answer2": "",
+                "answer3": ""
+            },
+            "isBanned": false
+        }
+    ]
 }
 
 
@@ -572,31 +613,41 @@ GET /api/v1/admin/clients/{:id}
 < Content-Type: application/json
 {
   "data":{
-      "id": "536cfc8a886fcbba14d07dd6",
-      "email": "johndoe@example.org",
-      "name": {
-        "familyName": "Doe",
-        "givenName": "John",
-        "middleName": ""
-      },
-      "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
-      "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
-      "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
-      "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
-      "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
-      "root": false,
-      "accountVerified": false,
-      "telefone":"555-339-69-72",
-      "localAddress":"Gothem city",
-      "title":"Mr.",
-      "needQuestionnaire":true,
-      "roles":{
-        "owner":false,
-        "buyer":true,
-        "seller":false
-      },
-      "isBanned":false
-  }
+            "id": "538b612c7f61bdb5eadffe22",
+            "huntKey": "d10899484b00263d062e5e1a1d79394fb7c893110ae2cc64d4bc8c508be3d7aff728058ea4ebb17afbf84be618a0708edab3f1f8e881d8a305b31ae48c1e99a4",
+            "email": "johndoe@example.org",
+            "name": {
+                "familyName": "Doe",
+                "givenName": "John",
+                "middleName": "Theodor"
+            },
+            "title": "Mr.",
+            "phone": "",
+            "altPhone": "",
+            "state": "",
+            "city": "",
+            "zip": "",
+            "localAddress": "",
+            "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+            "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
+            "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
+            "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+            "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
+            "root": false,
+            "roles": {
+                "owner": false,
+                "buyer": true,
+                "seller": false
+            },
+            "accountVerified": false,
+            "profile": {
+                "needQuestionnaire": true,
+                "answer1": "",
+                "answer2": "",
+                "answer3": ""
+            },
+            "isBanned":false
+    }
 }
 
 
@@ -605,36 +656,66 @@ PUT /api/v1/admin/clients/{:id}
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json; charset=utf-8
 {
-    "name":{
-      "familyName" : "Doe",
-      "givenName" : "John",
-      "middleName" : "Theodor"
-    }
-    "email":"johndoe@example.org",
-    "telefone":"555-339-69-72",
-    "localAddress":"Gothem city",
-    "needQuestionnaire":true,
-    "title":"Mr.",
-    "isBanned":false
+    "id": "538b612c7f61bdb5eadffe22",
+    "huntKey": "d10899484b00263d062e5e1a1d79394fb7c893110ae2cc64d4bc8c508be3d7aff728058ea4ebb17afbf84be618a0708edab3f1f8e881d8a305b31ae48c1e99a4",
+    "email": "johndoe@example.org",
+    "name": {
+        "familyName": "Doe",
+        "givenName": "John",
+        "middleName": "Theodor"
+    },
+    "title": "Mr.",
+    "phone": "",
+    "altPhone": "",
+    "state": "",
+    "city": "",
+    "zip": "",
+    "localAddress": "",
+    "roles": {
+        "owner": false,
+        "buyer": true,
+        "seller": false
+    },
+    "accountVerified": false,
+    "profile": {
+        "needQuestionnaire": true,
+        "answer1": "",
+        "answer2": "",
+        "answer3": ""
+    },
+    "isBanned": false
 }
 < 201
 < Content-Type: application/json
 {
-  "id": "536cfc8a886fcbba14d07dd6",
-  "email": "johndoe@example.org",
-  "name":{
-    "givenName": "John",
-    "middleName": "Theodor"
-    "familyName": "Doe"
-  },
-  "profile": {
-    "needQuestionnaire": true
-  },
-  "title":"Mr.",
-  "telefone":"555-339-69-72",
-  "localAddress":"Gothem city",
-  "root": false,
-  "isBanned":false
+    "id": "538b612c7f61bdb5eadffe22",
+    "huntKey": "d10899484b00263d062e5e1a1d79394fb7c893110ae2cc64d4bc8c508be3d7aff728058ea4ebb17afbf84be618a0708edab3f1f8e881d8a305b31ae48c1e99a4",
+    "email": "johndoe@example.org",
+    "name": {
+        "familyName": "Doe",
+        "givenName": "John",
+        "middleName": "Theodor"
+    },
+    "title": "Mr.",
+    "phone": "",
+    "altPhone": "",
+    "state": "",
+    "city": "",
+    "zip": "",
+    "localAddress": "",
+    "roles": {
+        "owner": false,
+        "buyer": true,
+        "seller": false
+    },
+    "accountVerified": false,
+    "profile": {
+        "needQuestionnaire": true,
+        "answer1": "",
+        "answer2": "",
+        "answer3": ""
+    },
+    "isBanned": false
 }
 +++++
 < 404
@@ -649,24 +730,47 @@ Create new client
 POST /api/v1/admin/clients
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json; charset=utf-8
-{"familyName" : "Doe", "givenName" : "John", "middleName" : "Theodor", "email":"johndoe@example.org","telefone":"555-339-69-72","localAddress":"Gothem city","title":"Mr.","needQuestionnaire":true}
+{
+    "familyName" : "Doe",
+    "givenName" : "John",
+    "middleName" : "Theodor",
+    "email":"johndoe@example.org",
+    "phone":"555-339-69-72",
+    "localAddress":"Gothem city",
+    "title":"Mr.",
+    "needQuestionnaire":true
+}
 < 202
 < Content-Type: application/json
 {
-  "id": "536cfc8a886fcbba14d07dd6",
-  "email": "johndoe@example.org",
-  "name":{
-    "givenName": "John",
-    "middleName": "Theodor"
-    "familyName": "Doe"
-  },
-  "profile": {
-    "needQuestionnaire": true
-  },
-  "title":"Mr.",
-  "telefone":"555-339-69-72",
-  "localAddress":"Gothem city",
-  "root": false
+    "id": "538b612c7f61bdb5eadffe22",
+    "huntKey": "d10899484b00263d062e5e1a1d79394fb7c893110ae2cc64d4bc8c508be3d7aff728058ea4ebb17afbf84be618a0708edab3f1f8e881d8a305b31ae48c1e99a4",
+    "email": "johndoe@example.org",
+    "name": {
+        "familyName": "Doe",
+        "givenName": "John",
+        "middleName": "Theodor"
+    },
+    "title": "Mr.",
+    "phone": "",
+    "altPhone": "",
+    "state": "",
+    "city": "",
+    "zip": "",
+    "localAddress": "",
+    "roles": {
+        "owner": false,
+        "buyer": true,
+        "seller": false
+    },
+    "accountVerified": false,
+    "profile": {
+        "needQuestionnaire": true,
+        "answer1": "",
+        "answer2": "",
+        "answer3": ""
+    },
+    "isBanned": false
 }
 
 Send client notification email with welcome link
@@ -747,32 +851,6 @@ DELETE /api/v1/admin/clients/5396002cb5282e71211d4f74
     }
 }
 
-
--- Owners' endpoint to create other owners --
-
-Owner can create other owners
-POST /api/v1/admin/createOwner
-> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
-> Content-Type: application/json; charset=utf-8
-{"email":"owner123@example.org", "password":"lalala"}
-< 201
-< Content-Type: application/json
-{
-  "id": "536cfc8a886fcbba14d07dd6",
-  "email":"owner123@example.org",
-  "name": {
-    "familyName": "",
-    "givenName": "",
-    "middleName": ""
-  },
-  "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
-  "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
-  "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
-  "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
-  "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
-  "root": true,
-  "accountVerified": true
-}
 
 
 -- Owner resource to edit products --

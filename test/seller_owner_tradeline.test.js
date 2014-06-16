@@ -45,7 +45,7 @@ describe('Owner creates new seller', function () {
           'familyName': 'Doe' + testId
         },
         'needQuestionnaire': true,
-        'telefone': '555-339' + testId,
+        'phone': '555-339' + testId,
         'localAddress': 'Some Address',
         'title': 'Mr.',
         'roles': {
@@ -68,7 +68,7 @@ describe('Owner creates new seller', function () {
         bodyParsed.name.middleName.should.be.equal('Teodor' + testId);
         bodyParsed.name.familyName.should.be.equal('Doe' + testId);
         bodyParsed.title.should.be.equal('Mr.');
-        bodyParsed.telefone.should.be.equal('555-339' + testId);
+        bodyParsed.phone.should.be.equal('555-339' + testId);
         bodyParsed.localAddress.should.be.equal('Some Address');
         bodyParsed.email.should.be.equal('unitTestSeller' + testId + '@mail.ru');
         bodyParsed.root.should.be.a.false;
@@ -78,13 +78,13 @@ describe('Owner creates new seller', function () {
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + sellerId,
           'headers': {'huntKey': ownerHuntKey}
-        }, function (error, response, body) {
+        }, function (error, response, body1) {
           if (error) {
             done(error);
           } else {
             response.statusCode.should.be.equal(200);
-            var bodyParsed = JSON.parse(body);
-            bodyParsed.data.id.should.be.equal(sellerId);
+            var bodyParsed1 = JSON.parse(body1);
+            bodyParsed1.data.id.should.be.equal(sellerId);
             done();
           }
         });
@@ -93,7 +93,7 @@ describe('Owner creates new seller', function () {
   });
 
   describe('seller do things', function () {
-    it('seller logins', function(done){
+    it('seller logins', function (done) {
       request({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/myself',
