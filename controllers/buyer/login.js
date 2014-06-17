@@ -17,6 +17,7 @@ module.exports = exports = function (core) {
               if (apiKeyAge < core.config.passport.apiKeyOutdates) {
 //key is fresh
                 userFound.accountVerified = true;
+                userFound.apiKeyCreatedAt = Date.now();
                 userFound.setPassword(request.body.password, function (error) {
                   if (error) {
                     throw error;
