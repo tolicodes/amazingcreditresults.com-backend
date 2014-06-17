@@ -670,7 +670,8 @@ PUT /api/v1/admin/clients/{:id}
     "state": "",
     "city": "",
     "zip": "",
-    "street1": "",
+    "street1": "aaa",
+    "street2": "bbb",
     "roles": {
         "owner": false,
         "buyer": true,
@@ -702,7 +703,8 @@ PUT /api/v1/admin/clients/{:id}
     "state": "",
     "city": "",
     "zip": "",
-    "street1": "",
+    "street1": "aaa",
+    "street2": "bbb",
     "roles": {
         "owner": false,
         "buyer": true,
