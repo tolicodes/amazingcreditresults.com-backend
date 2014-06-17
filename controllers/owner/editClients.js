@@ -86,7 +86,7 @@ module.exports = exports = function (core) {
         patch['name.' + a] = request.body.name[a];
       }
     });
-    ['title', 'localAddress', 'phone', 'altPhone', 'state', 'city', 'zip', 'needQuestionnaire'].map(function (b) {
+    ['title', 'street1', 'street2', 'phone', 'altPhone', 'state', 'city', 'zip', 'needQuestionnaire'].map(function (b) {
       if (request.body[b]) {
         patch['profile.' + b] = request.body[b];
       }
@@ -175,7 +175,8 @@ module.exports = exports = function (core) {
           'state': request.body.state,
           'city': request.body.city,
           'zip': request.body.zip,
-          'localAddress': request.body.localAddress,
+          'street1': request.body.street1,
+          'street2': request.body.street2,
           'title': request.body.title
         },
         'roles': {
@@ -239,7 +240,7 @@ module.exports = exports = function (core) {
                 'name': userFound.name,
                 'welcomeLink': welcomeLink,
                 'phone': userFound.profile.phone,
-                'localAddress': userFound.profile.localAddress,
+                'street1': userFound.profile.street1,
                 'date': frmDt(new Date())
               });
               cb();
@@ -288,7 +289,7 @@ module.exports = exports = function (core) {
                 'name': userFound.name,
                 'welcomeLink': welcomeLink,
                 'phone': userFound.profile ? userFound.profile.phone : null,
-                'localAddress': userFound.profile ? userFound.profile.localAddress : null,
+                'street1': userFound.profile ? userFound.profile.street1 : null,
                 'date': frmDt(new Date())
               });
               cb();

@@ -31,7 +31,7 @@ function verifyClient(client){
       //client.needQuestionnaire.should.be.true; //strange?
     }
     client.phone.should.be.a.String;
-    client.localAddress.should.be.a.String;
+  client.street1.should.be.a.String;
     client.title.should.be.a.String
 };
 
@@ -72,7 +72,7 @@ describe('/api/v1/owner/clients API resource test', function(){
         },
         'needQuestionnaire': true,
         'phone': '555-339'+testId,
-        'localAddress': 'Some Address',
+        'street1': 'Some Address',
         'title': 'Mr.'
       }
     }, function(error, response, body){
@@ -92,7 +92,7 @@ describe('/api/v1/owner/clients API resource test', function(){
         bodyParsed.name.familyName.should.be.equal('Doe'+testId);
         bodyParsed.title.should.be.equal('Mr.');
         bodyParsed.phone.should.be.equal('555-339'+testId);
-        bodyParsed.localAddress.should.be.equal('Some Address');
+        bodyParsed.street1.should.be.equal('Some Address');
         bodyParsed.email.should.be.equal('unitTestUser'+testId+'@mail.ru');
         bodyParsed.root.should.be.a.false;
 //and we can get this client
@@ -156,7 +156,7 @@ describe('/api/v1/owner/clients API resource test', function(){
         'method':'PUT',
         'url':'http://localhost:'+port+'/api/v1/admin/clients/'+clientId,
         'form':{
-          'localAddress':'City #'+clientId
+          'street1': 'City #' + clientId
         },
         'headers': {'huntKey':huntKey}
       }, function(error, response, body){
@@ -166,7 +166,7 @@ describe('/api/v1/owner/clients API resource test', function(){
           response.statusCode.should.be.equal(202);
           var bodyParsed = JSON.parse(body);
           verifyClient(bodyParsed);
-          bodyParsed.localAddress.should.be.equal('City #'+clientId);
+          bodyParsed.street1.should.be.equal('City #' + clientId);
           done();
         }
       });
@@ -184,7 +184,7 @@ describe('/api/v1/owner/clients API resource test', function(){
           response.statusCode.should.be.equal(200);
           var bodyParsed = JSON.parse(body);
           verifyClient(bodyParsed.data);
-          bodyParsed.data.localAddress.should.be.equal('City #'+clientId);
+          bodyParsed.data.street1.should.be.equal('City #' + clientId);
           done();
         }
       });
@@ -197,7 +197,7 @@ describe('/api/v1/owner/clients API resource test', function(){
         'method':'PUT',
         'url':'http://localhost:'+port+'/api/v1/admin/clients/'+clientId,
         'form':{
-          'localAddress':'new_City #'+testId,
+          'street1': 'new_City #' + testId,
           'email': 'new_unitTestUser'+testId+'@mail.ru',
           'name':{
             'givenName': 'new_John'+testId,
@@ -216,7 +216,7 @@ describe('/api/v1/owner/clients API resource test', function(){
           response.statusCode.should.be.equal(202);
           var bodyParsed = JSON.parse(body);
           verifyClient(bodyParsed);
-          bodyParsed.localAddress.should.be.equal('new_City #'+testId);
+          bodyParsed.street1.should.be.equal('new_City #' + testId);
           bodyParsed.email.should.be.equal('new_unitTestUser'+testId+'@mail.ru');
           bodyParsed.name.givenName.should.be.equal('new_John'+testId);
           bodyParsed.name.middleName.should.be.equal('new_Teodor'+testId);
@@ -240,7 +240,7 @@ describe('/api/v1/owner/clients API resource test', function(){
           response.statusCode.should.be.equal(200);
           var bodyParsed = JSON.parse(body);
           verifyClient(bodyParsed.data);
-          bodyParsed.data.localAddress.should.be.equal('new_City #'+testId);
+          bodyParsed.data.street1.should.be.equal('new_City #' + testId);
           bodyParsed.data.email.should.be.equal('new_unitTestUser'+testId+'@mail.ru');
           bodyParsed.data.name.givenName.should.be.equal('new_John'+testId);
           bodyParsed.data.name.middleName.should.be.equal('new_Teodor'+testId);

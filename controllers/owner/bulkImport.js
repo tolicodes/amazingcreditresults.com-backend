@@ -18,7 +18,7 @@ function formatUser(user) {
     },
     'title': user.profile ? (user.profile.title || 'Mr.') : 'Mr.',
     'telefone': user.profile ? (user.profile.telefone || '') : '',
-    'localAddress': user.profile ? (user.profile.localAddress || '') : '',
+    'street1': user.profile ? (user.profile.street1 || '') : '',
     'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : true,
     'gravatar': user.gravatar,
     'gravatar30': user.gravatar30,
