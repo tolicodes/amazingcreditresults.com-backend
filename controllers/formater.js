@@ -29,8 +29,8 @@ exports.formatUserForOwner = function (user) {
       'seller': user.roles ? user.roles.seller : false
     },
     'accountVerified': user.accountVerified,
+    'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : true,
     'profile': {
-      'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : true,
       'answer1': user.profile ? user.profile.answer1 : '',
       'answer2': user.profile ? user.profile.answer2 : '',
       'answer3': user.profile ? user.profile.answer3 : ''
