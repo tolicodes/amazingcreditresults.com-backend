@@ -78,7 +78,7 @@ module.exports = exports = function (core) {
     }
 
     if (request.body.accountVerified === true || request.body.accountVerified === false) {
-      patch['isBanned'] = request.body.isBanned;
+      patch.isBanned = request.body.isBanned;
     }
 
     ['familyName', 'givenName', 'middleName'].map(function (a) {
@@ -213,13 +213,14 @@ module.exports = exports = function (core) {
         throw error;
       } else {
         var welcomeLink = welcomeLinkGenerator();
-        if (userFound.roles && userFound.roles.owner === true) {
+        if ((userFound.roles && userFound.roles.owner === true) || userFound.root) {
           response.status(400); //not sure about js with it
           response.json({'error': 'Unable to send welcome link to owner!'});
         } else {
           core.async.waterfall([
             function (cb) {
               userFound.keychain.welcomeLink = welcomeLink;
+              userFound.apiKeyCreatedAt = Date.now();
               userFound.markModified('keychain');
               userFound.invalidateSession(cb);
             },
@@ -268,7 +269,7 @@ module.exports = exports = function (core) {
         throw error;
       } else {
         var welcomeLink = welcomeLinkGenerator();
-        if (userFound.roles && userFound.roles.owner === true) {
+        if ((userFound.roles && userFound.roles.owner === true) || userFound.root) {
           response.status(400); //not sure about js with it
           response.json({'error': 'Unable to send password reset link to owner!'});
         } else {
@@ -277,6 +278,7 @@ module.exports = exports = function (core) {
               userFound.keychain.welcomeLink = welcomeLink;
               userFound.markModified('keychain');
               userFound.accountVerified = false;
+              userFound.apiKeyCreatedAt = Date.now();
               userFound.invalidateSession(cb);
             },
             function (newApiKey, cb) {
