@@ -70,7 +70,7 @@ describe('/api/v1/owner/login API endpoint test', function () {
         var bodyParsed = body;
         bodyParsed.status.should.be.equal('Error');
         bodyParsed.errors[0].code.should.be.equal(403);
-        bodyParsed.errors[0].message.should.be.equal('Unable to authorize Owner with this credentials!');
+        bodyParsed.errors[0].message.should.be.equal('Invalid username or password. Please try again using correct username and password.');
         should.not.exist(bodyParsed.huntKey);
         done();
       }
