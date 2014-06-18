@@ -212,8 +212,8 @@ GET /api/v1/myself
     "buyer":false,
     "seller":false
   },
+  "needQuestionnaire":true,
   "profile": {
-    "needQuestionnaire":true,
     "answer1": "1",
     "answer2": "2",
     "answer3": "3"
@@ -244,8 +244,8 @@ POST /api/v1/buyer/saveQuestionnaireAnswers
     "givenName": "John",
     "middleName": ""
   },
+  "needQuestionnaire": true,
   "profile": {
-    "needQuestionnaire": true,
     "answer1": "1",
     "answer2": "2",
     "answer3": "3"
@@ -561,8 +561,8 @@ GET /api/v1/admin/clients
             },
             "accountVerified": false,
             "isBanned": true,
+            "needQuestionnaire": true,
             "profile": {
-                "needQuestionnaire": true,
                 "answer1": "",
                 "answer2": "",
                 "answer3": ""
@@ -594,8 +594,8 @@ GET /api/v1/admin/clients
                 "owner": true
             },
             "accountVerified": false,
+            "needQuestionnaire": true,
             "profile": {
-                "needQuestionnaire": true,
                 "answer1": "",
                 "answer2": "",
                 "answer3": ""
@@ -640,8 +640,8 @@ GET /api/v1/admin/clients/{:id}
                 "seller": false
             },
             "accountVerified": false,
+            "needQuestionnaire": true,
             "profile": {
-                "needQuestionnaire": true,
                 "answer1": "",
                 "answer2": "",
                 "answer3": ""
@@ -678,8 +678,8 @@ PUT /api/v1/admin/clients/{:id}
         "seller": false
     },
     "accountVerified": false,
+    "needQuestionnaire": true,
     "profile": {
-        "needQuestionnaire": true,
         "answer1": "",
         "answer2": "",
         "answer3": ""
@@ -711,8 +711,8 @@ PUT /api/v1/admin/clients/{:id}
         "seller": false
     },
     "accountVerified": false,
+    "needQuestionnaire": true,
     "profile": {
-        "needQuestionnaire": true,
         "answer1": "",
         "answer2": "",
         "answer3": ""
@@ -784,8 +784,8 @@ POST /api/v1/admin/clients
         "seller": false
     },
     "accountVerified": false,
+    "needQuestionnaire": true,
     "profile": {
-        "needQuestionnaire": true,
         "answer1": "",
         "answer2": "",
         "answer3": ""
