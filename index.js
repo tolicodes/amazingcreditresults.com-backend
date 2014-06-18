@@ -129,10 +129,10 @@ Hunt.extendRoutes(function (core) {
       response.status(400);
       response.json({
         'status': 'Error',
-        'errors': {
+        'errors': [{
           'code': 400,
           'message': 'Duplicate entry!'
-        }
+        }]
       });
       return;
     }
