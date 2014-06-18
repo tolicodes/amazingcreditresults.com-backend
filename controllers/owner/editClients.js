@@ -137,7 +137,6 @@ module.exports = exports = function (core) {
     );
   });
 
-
   core.app.post('/api/v1/admin/clients', ensureOwner, function (request, response) {
     var isOk,
       missed;
