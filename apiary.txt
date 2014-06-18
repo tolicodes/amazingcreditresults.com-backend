@@ -318,6 +318,49 @@ GET /api/v1/tradelines
 {"Code":401, "Error":"Authorization required"}
 
 
+-- Buyer cart (unstable) --
+
+List tradelines in cart
+GET /api/v1/buyer/cart
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 200
+< Content-Type: application/json
+{
+    "itemsInCart":0,
+    "data":[]
+}
+
+
+Add tradelines to cart
+PUT /api/v1/buyer/cart/5396002cb5282e71211d4f74
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 202
+< Content-Type: application/json
+{
+    "status": "ok"
+}
+
+
+Remove tradeline from cart
+DELETE /api/v1/buyer/cart/5396002cb5282e71211d4f74
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 202
+< Content-Type: application/json
+{
+    "status": "ok"
+}
+
+
+Checkout
+POST /api/v1/buyer/cart/5396002cb5282e71211d4f74
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 202
+< Content-Type: application/json
+{
+    "status": "ok"
+}
+
+
 
 -- Owner api for header based authorization
 
@@ -326,6 +369,7 @@ POST /api/v1/owner/login
 > Content-Type: application/json; charset=utf-8
 { "username":"owner@example.org", "password":"test123" }
 < 200
+< Content-Type: application/json
 {
     "Code":200,
     "huntKey":"someRealyLongString",
@@ -337,6 +381,7 @@ POST /api/v1/owner/login
 }
 +++++
 < 403
+< Content-Type: application/json
 {
 "status": "Error",
 "errors": [{
@@ -347,6 +392,7 @@ POST /api/v1/owner/login
 }
 +++++
 < 400
+< Content-Type: application/json
 {
 "status": "Error",
 "errors": [
