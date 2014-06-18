@@ -168,8 +168,9 @@ module.exports = exports = function (core) {
           'middleName': request.body.name.middleName,
           'familyName': request.body.name.familyName
         },
+        'accountVerified': request.body.accountVerified ? true : false,
         'profile': {
-          'needQuestionnaire': request.body.Questionnaire ? true : false,
+          'needQuestionnaire': request.body.needQuestionnaire ? true : false,
           'phone': request.body.phone,
           'altPhone': request.body.altPhone,
           'state': request.body.state,
