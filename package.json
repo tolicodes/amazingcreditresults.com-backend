@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "node index.js & sleep 3; ./node_modules/.bin/mocha --reporter spec; killall node"
+    "test": "./node_modules/.bin/mocha --reporter spec"
   },
   "repository": {
     "type": "git",
@@ -15,13 +15,13 @@
   "author": "Anatolij Ostroumov",
   "license": "MIT",
   "dependencies": {
-    "hunt":"https://api.github.com/repos/vodolaz095/hunt/tarball/master",
-    "fast-csv":"0.4.0",
-    "connect-multiparty":"1.0.5"
+    "hunt": "https://api.github.com/repos/vodolaz095/hunt/tarball/master",
+    "fast-csv": "0.4.0",
+    "connect-multiparty": "1.0.5"
   },
   "devDependencies": {
-    "request":"2.34.0",
-    "mocha":"1.18.2",
-    "should":"3.3.1"
+    "request": "2.34.0",
+    "mocha": "1.18.2",
+    "should": "3.3.1"
   }
 }
