@@ -1,0 +1,31 @@
+#! /bin/sh
+# Basic support for IRIX style chkconfig
+###
+# chkconfig: 235 98 55
+# description: Manages the services you are controlling with the chkconfig command
+###
+
+case "$1" in
+  start)
+        echo -n "Starting nodejsbackend"
+        #To run it as root:
+        #/path/to/command/to/start/new-service
+        #Or to run it as some other user:
+        /bin/su -l nodejs -c '/home/nodejs/runBackend.sh'
+        echo "."
+        ;;
+  stop)
+        echo -n "Stopping nodejsbackend"
+        #To run it as root:
+        #/path/to/command/to/stop/new-service
+        #Or to run it as some other user:
+        #/bin/su - username -c /path/to/command/to/stop/new-service
+        echo "."
+        ;;
+
+  *)
+        echo "Usage: /sbin/service nodejsbackend {start|stop}"
+        exit 1
+esac
+
+exit 0
