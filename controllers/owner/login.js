@@ -8,7 +8,7 @@ module.exports = exports = function (core) {
         } else {
           if (userFound && (userFound.roles && userFound.roles.owner === true) && userFound.verifyPassword(request.body.password)) {
             response.status(200);
-            response.json({'Code': 200, 'id': userFound.id, 'huntKey': userFound.apiKey, 'name': userFound.name})
+            response.json({'Code': 200, 'id': userFound.id, 'huntKey': userFound.apiKey, 'name': userFound.name});
           } else {
             response.status(403);
             response.json({
@@ -16,7 +16,7 @@ module.exports = exports = function (core) {
               'errors': [
                 {
                   'code': 403,
-                  'message': 'Unable to authorize Owner with this credentials!',
+                  'message': 'Invalid username or password. Please try again using correct username and password.'
                   //'field': 'username' //https://oselot.atlassian.net/browse/ACR-304#
                 }
               ]

@@ -17,6 +17,7 @@ module.exports = exports = function (core) {
               if (apiKeyAge < core.config.passport.apiKeyOutdates) {
 //key is fresh
                 userFound.accountVerified = true;
+                userFound.apiKeyCreatedAt = Date.now();
                 userFound.setPassword(request.body.password, function (error) {
                   if (error) {
                     throw error;
@@ -171,13 +172,21 @@ module.exports = exports = function (core) {
 //2. The first time a Buyer clicks the link, s/he will see a prompt asking to create a password
                 response.json({
                   'needToSetPassword': true,
-                  'name': userFound.name
+                  'name': {
+                    'familyName': userFound.name.familyName, //http://schema.org/familyName
+                    'givenName': userFound.name.givenName, //http://schema.org/givenName
+                    'middleName': userFound.name.middleName //http://schema.org/middleName - at least the google oauth has this structure!
+                  }
                 });
               } else {
 //3. The second time a Buyer click the link, s/he will be prompted for the password
                 response.json({
                   'needToSetPassword': false,
-                  'name': userFound.name
+                  'name': {
+                    'familyName': userFound.name.familyName, //http://schema.org/familyName
+                    'givenName': userFound.name.givenName, //http://schema.org/givenName
+                    'middleName': userFound.name.middleName //http://schema.org/middleName - at least the google oauth has this structure!
+                  }
                 });
               }
             } else {
@@ -185,8 +194,9 @@ module.exports = exports = function (core) {
               response.status(400);
               response.json({
                 'status': 'Error',
-                'errors': [{
-                    "code": 400,
+                'errors': [
+                  {
+                    'code': 400,
                     'message': 'Link is outdated!'
                   }
                 ]
@@ -196,16 +206,17 @@ module.exports = exports = function (core) {
 //there is nobody, who has this key!
             response.status(404);
             response.json({
-                'status': 'Error',
-                'errors': [{
-                    "code": 404,
-                    'message': 'Link is not valid!'
-                  }
-                ]
+              'status': 'Error',
+              'errors': [
+                {
+                  'code': 404,
+                  'message': 'Link is not valid!'
+                }
+              ]
             });
           }
         }
       }
-    );
+      );
   });
 };

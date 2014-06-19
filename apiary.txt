@@ -206,14 +206,14 @@ GET /api/v1/myself
   "root": true,
   "accountVerified": false,
   "telefone":"555-339-69-72",
-  "localAddress":"Gothem city",
+  "street1":"Gothem city",
   "roles":{
     "owner":true,
     "buyer":false,
     "seller":false
   },
+  "needQuestionnaire":true,
   "profile": {
-    "needQuestionnaire":true,
     "answer1": "1",
     "answer2": "2",
     "answer3": "3"
@@ -244,8 +244,8 @@ POST /api/v1/buyer/saveQuestionnaireAnswers
     "givenName": "John",
     "middleName": ""
   },
+  "needQuestionnaire": true,
   "profile": {
-    "needQuestionnaire": true,
     "answer1": "1",
     "answer2": "2",
     "answer3": "3"
@@ -318,6 +318,49 @@ GET /api/v1/tradelines
 {"Code":401, "Error":"Authorization required"}
 
 
+-- Buyer cart (unstable) --
+
+List tradelines in cart
+GET /api/v1/buyer/cart
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 200
+< Content-Type: application/json
+{
+    "itemsInCart":0,
+    "data":[]
+}
+
+
+Add tradelines to cart
+PUT /api/v1/buyer/cart/5396002cb5282e71211d4f74
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 202
+< Content-Type: application/json
+{
+    "status": "ok"
+}
+
+
+Remove tradeline from cart
+DELETE /api/v1/buyer/cart/5396002cb5282e71211d4f74
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 202
+< Content-Type: application/json
+{
+    "status": "ok"
+}
+
+
+Checkout
+POST /api/v1/buyer/cart/5396002cb5282e71211d4f74
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 202
+< Content-Type: application/json
+{
+    "status": "ok"
+}
+
+
 
 -- Owner api for header based authorization
 
@@ -326,6 +369,7 @@ POST /api/v1/owner/login
 > Content-Type: application/json; charset=utf-8
 { "username":"owner@example.org", "password":"test123" }
 < 200
+< Content-Type: application/json
 {
     "Code":200,
     "huntKey":"someRealyLongString",
@@ -337,6 +381,7 @@ POST /api/v1/owner/login
 }
 +++++
 < 403
+< Content-Type: application/json
 {
 "status": "Error",
 "errors": [{
@@ -347,6 +392,7 @@ POST /api/v1/owner/login
 }
 +++++
 < 400
+< Content-Type: application/json
 {
 "status": "Error",
 "errors": [
@@ -547,7 +593,7 @@ GET /api/v1/admin/clients
             "state": "",
             "city": "",
             "zip": "",
-            "localAddress": "",
+            "street1": "",
             "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
             "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
             "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
@@ -561,8 +607,8 @@ GET /api/v1/admin/clients
             },
             "accountVerified": false,
             "isBanned": true,
+            "needQuestionnaire": true,
             "profile": {
-                "needQuestionnaire": true,
                 "answer1": "",
                 "answer2": "",
                 "answer3": ""
@@ -583,7 +629,7 @@ GET /api/v1/admin/clients
             "state": "",
             "city": "",
             "zip": "",
-            "localAddress": "",
+            "street1": "",
             "gravatar": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
             "gravatar30": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
             "gravatar50": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
@@ -594,8 +640,8 @@ GET /api/v1/admin/clients
                 "owner": true
             },
             "accountVerified": false,
+            "needQuestionnaire": true,
             "profile": {
-                "needQuestionnaire": true,
                 "answer1": "",
                 "answer2": "",
                 "answer3": ""
@@ -627,7 +673,7 @@ GET /api/v1/admin/clients/{:id}
             "state": "",
             "city": "",
             "zip": "",
-            "localAddress": "",
+            "street1": "",
             "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
             "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
             "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
@@ -640,8 +686,8 @@ GET /api/v1/admin/clients/{:id}
                 "seller": false
             },
             "accountVerified": false,
+            "needQuestionnaire": true,
             "profile": {
-                "needQuestionnaire": true,
                 "answer1": "",
                 "answer2": "",
                 "answer3": ""
@@ -670,15 +716,16 @@ PUT /api/v1/admin/clients/{:id}
     "state": "",
     "city": "",
     "zip": "",
-    "localAddress": "",
+    "street1": "aaa",
+    "street2": "bbb",
     "roles": {
         "owner": false,
         "buyer": true,
         "seller": false
     },
     "accountVerified": false,
+    "needQuestionnaire": true,
     "profile": {
-        "needQuestionnaire": true,
         "answer1": "",
         "answer2": "",
         "answer3": ""
@@ -702,15 +749,16 @@ PUT /api/v1/admin/clients/{:id}
     "state": "",
     "city": "",
     "zip": "",
-    "localAddress": "",
+    "street1": "aaa",
+    "street2": "bbb",
     "roles": {
         "owner": false,
         "buyer": true,
         "seller": false
     },
     "accountVerified": false,
+    "needQuestionnaire": true,
     "profile": {
-        "needQuestionnaire": true,
         "answer1": "",
         "answer2": "",
         "answer3": ""
@@ -737,13 +785,16 @@ POST /api/v1/admin/clients
       "middleName" : "Theodor"
     },
     "email":"johndoe@example.org",
-    "phone":"555-339-69-72",
-    "altPhone":"555-339-69-72",
-    "state":"Alaska",
-    "zip":1234567,
-    "localAddress":"Gothem city",
     "title":"Mr.",
+    "phone": "555-339-69-72",
+    "altPhone": "555-339-69-73",
+    "state": "Alaska",
+    "city": "Vankuver",
+    "zip": "",
+    "street1": "White street",
+    "street2": "house 10",
     "needQuestionnaire":true,
+    "accountVerified":true,
     "roles":{
        "seller":false,
        "buyer":true
@@ -759,27 +810,28 @@ POST /api/v1/admin/clients
     "altPhone":"555-339-69-72",
     "state":"Alaska",
     "zip":1234567,
-    "localAddress":"Gothem city",
+    "street1":"Gothem city",
     "name": {
         "familyName": "Doe",
         "givenName": "John",
         "middleName": "Theodor"
     },
     "title": "Mr.",
-    "phone": "",
-    "altPhone": "",
-    "state": "",
-    "city": "",
+    "phone": "555-339-69-72",
+    "altPhone": "555-339-69-73",
+    "state": "Alaska",
+    "city": "Vankuver",
     "zip": "",
-    "localAddress": "",
+    "street1": "White street",
+    "street2": "house 10",
     "roles": {
         "owner": false,
         "buyer": true,
         "seller": false
     },
     "accountVerified": false,
+    "needQuestionnaire": true,
     "profile": {
-        "needQuestionnaire": true,
         "answer1": "",
         "answer2": "",
         "answer3": ""

@@ -78,7 +78,7 @@ module.exports = exports = function (core) {
     }
 
     if (request.body.accountVerified === true || request.body.accountVerified === false) {
-      patch['isBanned'] = request.body.isBanned;
+      patch.isBanned = request.body.isBanned;
     }
 
     ['familyName', 'givenName', 'middleName'].map(function (a) {
@@ -86,7 +86,7 @@ module.exports = exports = function (core) {
         patch['name.' + a] = request.body.name[a];
       }
     });
-    ['title', 'localAddress', 'phone', 'altPhone', 'state', 'city', 'zip', 'needQuestionnaire'].map(function (b) {
+    ['title', 'street1', 'street2', 'phone', 'altPhone', 'state', 'city', 'zip', 'needQuestionnaire'].map(function (b) {
       if (request.body[b]) {
         patch['profile.' + b] = request.body[b];
       }
@@ -137,7 +137,6 @@ module.exports = exports = function (core) {
     );
   });
 
-
   core.app.post('/api/v1/admin/clients', ensureOwner, function (request, response) {
     var isOk,
       missed;
@@ -168,14 +167,16 @@ module.exports = exports = function (core) {
           'middleName': request.body.name.middleName,
           'familyName': request.body.name.familyName
         },
+        'accountVerified': request.body.accountVerified ? true : false,
         'profile': {
-          'needQuestionnaire': request.body.Questionnaire ? true : false,
+          'needQuestionnaire': request.body.needQuestionnaire ? true : false,
           'phone': request.body.phone,
           'altPhone': request.body.altPhone,
           'state': request.body.state,
           'city': request.body.city,
           'zip': request.body.zip,
-          'localAddress': request.body.localAddress,
+          'street1': request.body.street1,
+          'street2': request.body.street2,
           'title': request.body.title
         },
         'roles': {
@@ -212,13 +213,14 @@ module.exports = exports = function (core) {
         throw error;
       } else {
         var welcomeLink = welcomeLinkGenerator();
-        if (userFound.roles && userFound.roles.owner === true) {
+        if ((userFound.roles && userFound.roles.owner === true) || userFound.root) {
           response.status(400); //not sure about js with it
           response.json({'error': 'Unable to send welcome link to owner!'});
         } else {
           core.async.waterfall([
             function (cb) {
               userFound.keychain.welcomeLink = welcomeLink;
+              userFound.apiKeyCreatedAt = Date.now();
               userFound.markModified('keychain');
               userFound.invalidateSession(cb);
             },
@@ -239,7 +241,7 @@ module.exports = exports = function (core) {
                 'name': userFound.name,
                 'welcomeLink': welcomeLink,
                 'phone': userFound.profile.phone,
-                'localAddress': userFound.profile.localAddress,
+                'street1': userFound.profile.street1,
                 'date': frmDt(new Date())
               });
               cb();
@@ -267,7 +269,7 @@ module.exports = exports = function (core) {
         throw error;
       } else {
         var welcomeLink = welcomeLinkGenerator();
-        if (userFound.roles && userFound.roles.owner === true) {
+        if ((userFound.roles && userFound.roles.owner === true) || userFound.root) {
           response.status(400); //not sure about js with it
           response.json({'error': 'Unable to send password reset link to owner!'});
         } else {
@@ -276,6 +278,7 @@ module.exports = exports = function (core) {
               userFound.keychain.welcomeLink = welcomeLink;
               userFound.markModified('keychain');
               userFound.accountVerified = false;
+              userFound.apiKeyCreatedAt = Date.now();
               userFound.invalidateSession(cb);
             },
             function (newApiKey, cb) {
@@ -288,7 +291,7 @@ module.exports = exports = function (core) {
                 'name': userFound.name,
                 'welcomeLink': welcomeLink,
                 'phone': userFound.profile ? userFound.profile.phone : null,
-                'localAddress': userFound.profile ? userFound.profile.localAddress : null,
+                'street1': userFound.profile ? userFound.profile.street1 : null,
                 'date': frmDt(new Date())
               });
               cb();

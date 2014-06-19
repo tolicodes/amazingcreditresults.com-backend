@@ -45,7 +45,7 @@ describe('Unit test for user authorization by welcome link', function () {
           },
           'needQuestionnaire': true,
           'telefone': '555-339' + testId,
-          'localAddress': 'Some Address',
+          'street1': 'Some Address',
           'title': 'Mr.'
         }
       }, function (error, response, body) {
