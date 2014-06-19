@@ -3,13 +3,13 @@ Backend
 
 Access for owners - `/admin/login`
 Access for anybody - by link in email address
-[Apiary documentation](http://docs.amazing.apiary.io/)
+[Apiary documentation](http://docs.amazingcreditresultsapi.apiary.io/)
 
 
-Development environment
-=============================
+Setting Up Development Environment
+==================================
 
-I suggest installing nginx, to act as static http server for frontend code, and proxy for api on staging server
+* I suggest installing nginx, to act as static http server for frontend code, and proxy for api on staging server
 So, both the backend, and frontend (from local folder) are served from the localhost!
 This eliminates a lot cross origin issues and allows session based authorization
 Nginx config is published [here](https://bitbucket.org/nycitt/amazingcreditresults.com-backend/src/56a3bb3f036f38d20102b9af03ff17c304138c4e/nginx.conf)
@@ -19,13 +19,18 @@ Some usefull info:
 [http://nginx.org/en/docs/windows.html](http://nginx.org/en/docs/windows.html)
 [http://wiki.nginx.org/Install](http://wiki.nginx.org/Install)
 
+* After installing nginx replace your configuration file with the one found in the repository,
+open it, and adjust the lines that follow exclamation marks.
 
+* `cd` into the backend directory and execute `node index.js` to start the server.
+* Now your server should be available at http://localhost.
+Try to open http://localhost/#admin/login. Default credentials are owner@example.org/test123
 
 Sessionless authorization
 =============================
 
-When user is authorized, s/he can receive profile JSON on this page
-http://docs.amazing.apiary.io/#get-%2Fauth%2Fmyself
+When user is authorized, she or he can receive profile JSON on this page
+http://docs.amazingcreditresultsapi.apiary.io/#get-%2Fapi%2Fv1%2Fmyself
 
 This response is something like this
 
