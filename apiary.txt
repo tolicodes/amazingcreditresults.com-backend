@@ -321,7 +321,7 @@ GET /api/v1/tradelines
 -- Buyer cart (unstable) --
 
 List tradelines in cart
-GET /api/v1/buyer/cart
+GET /api/v1/cart/items
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
 < Content-Type: application/json
@@ -332,27 +332,19 @@ GET /api/v1/buyer/cart
 
 
 Add tradelines to cart
-PUT /api/v1/buyer/cart/5396002cb5282e71211d4f74
+POST /api/v1/cart/items
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
-< 202
-< Content-Type: application/json
-{
-    "status": "ok"
-}
+< 201
 
 
 Remove tradeline from cart
-DELETE /api/v1/buyer/cart/5396002cb5282e71211d4f74
+DELETE /api/v1/cart/items/5396002cb5282e71211d4f74
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
-< 202
-< Content-Type: application/json
-{
-    "status": "ok"
-}
+< 200
 
 
 Checkout
-POST /api/v1/buyer/cart/5396002cb5282e71211d4f74
+POST /api/v1/cart/checkout
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 202
 < Content-Type: application/json
