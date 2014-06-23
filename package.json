@@ -13,7 +13,7 @@
     "url": "git@bitbucket.org:oselot/amazingcreditresults.com-backend.git"
   },
   "author": "Anatolij Ostroumov",
-  "license": "MIT",
+  "license": "proprietary",
   "dependencies": {
     "hunt": "https://api.github.com/repos/vodolaz095/hunt/tarball/master",
     "fast-csv": "0.4.0",
