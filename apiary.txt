@@ -309,8 +309,30 @@ GET /api/v1/tradelines
             "ncRating": "Bronze",
             "bcRating": "Bronze",
             "moRating": "Bronze"
+        },
+        {
+            "id": "5388dd22e87f5b444eaf1c8e",
+            "seller": "5370a4fa25777db9531ffa91",
+            "dateOpen": "2014-05-30T19:33:54.022Z",
+            "availableAus": 15,
+            "product": {
+                "id": "53876e1e6b7719ef31025220",
+                "name": "Gemoroi 2",
+                "bank": "Sperbank (testing)",
+                "reportsToExperian": false,
+                "reportsToEquifax": false,
+                "reportsToTransunion": false,
+                "ncRating": "None",
+                "bcRating": "None",
+                "moRating": "None",
+                "type": "MasterCard"
+            },
+            "price": 1100,
+            "ncRating": "Bronze",
+            "bcRating": "Bronze",
+            "moRating": "Bronze"
         }
-   ]
+    ]
 }
 +++++
 < 401
