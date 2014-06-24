@@ -2,7 +2,7 @@ var ensureBuyerOrOwner = require('../middleware.js').ensureBuyerOrOwner;
 
 module.exports = exports = function (core) {
 
-  core.app.get('/api/v1/cart/items', function (request, response) {
+  core.app.get('/api/v1/cart/items', ensureBuyerOrOwner, function (request, response) {
     var tradelineIds = request.user.profile ? (request.user.profile.cart.keys() || []) : [];
     core.async.map(tradelineIds,
       request.model.TradeLine.findById,
