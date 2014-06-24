@@ -997,7 +997,7 @@ describe('init', function () {
       });
     });
 //*/
-    it('owner can create tradeline with existand product and seller', function (done) {
+    it('owner can create tradeline with existent product and seller', function (done) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
