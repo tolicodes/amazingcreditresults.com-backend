@@ -2,7 +2,7 @@ var ensureBuyerOrOwner = require('../../lib/middleware.js').ensureBuyerOrOwner;
 
 module.exports = exports = function (core) {
 
-  core.app.get('/api/v1/cart/items', ensureBuyerOrOwner, function (request, response) {
+  core.app.get('/api/v1/cart/tradelines', ensureBuyerOrOwner, function (request, response) {
     var tradelineIds = request.user.profile ? (request.user.profile.cart.keys() || []) : [];
     core.async.map(tradelineIds,
       request.model.TradeLine.findById,
@@ -18,7 +18,7 @@ module.exports = exports = function (core) {
       });
   });
 
-  core.app.post('/api/v1/cart/items', ensureBuyerOrOwner, function (request, response) {
+  core.app.post('/api/v1/cart/tradelines', ensureBuyerOrOwner, function (request, response) {
     if (request.params.id) {
       core.async.waterfall([
         function (cb) {
@@ -81,7 +81,7 @@ module.exports = exports = function (core) {
     }
   });
 
-  core.app.delete('/api/v1/cart/items/:id', ensureBuyerOrOwner, function (request, response) {
+  core.app.delete('/api/v1/cart/tradelines/:id', ensureBuyerOrOwner, function (request, response) {
     if (request.params.id) {
       if (request.user.profile && request.user.profile.cart) {
         delete request.user.profile.cart[request.params.id];
