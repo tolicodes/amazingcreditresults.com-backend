@@ -1,4 +1,4 @@
-var ensureOwner = require('./../middleware.js').ensureOwner;
+var ensureOwner = require('./../../lib/middleware.js').ensureOwner;
 //https://oselot.atlassian.net/browse/ACR-313
 module.exports = exports = function (core) {
   function formatOwner(owner) {

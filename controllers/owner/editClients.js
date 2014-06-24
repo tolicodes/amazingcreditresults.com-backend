@@ -1,7 +1,7 @@
 //controller for owner users to edit the clients list
 var welcomeLinkGenerator = require('./../../lib/welcome.js'),
   formatUser = require('./../formater.js').formatUserForOwner,
-  ensureOwner = require('./../middleware.js').ensureOwner;
+  ensureOwner = require('./../../lib/middleware.js').ensureOwner;
 
 module.exports = exports = function (core) {
 

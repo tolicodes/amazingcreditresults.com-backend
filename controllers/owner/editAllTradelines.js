@@ -1,6 +1,6 @@
 //https://oselot.atlassian.net/browse/ACR-197
 //https://oselot.atlassian.net/browse/ACR-198
-var ensureUserIsOwnerMiddleware = require('./../middleware.js').ensureOwner;
+var ensureUserIsOwnerMiddleware = require('./../../lib/middleware.js').ensureOwner;
 
 module.exports = exports = function (core) {
 

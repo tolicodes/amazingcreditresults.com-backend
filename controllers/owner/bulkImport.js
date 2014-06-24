@@ -5,7 +5,7 @@ var csv = require('fast-csv'),
     'autoFields': false,
     'autoFiles': false
   }),
-  ensureUserIsOwnerMiddleware = require('./../middleware.js').ensureOwner;
+  ensureUserIsOwnerMiddleware = require('./../../lib/middleware.js').ensureOwner;
 
 function formatUser(user) {
   return {

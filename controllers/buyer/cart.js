@@ -1,4 +1,4 @@
-var ensureBuyerOrOwner = require('../middleware.js').ensureBuyerOrOwner;
+var ensureBuyerOrOwner = require('../../lib/middleware.js').ensureBuyerOrOwner;
 
 module.exports = exports = function (core) {
 
