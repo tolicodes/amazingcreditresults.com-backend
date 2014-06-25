@@ -17,6 +17,6 @@ module.exports = exports = function (core) {
 
 //https://oselot.atlassian.net/browse/ACR-51
   core.app.put('/api/v1/myself', ensureBuyerOrOwner, function (request, response) {
-    response.redirec('https://oselot.atlassian.net/browse/ACR-51');
+    response.redirect('https://oselot.atlassian.net/browse/ACR-51');
   });
 };
