@@ -1,17 +1,18 @@
 var ensureBuyerOrOwner = require('../../lib/middleware.js').ensureBuyerOrOwner;
+var formatter = require('../formater');
 
 module.exports = exports = function (core) {
 
   core.app.get('/api/v1/cart/tradelines', ensureBuyerOrOwner, function (request, response) {
     var tradelineIds = request.user.profile ? (Object.keys(request.user.profile.cart) || []) : [];
     core.async.map(tradelineIds,
-      function(id, cb){ request.model.TradeLine.findById(id, cb)},
+      function(id, cb){ request.model.TradeLine.findById(id, cb).populate('product')},
       function (error, tradeLinesFound) {
         if (error) {
           throw error;
         } else {
           response.json({
-            'data': tradeLinesFound,
+            'data': tradeLinesFound.map(formatter.formatTradelineForBuyer),
             'itemsInCart': tradeLinesFound.length
           });
         }
@@ -37,8 +38,7 @@ module.exports = exports = function (core) {
                 if (error) {
                   throw error;
                 } else {
-                  response.status(202);//accepted
-                  response.json({'status': 'ok'}); //todo: what is the expected response for it?
+                  response.status(201);
                 }
               });
             } else {
@@ -93,8 +93,7 @@ module.exports = exports = function (core) {
         if (error) {
           throw error;
         } else {
-          response.status(202);//accepted
-          response.json({'status': 'ok'}); //todo: what is the expected response for it?
+          response.status(200);
         }
       });
     } else {

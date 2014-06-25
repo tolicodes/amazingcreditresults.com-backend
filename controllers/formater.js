@@ -1,3 +1,6 @@
+var utilities = require('../lib/utilities');
+var moment = require('moment');
+
 exports.formatUserForOwner = function (user) {
   return {
     'id': user.id,
@@ -38,3 +41,43 @@ exports.formatUserForOwner = function (user) {
     'isBanned': user.isBanned
   };
 };
+
+exports.formatTradelineForBuyer = function(tradeline) {
+  return {
+    id:    tradeline.id,
+    price: utilities.formatMoney(tradeline.price),
+    lender: {
+      bank: tradeline.product.bank,
+      type: tradeline.product.type,
+      name: tradeline.product.name
+    },
+    limit:   utilities.formatMoney(tradeline.creditLimit),
+    lineAge: humanizeLineAge(tradeline.dateOpen),
+    availableAus: tradeline.availableAus,
+    ratings: {
+      bc: tradeline.bcRating || tradeline.product.bcRating,
+      mo: tradeline.moRating || tradeline.product.moRating,
+      nc: tradeline.ncRating || tradeline.product.ncRating
+    },
+    reportsTo: {
+      reportsToExperian:   tradeline.product.reportsToExperian,
+      reportsToEquifax:    tradeline.product.reportsToEquifax,
+      reportsToTransunion: tradeline.product.reportsToTransunion
+    }
+  }
+};
+
+
+// Always round to the nearest month
+// If < 1 year, display x months (ex: 3 months 10 days = 3 months)
+// If > y year also display years + months (ex: 1 year 3 months 20 days = "1 year 4 months")
+function humanizeLineAge(dateOpen) {
+  var diff = moment.duration(moment() - moment(dateOpen));
+
+  var months = diff.months();
+  if (diff.days() >= 15) {
+    months += 1;
+  }
+  var humanized = diff.years() ? (diff.years() + ' years') : '';
+  return humanized + months + ' months';
+}
