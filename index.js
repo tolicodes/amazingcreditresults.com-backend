@@ -49,25 +49,24 @@ Hunt.extendApp(function (core) {
 //*/
 });
 
-Hunt.extendMiddleware(
-  function (core) {
-    return function (request, response, next) {
-      if (request.user && request.user.isBanned) {
-        response.status(403);
-        response.json({
-          'status': 'Error',
-          'errors': [
-            {
-              'code': 403,
-              'message': 'Access denied! You user account is banned!'
-            }
-          ]
-        });
-      } else {
-        next();
-      }
+Hunt.extendMiddleware(function (core) {
+  return function (request, response, next) {
+    if (request.user && request.user.isBanned) {
+      response.status(403);
+      response.json({
+        'status': 'Error',
+        'errors': [
+          {
+            'code': 403,
+            'message': 'Access denied! You user account is banned!'
+          }
+        ]
+      });
+    } else {
+      next();
     }
-  });
+  };
+});
 
 //loading different controllers for buyers
 Hunt.extendRoutes(require('./controllers/buyer/login.js'));
@@ -75,6 +74,7 @@ Hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
 //loading controller for inventory table
 Hunt.extendRoutes(require('./controllers/buyer/tradelines.js'));
 //loading controller for cart
+Hunt.extendRoutes(require('./controllers/buyer/cart.js'));
 
 //loading different controllers for owners
 Hunt.extendRoutes(require('./controllers/owner/login.js'));
@@ -90,7 +90,6 @@ Hunt.extendRoutes(require('./controllers/seller/editMyTradelines.js'));
 
 //loading controller shared by all users
 Hunt.extendRoutes(require('./controllers/shared.js'));
-
 
 
 //Development route to test error catcher middleware
@@ -131,10 +130,12 @@ Hunt.extendRoutes(function (core) {
       response.status(400);
       response.json({
         'status': 'Error',
-        'errors': [{
-          'code': 400,
-          'message': 'Duplicate entry!'
-        }]
+        'errors': [
+          {
+            'code': 400,
+            'message': 'Duplicate entry!'
+          }
+        ]
       });
       return;
     }
