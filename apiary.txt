@@ -936,7 +936,7 @@ DELETE /api/v1/admin/clients/5396002cb5282e71211d4f74
 }
 
 
-Download example Excel file to be used as template fr buld uploads of Buyers and Sellers
+Download example Excel file to be used as template for build uploads of Buyers and Sellers
 GET /api/v1/owner/clientsExample.csv
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebs
 < 200
