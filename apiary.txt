@@ -190,34 +190,38 @@ GET /api/v1/myself
 < 200
 < Content-Type: application/json; charset=utf-8
 {
-  "id": "536cfc8a886fcbba14d07dd5",
-  "huntKey": "1fcfaecdc53ce05ac5aa0658a977931b77d28861799c9b0261af1d83d713d2ea910b7f110d8f76fe02748040903cd70cef7107357395125c9a2888100f0634a9",
-  "email": "owner@example.org",
-  "name": {
-    "givenName": "Jean Batist",
-    "middleName": "Emmanuele",
-    "familyName": "Zorg"
-  },
-  "gravatar": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
-  "gravatar30": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
-  "gravatar50": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
-  "gravatar80": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
-  "gravatar100": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=100&d=wavatar&r=g",
-  "root": true,
-  "accountVerified": false,
-  "telefone":"555-339-69-72",
-  "street1":"Gothem city",
-  "roles":{
-    "owner":true,
-    "buyer":false,
-    "seller":false
-  },
-  "needQuestionnaire":true,
-  "profile": {
-    "answer1": "1",
-    "answer2": "2",
-    "answer3": "3"
-  }
+    "id": "5370a4fa25777db9531ffa91",
+    "huntKey": "iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv",
+    "email": "owner@example.org",
+    "name": {
+        "familyName": "Zorg",
+        "givenName": "Jean Batist",
+        "middleName": "Emmanuele"
+    },
+    "title": "Mr.",
+    "phone": "",
+    "altPhone": "",
+    "state": "",
+    "city": "",
+    "zip": "",
+    "street1": "",
+    "street2": "",
+    "gravatar": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
+    "gravatar30": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
+    "gravatar50": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
+    "gravatar80": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
+    "gravatar100": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=100&d=wavatar&r=g",
+    "root": true,
+    "roles": {
+        "owner": true
+    },
+    "accountVerified": false,
+    "profile": {
+        "answer1": "",
+        "answer2": "",
+        "answer3": ""
+    },
+    "isBanned": false
 }
 +++++
 < 400
