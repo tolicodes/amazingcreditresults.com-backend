@@ -1,4 +1,4 @@
-var  formatUser = require('./formater.js').formatUserForOwner;
+var  formatUser = require('./formatter.js').formatUserForOwner;
 
 //GET request to get current authorized users parameters in form of json
 module.exports = exports = function (core) {

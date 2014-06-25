@@ -1,5 +1,5 @@
 var ensureBuyerOrOwner = require('../../lib/middleware.js').ensureBuyerOrOwner;
-var formatter = require('../formater');
+var formatter = require('../formatter');
 
 module.exports = exports = function (core) {
 
