@@ -192,7 +192,7 @@ Hunt.on('start', function (evnt) {
   }
   /*/
    //testing amazon SES
-   Hunt.sendEmail('anatolij@oselot.com','SES works','YRA!', console.error);
+   Hunt.sendEmail('nowak@oselot.com','SES works','YO!', console.error);
    //*/
 });
 

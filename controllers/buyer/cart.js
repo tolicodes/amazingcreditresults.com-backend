@@ -1,5 +1,8 @@
-module.exports = exports = {
-  items: function (core, request, response) {
+var ensureBuyerOrOwner = require('../middleware.js').ensureBuyerOrOwner;
+
+module.exports = exports = function (core) {
+
+  core.app.get('/api/v1/cart/items', function (request, response) {
     var tradelineIds = request.user.profile ? (request.user.profile.cart.keys() || []) : [];
     core.async.map(tradelineIds,
       request.model.TradeLine.findById,
@@ -12,11 +15,10 @@ module.exports = exports = {
             'itemsInCart': tradeLinesFound.length
           });
         }
-      }
-    );
-  },
+      });
+  });
 
-  addItem: function (core, request, response) {
+  core.app.post('/api/v1/cart/items', ensureBuyerOrOwner, function (request, response) {
     if (request.params.id) {
       core.async.waterfall([
         function (cb) {
@@ -77,9 +79,9 @@ module.exports = exports = {
         ]
       });
     }
-  },
+  });
 
-  deleteItem: function (core, request, response) {
+  core.app.delete('/api/v1/cart/items/:id', ensureBuyerOrOwner, function (request, response) {
     if (request.params.id) {
       if (request.user.profile && request.user.profile.cart) {
         delete request.user.profile.cart[request.params.id];
@@ -107,9 +109,9 @@ module.exports = exports = {
         ]
       });
     }
-  },
+  });
 
-  someStrangeFunction: function (core, request, response) {
+  core.app.post('/api/v1/cart/checkout', ensureBuyerOrOwner, function (request, response) {
     response.send('okay');
-  }
+  });
 };

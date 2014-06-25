@@ -15,20 +15,12 @@ exports.ensureBuyerOrOwner = function (request, response, next) {
 };
 
 function ensureRole(hasRole, request, response, next) {
-  if (!request.user) return authorizationRequired(response);
-  if (hasRole) return next();
-  accessDenied(response)
+  if (!request.user) return error(401, 'Authorization required!', response);
+  if (!hasRole)      return error(403, 'Access Denied!', response);
+  next();
 }
 
-function authorizationRequired(response) {
-  error(401, 'Authorization required!', response);
-}
-
-function accessDenied(response) {
-  error(403, 'Access Denied!', response);
-}
-
-function error(code, message, response) {
+exports.error = function error(code, message, response) {
   response.status(code);
   response.json({
     'status': 'Error',
@@ -39,4 +31,4 @@ function error(code, message, response) {
       }
     ]
   });
-}
+};
