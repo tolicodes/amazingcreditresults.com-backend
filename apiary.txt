@@ -532,7 +532,7 @@ POST /api/v1/admin/owners
 
 Update one of Owners. Is user is root, he can update other users, not myself only!!!
 PUT /api/v1/admin/owners/5396002cb5282e71211d4f74
-> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebs
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json; charset=utf-8
 {
     "name":{
@@ -564,7 +564,7 @@ PUT /api/v1/admin/owners/5396002cb5282e71211d4f74
 
 Ban(delete) one of Owners. Only accessible by root user.
 DELETE /api/v1/admin/owners/5396002cb5282e71211d4f74
-> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebs
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json; charset=utf-8
 < 202
 < Content-Type: application/json
@@ -914,7 +914,7 @@ POST /api/v1/admin/clients/resetPassword/:id
 
 Ban(delete) one of Buyers. Accessible by Owners.
 DELETE /api/v1/admin/clients/5396002cb5282e71211d4f74
-> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebs
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json; charset=utf-8
 < 202
 < Content-Type: application/json
@@ -938,7 +938,7 @@ DELETE /api/v1/admin/clients/5396002cb5282e71211d4f74
 
 Download example Excel file to be used as template for build uploads of Buyers and Sellers
 GET /api/v1/owner/clientsExample.csv
-> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebs
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
 < Content-Type: Content-type: text/csv
 Title,givenName,middleName,familyName,email,phone,altPhone,state,city,zip,street1,street2
@@ -947,20 +947,20 @@ Mr.,John,Theodore,Doe,john.doe@xample.org,5553396972,5553396973,Alaska,Naruel,14
 
 Non SPA example page for bulk upload process
 GET /owner/bulkImport
-> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebs
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
 < Content-Type: Content-type: text/html
 
 
 Api endpoint for accepting CSV files. File have to be submitted as <input type="file" name="myCsv"/>
 POST /api/v1/owner/bulkImport
-> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebs
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
 < Content-Type: Content-type: application/json
 
 Issue balance adjustment for client. Amount can be positive (give money to client) and negative (take money from client)
 POST /api/v1/admin/clients/balance/5396002cb5282e71211d4f74
-> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebs
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json; charset=utf-8
 {
  "amount":"1",
@@ -2154,7 +2154,7 @@ PUT /api/v1/seller/tradelines/:id
 
 Send to archive one tradeline
 DELETE /api/v1/seller/tradelines/:id
-> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsvv
 > Content-Type: application/json
 < 202
 < Content-Type: application/json
