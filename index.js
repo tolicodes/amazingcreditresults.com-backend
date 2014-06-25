@@ -1,7 +1,3 @@
-var security  = require('./lib/security')
-var utilities = require('./lib/utilities')
-var routes    = require('./lib/routes')
-
 var hunt = require('hunt'),
   Hunt = hunt({
 //    'hostUrl':'https://dev.amazingcreditresults.com/', //for example
@@ -94,15 +90,6 @@ Hunt.extendRoutes(require('./controllers/seller/editMyTradelines.js'));
 
 //loading controller shared by all users
 Hunt.extendRoutes(require('./controllers/shared.js'));
-
-
-
-// The new way to add routes.
-Hunt.extendRoutes(function(core){
-  routes.forEach(function(route){
-    core.app[route.method](route.path, security.ensurePermissions(route), route.handler.bind(null, core))
-  });
-});
 
 
 
