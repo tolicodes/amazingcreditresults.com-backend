@@ -958,6 +958,19 @@ POST /api/v1/owner/bulkImport
 < 200
 < Content-Type: Content-type: application/json
 
+Issue balance adjustment for client. Amount can be positive (give money to client) and negative (take money from client)
+POST /api/v1/admin/clients/balance/5396002cb5282e71211d4f74
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebs
+> Content-Type: application/json; charset=utf-8
+{
+ "amount":"1",
+ "notes":"Merry Christmas, f*ck you!"
+}
+< 201
+< Content-Type: Content-type: application/json
+{"status":"Ok"}
+
+
 
 -- Owner resource to edit products --
 
