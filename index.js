@@ -75,7 +75,6 @@ Hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
 //loading controller for inventory table
 Hunt.extendRoutes(require('./controllers/buyer/tradelines.js'));
 //loading controller for cart
-Hunt.extendRoutes(require('./controllers/buyer/cart.js'));
 
 //loading different controllers for owners
 Hunt.extendRoutes(require('./controllers/owner/login.js'));
@@ -91,6 +90,7 @@ Hunt.extendRoutes(require('./controllers/seller/editMyTradelines.js'));
 
 //loading controller shared by all users
 Hunt.extendRoutes(require('./controllers/shared.js'));
+
 
 
 //Development route to test error catcher middleware
