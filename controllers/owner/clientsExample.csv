@@ -1,2 +1,2 @@
-Title,givenName,middleName,familyName,email,telephone,address
-Mr.,John,Theodore,Doe,john.doe@xample.org,5553396972,"Russia, Votkinsk, 1 May street, house 7, flat 12"
+Title,givenName,middleName,familyName,email,phone,altPhone,state,city,zip,street1,street2
+Mr.,John,Theodore,Doe,john.doe@xample.org,5553396972,5553396973,Alaska,Naruel,141400,White,House 10

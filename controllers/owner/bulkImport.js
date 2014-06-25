@@ -5,36 +5,9 @@ var csv = require('fast-csv'),
     'autoFields': false,
     'autoFiles': false
   }),
-  ensureUserIsOwnerMiddleware = require('./../../lib/middleware.js').ensureOwner;
+  ensureUserIsOwnerMiddleware = require('./../../lib/middleware.js').ensureOwner,
+  formatUser = require('./../formatter.js').formatUserForOwner;
 
-function formatUser(user) {
-  return {
-    'id': user.id,
-    'email': user.email,
-    'name': {
-      'familyName': user.name.familyName, //http://schema.org/familyName
-      'givenName': user.name.givenName, //http://schema.org/givenName
-      'middleName': user.name.middleName //http://schema.org/middleName - at least the google oauth has this structure!
-    },
-    'title': user.profile ? (user.profile.title || 'Mr.') : 'Mr.',
-    'telefone': user.profile ? (user.profile.telefone || '') : '',
-    'street1': user.profile ? (user.profile.street1 || '') : '',
-    'needQuestionnaire': user.profile ? user.profile.needQuestionnaire : true,
-    'gravatar': user.gravatar,
-    'gravatar30': user.gravatar30,
-    'gravatar50': user.gravatar50,
-    'gravatar80': user.gravatar80,
-    'gravatar100': user.gravatar100,
-    'online': user.online,
-    'root': user.root,
-    'roles': {
-      'owner': user.roles ? user.roles.owner : false,
-      'buyer': user.roles ? user.roles.buyer : false,
-      'seller': user.roles ? user.roles.seller : false
-    },
-    'accountVerified': user.accountVerified
-  };
-}
 module.exports = exports = function (core) {
   core.app.get('/api/v1/owner/clientsExample.csv', ensureUserIsOwnerMiddleware, function (request, response) {
     response.sendfile(__dirname + '/clientsExample.csv');
@@ -67,6 +40,16 @@ module.exports = exports = function (core) {
                     'familyName': user.familyName || '',
                     'givenName': user.givenName || '',
                     'middleName': user.middleName || ''
+                  },
+                  'profile':{
+                    'title':user.title,
+                    'phone':user.phone,
+                    'altPhone':user.altPhone,
+                    'state': user.state,
+                    'city': user.city,
+                    'zip': user.zip,
+                    'street1':user.street1,
+                    'street2':user.street2
                   },
                   'apiKey': core.rack(),
                   'email': user.email,
