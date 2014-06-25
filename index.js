@@ -137,6 +137,7 @@ Hunt.extendRoutes(function (core) {
 //http://mongoosejs.com/docs/validation.html
     if (core.config.env === 'development') {
       console.error(error);
+      console.error(error.stack);
     }
 
     if (error.code === 11000) {
