@@ -936,6 +936,28 @@ DELETE /api/v1/admin/clients/5396002cb5282e71211d4f74
 }
 
 
+Download example Excel file to be used as template fr buld uploads of Buyers and Sellers
+GET /api/v1/owner/clientsExample.csv
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebs
+< 200
+< Content-Type: Content-type: text/csv
+Title,givenName,middleName,familyName,email,phone,altPhone,state,city,zip,street1,street2
+Mr.,John,Theodore,Doe,john.doe@xample.org,5553396972,5553396973,Alaska,Naruel,141400,White,House 10
+
+
+Non SPA example page for bulk upload process
+GET /owner/bulkImport
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebs
+< 200
+< Content-Type: Content-type: text/html
+
+
+Api endpoint for accepting CSV files. File have to be submitted as <input type="file" name="myCsv"/>
+POST /api/v1/owner/bulkImport
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebs
+< 200
+< Content-Type: Content-type: application/json
+
 
 -- Owner resource to edit products --
 
