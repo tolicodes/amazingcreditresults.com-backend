@@ -1,5 +1,4 @@
 var hunt = require('hunt'),
-  stripe = require('stripe')(process.env.STRIPE_API_KEY || 'sk_test_BQokikJOvBiI2HlWgH4olfQ2'),
   Hunt = hunt({
 //    'hostUrl':'https://dev.amazingcreditresults.com/', //for example
     'redisUrl': process.env.AMAZING_REDIS_URL || 'redis://localhost:6379',
@@ -70,14 +69,6 @@ Hunt.extendMiddleware(function (core) {
   };
 });
 
-//inject stripe into controller
-Hunt.extendMiddleware(function (core) {
-  return function (request, response, next) {
-    request.stripe = stripe;
-    next();
-  };
-});
-
 //loading different controllers for buyers
 Hunt.extendRoutes(require('./controllers/buyer/login.js'));
 Hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
@@ -101,6 +92,8 @@ Hunt.extendRoutes(require('./controllers/seller/editMyTradelines.js'));
 //loading controller shared by all users
 Hunt.extendRoutes(require('./controllers/shared.js'));
 
+//processing payment notifications from stripe
+Hunt.extendRoutes(require('./controllers/stripe/webhooks.js'));
 
 //Development route to test error catcher middleware
 if (Hunt.config.env === 'development') {

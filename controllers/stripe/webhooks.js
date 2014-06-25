@@ -1,9 +1,11 @@
-// Using Express
-app.post("/my/webhook/url", function(request, response) {
-  // Retrieve the request's body and parse it as JSON
-  var event_json = JSON.parse(request.body);
+var stripe = require('stripe')(process.env.STRIPE_API_KEY || 'sk_test_BQokikJOvBiI2HlWgH4olfQ2');
 
-  // Do something with event_json
 
-  response.send(200);
-});
+module.exports = exports = function (core) {
+  core.app.get('/stripewebhooks', function (request, response) {
+  //todo - change /stripewebhooks to something much more unpredictable
+  //like - /papytraxaetsobakatakemuinado
+    console.info(request.body);
+    response.send(200);
+  });
+};
