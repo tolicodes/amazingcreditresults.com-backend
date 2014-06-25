@@ -36,6 +36,7 @@ var hunt = require('hunt'),
 Hunt.extendModel('Product', require('./models/Product.model.js'));
 Hunt.extendModel('TradeLine', require('./models/TradeLine.model.js'));
 Hunt.extendModel('TradeLineChange', require('./models/TradeLineChange.model.js'));
+Hunt.extendModel('TradeLineChange', require('./models/Transaction.model.js'));
 Hunt.extendModel('Facade', require('./models/Facade.model.js'));
 
 Hunt.extendApp(function (core) {
