@@ -93,7 +93,7 @@ module.exports = exports = function (core) {
         if (error) {
           throw error;
         } else {
-          response.status(200);
+          response.send(200);
         }
       });
     } else {

@@ -1730,19 +1730,16 @@ describe('init', function () {
         it('and tradeline2 is correct');
       });
     });
+  });
 
+  describe('Buyer', function() {
     describe('cart', function () {
       describe('adding tradelines', function() {
+
         it('should be able to add a tradeline to a cart', function(done) {
           helpers.getTradelines(function(error, response, body) {
             var tradeline = body.data[0];
-            request({
-              'method': 'POST',
-              'url': 'http://localhost:' + port + '/api/v1/cart/tradelines',
-              'headers': {'huntKey': buyerHuntKey},
-              form: {id: tradeline.id},
-              json: true
-            }, function (error, response) {
+            helpers.cart.addTradeline(tradeline.id, function (error, response) {
               response.statusCode.should.be.equal(201);
               done();
             });
@@ -1757,9 +1754,9 @@ describe('init', function () {
                 helpers.cart.getTradelines(function(error, response, body) {
                   body.data.length.should.be.equal(1);
                   done()
-                })
-              })
-            })
+                });
+              });
+            });
           });
         });
 
@@ -1767,25 +1764,46 @@ describe('init', function () {
           helpers.cart.addTradeline(null, function(error, response) {
             response.statusCode.should.be.equal(400);
             done();
-          })
+          });
         });
       });
 
-      it('should return list of tradelines', function(done) {
-        request({
-          'method': 'GET',
-          'url': 'http://localhost:' + port + '/api/v1/cart/tradelines',
-          'headers': {'huntKey': buyerHuntKey},
-          json: true
-        }, function (error, response, body) {
-          response.statusCode.should.be.equal(200);
-          body.data.should.be.an.Array;
-          body.itemsInCart.should.be.an.Integer;
-          done();
+      describe("list of tradelines", function() {
+        it('should return list of tradelines', function(done) {
+          helpers.cart.getTradelines(function (error, response, body) {
+            response.statusCode.should.be.equal(200);
+            body.data.should.be.an.Array;
+            body.itemsInCart.should.be.an.Integer;
+            done();
+          });
         });
       });
+
+      describe("deleting a tradeline", function(){
+        it("should be able to delete a tradeline", function(done){
+          helpers.getTradelines(function(error, response, body) {
+            var tradeline = body.data[0];
+
+            helpers.cart.addTradeline(tradeline.id, function() {
+              helpers.cart.getTradelines(function(error, response, body) {
+                body.data.length.should.be.equal(1);
+
+                helpers.cart.deleteTradeline(tradeline.id, function() {
+                  response.statusCode.should.be.equal(200);
+                  helpers.cart.getTradelines(function(error, response, body) {
+                    body.data.length.should.be.equal(0);
+                    done();
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+
     });
-  });
+
+  })
 });
 
 
@@ -1806,6 +1824,15 @@ var helpers = {
         'url': 'http://localhost:' + port + '/api/v1/cart/tradelines',
         'headers': {'huntKey': buyerHuntKey},
         form: {id: id},
+        json: true
+      }, cb);
+    },
+
+    deleteTradeline: function(id, cb) {
+      request({
+        'method': 'DELETE',
+        'url': 'http://localhost:' + port + '/api/v1/cart/tradelines/' + id,
+        'headers': {'huntKey': buyerHuntKey},
         json: true
       }, cb);
     },
