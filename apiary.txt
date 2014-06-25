@@ -181,7 +181,7 @@ POST /api/v1/buyer/login
 
 
 
--- Buyer/Owner profile json --
+-- Buyer/Seller/Owner profile json --
 
 Get information about currently authenticated (by cookie or header based session) user
 Additional info about sessionless authorization is published here https://bitbucket.org/oselot/amazingcreditresults.com-backend
@@ -227,8 +227,36 @@ GET /api/v1/myself
 < 400
 < Content-Type: application/json; charset=utf-8
 {
-  "Error":"Authorization required!"
+  "Error":"Authorization required!",
+   "status": "Error",
+    "errors": [{
+      "code": 400,
+      "message": "Authorization required!"
+    }]
 }
+
+
+-- Buyer/Seller/Owner transactions --
+
+Get recent transactions, done for user being authorized
+GET /api/v1/account
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 200
+< Content-Type: application/json; charset=utf-8
+{
+    "data": {
+        "balance": 1,
+        "transactions": [
+            {
+                "id": "53ab38233db1d9ad4e5532db",
+                "timestamp": "2014-06-25T20:54:45.771Z",
+                "amount": 1,
+                "type": "ownerUpload"
+            }
+        ]
+    }
+}
+
 
 
 -- Buyer dashboard --
@@ -2154,7 +2182,7 @@ PUT /api/v1/seller/tradelines/:id
 
 Send to archive one tradeline
 DELETE /api/v1/seller/tradelines/:id
-> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsvv
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json
 < 202
 < Content-Type: application/json
