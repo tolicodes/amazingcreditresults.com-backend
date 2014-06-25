@@ -1,4 +1,4 @@
-var stripe = require('stripe')(process.env.STRIPE_API_KEY || 'sk_test_BQokikJOvBiI2HlWgH4olfQ2');
+var stripe = require('stripe')(process.env.STRIPE_API_KEY || 'sk_test_Bq4myUHpyXqVaiZ47u7VrtCY');
 
 
 module.exports = exports = function (core) {
