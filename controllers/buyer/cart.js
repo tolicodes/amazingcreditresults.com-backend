@@ -4,7 +4,7 @@ var formatter = require('../formatter');
 module.exports = exports = function (core) {
 
   core.app.get('/api/v1/cart/tradelines', ensureBuyerOrOwner, function (request, response) {
-    var tradelineIds = request.user.profile ? (Object.keys(request.user.profile.cart) || []) : [];
+    var tradelineIds = request.user.profile ? (Object.keys(request.user.profile.cart || {})) : [];
     core.async.map(tradelineIds,
       function(id, cb){ request.model.TradeLine.findById(id, cb).populate('product')},
       function (error, tradeLinesFound) {
@@ -38,7 +38,7 @@ module.exports = exports = function (core) {
                 if (error) {
                   throw error;
                 } else {
-                  response.status(201);
+                  response.send(201);
                 }
               });
             } else {
