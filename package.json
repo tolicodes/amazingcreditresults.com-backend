@@ -18,7 +18,8 @@
     "connect-multiparty": "1.0.5",
     "fast-csv": "0.4.0",
     "hunt": "https://api.github.com/repos/vodolaz095/hunt/tarball/master",
-    "moment": "^2.7.0"
+    "moment": "^2.7.0",
+    "stripe":"latest"
   },
   "devDependencies": {
     "request": "2.34.0",

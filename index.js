@@ -1,4 +1,5 @@
 var hunt = require('hunt'),
+  stripe = require('stripe')(process.env.STRIPE_API_KEY || 'sk_test_BQokikJOvBiI2HlWgH4olfQ2'),
   Hunt = hunt({
 //    'hostUrl':'https://dev.amazingcreditresults.com/', //for example
     'redisUrl': process.env.AMAZING_REDIS_URL || 'redis://localhost:6379',
@@ -49,6 +50,7 @@ Hunt.extendApp(function (core) {
 //*/
 });
 
+//perform ban for users being banned
 Hunt.extendMiddleware(function (core) {
   return function (request, response, next) {
     if (request.user && request.user.isBanned) {
@@ -65,6 +67,14 @@ Hunt.extendMiddleware(function (core) {
     } else {
       next();
     }
+  };
+});
+
+//inject stripe into controller
+Hunt.extendMiddleware(function (core) {
+  return function (request, response, next) {
+    request.stripe = stripe;
+    next();
   };
 });
 
