@@ -357,6 +357,41 @@ module.exports = exports = function (core) {
       });
     }
   });
+
+  core.app.post('/api/v1/admin/clients/balance/:id', ensureOwner, function (request, response) {
+    request.model.User.findById(request.params.id, function (error, userFound) {
+      if (error) {
+        throw error;
+      } else {
+        if (userFound) {
+          request.model.Transaction.create({
+            'client': userFound._id,
+            'type': 'ownerUpload',
+            'amount': request.body.amount,
+            'notes': request.body.notes.toString() + 'Transaction issued by Owner ' + request.user.email
+          }, function (error) {
+            if (error) {
+              throw error;
+            } else {
+              response.status(201);
+              response.json({'status': 'Ok'})
+            }
+          });
+        } else {
+          response.status(404);
+          response.json({
+            'status': 'Error',
+            'errors': [
+              {
+                'code': 404,
+                'message': 'User with this ID do not exists!'
+              }
+            ]
+          });
+        }
+      }
+    });
+  });
 };
 
 
