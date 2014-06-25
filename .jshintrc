@@ -24,6 +24,7 @@
     "beforeEach",
     "after",
     "afterEach",
-    "exports"
+    "exports",
+    "module"
   ]
 }
