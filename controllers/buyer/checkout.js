@@ -3,7 +3,10 @@ var ensureBuyerOrOwner = require('../../lib/middleware.js').ensureBuyerOrOwner,
 
 module.exports = exports = function (core) {
   core.app.post('/api/v1/cart/checkout', ensureBuyerOrOwner, function (request, response) {
-    var tradelineIds = request.user.profile ? (Object.keys(request.user.profile.cart || {})) : [];
+    var tradelineIds = request.user.profile ? (Object.keys(request.user.profile.cart || {})) : [],
+      properTradeLineIds = [],
+      toPay = 0;
+
     core.async.waterfall(
       [
         function (cb) {
@@ -26,14 +29,18 @@ module.exports = exports = function (core) {
             },
             'cost': function (c) {
 //calculate the cost of all tradelines Buyer want to buyer
+//also drop non active transactiosn, and with
               var sumCost = 0;
               core.async.map(tradelineIds,
-                function (tradelineId, cc) {
-                  request.model.TradeLine.findById(tradelineId, function (error, tradeLineFound) {
+                function (tradeLineId, cc) {
+                  request.model.TradeLine.findById(tradeLineId, function (error, tradeLineFound) {
                     if (error) {
                       cc(error);
                     } else {
-                      sumCost = sumCost + tradeLineFound.cost; //https://oselot.atlassian.net/wiki/display/ACR/Inventory+Table+Requirements
+                      if ((tradeLineFound.totalAus - tradeLineFound.usedAus) > 0 && tradeLineFound.active) {
+                        sumCost = sumCost + tradeLineFound.cost; //https://oselot.atlassian.net/wiki/display/ACR/Inventory+Table+Requirements
+                        properTradeLineIds.push(tradeLineFound.id);
+                      }
                       cc(null);
                     }
                   });
@@ -51,13 +58,12 @@ module.exports = exports = function (core) {
         function (obj, cb) {
 //decide what to do
           if (obj.cost <= obj.balance) {
-//Buyer can affort the packages
-//we issue new transaction for it
+//Buyer can affort the packages we issue new transaction for it
             request.model.Transaction.create({
               'client': request.user.id,
               'amount': obj.cost,
               'type': 'checkout',
-              'tradelinesBought': tradelineIds
+              'tradelinesBought': properTradeLineIds
             }, function (error) {
               if (error) {
                 cb(error);
@@ -67,9 +73,29 @@ module.exports = exports = function (core) {
             });
           } else {
 //Buyer can't affort the packages
+            toPay = obj.cost - obj.balance;
+            cb(null, false);
+          }
+        },
+        function (transactionIssued, cb) {
+          if (transactionIssued) {
+//todo
+            cb(null, true);
+          } else {
+            cb(null, null);
+          }
+        }
+      ],
+      function (error, checkoutIsDone) {
+        if (error) {
+          throw error;
+        } else {
+          if (checkoutIsDone) {
+            response.send('ok');
+          } else {
             response.status(402); //http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
             response.json({
-              'needToPay': (obj.cost - obj.balance),
+              'needToPay': toPay,
               'status': 'Error',
               'errors': [
                 {
@@ -78,23 +104,7 @@ module.exports = exports = function (core) {
                 }
               ]
             });
-            cb(null, false);
           }
-        },
-        function (transactionIssued, cb) {
-          if (transactionIssued) {
-            //todo
-            cb();
-          } else {
-            cb(null);
-          }
-        }
-      ],
-      function (error) {
-        if (error) {
-          throw error;
-        } else {
-          response.send('ok');
         }
       }
     );
