@@ -1,29 +1,32 @@
 module.exports = exports = function (core) {
-  var ranks = ['None','Bronze', 'Silver', 'Gold'];
-
-  var TradeLineSchema = new core.mongoose.Schema({
-      'product': { type: core.mongoose.Schema.Types.ObjectId, ref: 'Product', required:true },
-      'seller': { type: core.mongoose.Schema.Types.ObjectId, ref: 'User', required:true },
-      'totalAus': { type: Number, min: 0, max: 9999 },
-      'usedAus': { type: Number, min: 0, max: 9999 },
-      'statementDate': { type: Number, min: 0, max: 10 },
-      'dateOpen': {type: Date, default: Date.now()},
-      'creditLimit': { type: Number, min: 0, max: 999999 },
-      'cashLimit': { type: Number, min: 0, max: 999999 },
-      'currentBalance': { type: Number, min: 0, max: 9999 },
-      '_ncRating': { type: Number, min: 0, max: 3, default: 0 },
-      '_bcRating': { type: Number, min: 0, max: 3, default: 0 },
-      '_moRating': { type: Number, min: 0, max: 3, default: 0 },
-      'cost': { type: Number, min: 0, max: 10000000},
-      'price': { type: Number, min: 0, max: 10000000},
-      'notes': String,
-      'active':{type: Boolean, default: false}
-    },
-    {
-      toObject: { getters: true, virtuals: true },
-      toJSON: { getters: true, virtuals: true }
-    }
-  );
+  var ranks = ['None', 'Bronze', 'Silver', 'Gold'],
+    TradeLineSchema = new core.mongoose.Schema(
+      {
+        'product': { type: core.mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+        'seller': { type: core.mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+        'totalAus': { type: Number, min: 0, max: 9999 },
+        'usedAus': { type: Number, min: 0, max: 9999 },
+        'statementDate': { type: Number, min: 0, max: 10 },
+        'dateOpen': {type: Date, default: Date.now()},
+        'creditLimit': { type: Number, min: 0, max: 999999 },
+        'cashLimit': { type: Number, min: 0, max: 999999 },
+        'currentBalance': { type: Number, min: 0, max: 9999 },
+        '_ncRating': { type: Number, min: 0, max: 3, default: 0 },
+        '_bcRating': { type: Number, min: 0, max: 3, default: 0 },
+        '_moRating': { type: Number, min: 0, max: 3, default: 0 },
+        'cost': { type: Number, min: 0, max: 10000000},
+        'price': { type: Number, min: 0, max: 10000000},
+        'notes': String,
+        'active': {type: Boolean, default: false},
+        'buyers': [
+          { type: core.mongoose.Schema.Types.ObjectId, ref: 'User', required: false}
+        ]
+      },
+      {
+        toObject: { getters: true, virtuals: true },
+        toJSON: { getters: true, virtuals: true }
+      }
+    );
 //todo - add parameters for length of credit history, credit score, debt to income ratio, etc. so we can extract more precisious the tradelines
 
   TradeLineSchema.index({
@@ -35,22 +38,22 @@ module.exports = exports = function (core) {
   });
 
 
-  TradeLineSchema.path('product').validate(function(value, respond) {
-    return core.model.Product.findById(value, function(error, productFound){
-      if(error) {
+  TradeLineSchema.path('product').validate(function (value, respond) {
+    return core.model.Product.findById(value, function (error, productFound) {
+      if (error) {
         throw error;
       } else {
-        respond(productFound?true:false);
+        respond(productFound ? true : false);
       }
     });
   }, 'Unable to find corresponding Product!');
 
-  TradeLineSchema.path('seller').validate(function(value, respond) {
-    return core.model.User.findById(value, function(error, userFound){
-      if(error) {
+  TradeLineSchema.path('seller').validate(function (value, respond) {
+    return core.model.User.findById(value, function (error, userFound) {
+      if (error) {
         throw error;
       } else {
-        respond(userFound?true:false);
+        respond(userFound ? true : false);
       }
     });
   }, 'Unable to find corresponding Seller among the Users!');
@@ -95,10 +98,10 @@ module.exports = exports = function (core) {
     });
 
   TradeLineSchema.virtual('availableAus')
-    .get(function(){
+    .get(function () {
       return (this.totalAus - this.usedAus);
     })
-    .set(function(val){
+    .set(function (val) {
       return;
     });
 
@@ -119,12 +122,12 @@ module.exports = exports = function (core) {
       'statementDate': this.statementDate,
       'dateOpen': this.dateOpen,
       'product': {
-        'id':this.product.id,
-        'name':this.product.name,
-        'bank':this.product.bank,
-        'reportsToExperian':this.product.reportsToExperian,
-        'reportsToEquifax':this.product.reportsToEquifax,
-        'reportsToTransunion':this.product.reportsToTransunion,
+        'id': this.product.id,
+        'name': this.product.name,
+        'bank': this.product.bank,
+        'reportsToExperian': this.product.reportsToExperian,
+        'reportsToEquifax': this.product.reportsToEquifax,
+        'reportsToTransunion': this.product.reportsToTransunion,
         'ncRating': this.product.ncRating,
         'bcRating': this.product.bcRating,
         'moRating': this.product.moRating,

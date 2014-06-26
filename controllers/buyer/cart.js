@@ -1,12 +1,14 @@
-var ensureBuyerOrOwner = require('../../lib/middleware.js').ensureBuyerOrOwner;
-var formatter = require('../formatter');
+var ensureBuyerOrOwner = require('../../lib/middleware.js').ensureBuyerOrOwner,
+  formatter = require('../formatter');
 
 module.exports = exports = function (core) {
 
   core.app.get('/api/v1/cart/tradelines', ensureBuyerOrOwner, function (request, response) {
     var tradelineIds = request.user.profile ? (Object.keys(request.user.profile.cart || {})) : [];
     core.async.map(tradelineIds,
-      function(id, cb){ request.model.TradeLine.findById(id, cb).populate('product')},
+      function (id, cb) {
+        request.model.TradeLine.findById(id, cb).populate('product')
+      },
       function (error, tradeLinesFound) {
         if (error) {
           throw error;
