@@ -5,7 +5,8 @@ module.exports = exports = function (core) {
   core.app.post('/api/v1/cart/checkout', ensureBuyerOrOwner, function (request, response) {
     var tradelineIds = request.user.profile ? (Object.keys(request.user.profile.cart || {})) : [],
       properTradeLineIds = [],
-      toPay = 0;
+      toPay = 0,
+      paymentTransactionId;
 
     core.async.waterfall(
       [
@@ -65,10 +66,11 @@ module.exports = exports = function (core) {
               'amount': obj.cost,
               'type': 'checkout',
               'tradeLinesBought': properTradeLineIds
-            }, function (error) {
+            }, function (error, tCreated) {
               if (error) {
                 cb(error);
               } else {
+                paymentTransactionId = tCreated[0].id; //todo - test it!!!
                 cb(null, true);
               }
             });
@@ -116,7 +118,11 @@ module.exports = exports = function (core) {
           throw error;
         } else {
           if (checkoutIsDone) {
-            response.send('ok');
+            response.status(201);
+            response.json({
+              'status': 'Ok',
+              'transactionId': paymentTransactionId
+            });
           } else {
             response.status(402); //http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
             response.json({
