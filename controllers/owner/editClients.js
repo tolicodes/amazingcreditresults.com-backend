@@ -268,10 +268,10 @@ module.exports = exports = function (core) {
 //              welcomeLink = core.config.hostUrl+'buyer/welcome/'+welcomeLink;
               welcomeLink = core.config.hostUrl + '#login/' + welcomeLink;
               var tpl = 'emails/welcomeBuyer';
-              if (userFound.roles.buyer) {
+              if (userFound.roles && userFound.roles.buyer) {
                 tpl = 'emails/welcomeBuyer';
               }
-              if (userFound.roles.seller) {
+              if (userFound.roles && userFound.roles.seller) {
                 tpl = 'emails/welcomeSeller';
               }
               userFound.notifyByEmail({
