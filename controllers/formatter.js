@@ -33,6 +33,8 @@ exports.formatUserForOwner = function (user) {
     'zip': user.profile ? (user.profile.zip || '') : '',
     'street1': user.profile ? (user.profile.street1 || '') : '',
     'street2': user.profile ? (user.profile.street2 || '') : '',
+    'ssn': user.profile ? (user.profile.ssn || '') : '',
+    'birthday': user.profile ? (user.profile.birthday || '') : '',
     'gravatar': user.gravatar,
     'gravatar30': user.gravatar30,
     'gravatar50': user.gravatar50,

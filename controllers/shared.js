@@ -23,11 +23,44 @@ module.exports = exports = function (core) {
   core.app.all('/api/v1/myself', f4myself);
   core.app.all('/auth/myself', f4myself); //not used and can be deprecated
 
+//Seller, Buyer, Owner can update their names, birthday, ssn
 //https://oselot.atlassian.net/browse/ACR-51
-  core.app.put('/api/v1/myself', ensureBuyerOrOwner, function (request, response) {
-    response.redirect('https://oselot.atlassian.net/browse/ACR-51');
+  core.app.put('/api/v1/myself', function (request, response) {
+    if (request.user) {
+      ['familyName', 'givenName', 'middleName'].map(function (n) {
+        if (request.body.name[n]) {
+          request.user.name = request.body.name[n];
+        }
+      });
+
+      ['birthday', 'ssn'].map(function (n) {
+        if (request.body.name[n]) {
+          request.user.profile[n] = request.body.profile[n];
+        }
+      });
+
+      request.user.save(function (error) {
+        if (error) {
+          throw error;
+        } else {
+          response.json(formatUser(request.user));
+        }
+      });
+    } else {
+      response.status(400);
+      response.json({
+        'status': 'Error',
+        'errors': [
+          {
+            'code': 400,
+            'message': 'Authorization required!'
+          }
+        ]
+      });
+    }
   });
 
+//show current user balance
 //https://oselot.atlassian.net/browse/ACR-387#
   core.app.get('/api/v1/account', function (request, response) {
     if (request.user) {

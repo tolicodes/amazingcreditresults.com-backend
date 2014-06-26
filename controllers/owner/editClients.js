@@ -86,7 +86,7 @@ module.exports = exports = function (core) {
         patch['name.' + a] = request.body.name[a];
       }
     });
-    ['title', 'street1', 'street2', 'phone', 'altPhone', 'state', 'city', 'zip', 'needQuestionnaire'].map(function (b) {
+    ['title', 'street1', 'street2', 'phone', 'altPhone', 'state', 'city', 'ssn', 'birthday', 'zip', 'needQuestionnaire'].map(function (b) {
       if (request.body[b]) {
         patch['profile.' + b] = request.body[b];
       }
@@ -178,7 +178,9 @@ module.exports = exports = function (core) {
           'zip': request.body.zip,
           'street1': request.body.street1,
           'street2': request.body.street2,
-          'title': request.body.title
+          'title': request.body.title,
+          'ssn': request.body.ssn,
+          'birthday': request.body.birthday
         },
         'roles': {
           'buyer': request.body.roles ? request.body.roles.buyer : true,
