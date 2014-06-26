@@ -41,5 +41,31 @@ module.exports = exports = function (core) {
       }
     });
 
+  TransactionSchema.post('save', function (doc) {
+    core.model.Transaction.find({'client': doc.client}, function (error, transactionsFound) {
+      if (error) {
+        throw error;
+      } else {
+        var balance = 0;
+        transactionsFound.map(function (t) {
+          balance = balance + t.amount;
+        });
+        core.model.User.findById(doc.id, function (error, userFound) {
+          if (error) {
+            throw error;
+          } else {
+            userFound.profile = userFound.profile || {};
+            userFound.profile.balance = balance;
+            userFound.save(function (error) {
+              if (error) {
+                throw error;
+              }
+            });
+          }
+        });
+      }
+    });
+  });
+
   return core.mongoConnection.model('Transaction', TransactionSchema);
 };

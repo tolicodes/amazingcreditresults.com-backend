@@ -1,4 +1,4 @@
-var utilities = require('../lib/utilities'),
+var utilities = require('../lib/utilities.js'),
   moment = require('moment');
 
 // Always round to the nearest month
@@ -54,7 +54,8 @@ exports.formatUserForOwner = function (user) {
       'answer2': user.profile ? user.profile.answer2 : '',
       'answer3': user.profile ? user.profile.answer3 : ''
     },
-    'isBanned': user.isBanned
+    'isBanned': user.isBanned,
+    'balance': utilities.formatMoney(user.profile.balance || 0)
   };
 };
 
