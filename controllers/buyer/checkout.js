@@ -38,7 +38,8 @@ module.exports = exports = function (core) {
                       cc(error);
                     } else {
                       if ((tradeLineFound.totalAus - tradeLineFound.usedAus) > 0 && tradeLineFound.active) {
-                        sumCost = sumCost + tradeLineFound.cost; //https://oselot.atlassian.net/wiki/display/ACR/Inventory+Table+Requirements
+//https://oselot.atlassian.net/wiki/display/ACR/Inventory+Table+Requirements
+                        sumCost = sumCost + tradeLineFound.cost;
                         properTradeLineIds.push(tradeLineFound.id);
                       }
                       cc(null);
@@ -79,13 +80,32 @@ module.exports = exports = function (core) {
         },
         function (transactionIssued, cb) {
           if (transactionIssued) {
-//todo
-//for every good Tradeline set the userdAus ++, and add userId in buyers
+//for every good Tradeline in cart set the userdAus ++, and add userId in buyers
+            core.async.each(properTradeLineIds,
+              function (id, c) {
+                request.model.TradeLine.findOneAndUpdate(
+                  {
+                    '_id': id
+                  },
+                  {
+                    '$inc': {'usedAus': 1},
+                    '$push': {'buyers': request.user._id}
+                  },
+                  c
+                );
+              },
+              function (error) {
+                if (error) {
+                  cb(error);
+                } else {
 //flush up cart from user profile
+                  request.user.profile.cart = {};
 //save user profile
-
-
-            cb(null, true);
+                  request.user.save(function (err) {
+                    cb(err, true);
+                  });
+                }
+              });
           } else {
             cb(null, null);
           }
