@@ -4,6 +4,7 @@ var request = require('request'),
   fs = require('fs'),
   path = require('path'),
   backend = require('./../index.js'),
+  async  = require('async'),
   port = 3001,
   testId = Math.floor(Math.random() * 10000),
   ownerHuntKey,
@@ -1737,33 +1738,60 @@ describe('init', function () {
       describe('adding tradelines', function() {
 
         it('should be able to add a tradeline to a cart', function(done) {
-          helpers.getTradelines(function(error, response, body) {
-            var tradeline = body.data[0];
-            helpers.cart.addTradeline(tradeline.id, function (error, response) {
-              response.statusCode.should.be.equal(201);
-              done();
-            });
+          async.waterfall([
+            function(cb) {
+              helpers.getTradelines(function(error, response, body) {
+                cb(error, body.data[0]);
+              });
+            },
+            function(tradeline, cb) {
+              helpers.cart.addTradeline(tradeline.id, function(error, response) {
+                cb(error, response);
+              });
+            }
+          ], function(error, response) {
+            response.statusCode.should.be.equal(201);
+            done(error);
           });
         });
 
         it("doesn't add the same item twice", function(done) {
-          helpers.getTradelines(function(error, response, body) {
-            var tradeline = body.data[0];
-            helpers.cart.addTradeline(tradeline.id, function() {
-              helpers.cart.addTradeline(tradeline.id, function() {
-                helpers.cart.getTradelines(function(error, response, body) {
-                  body.data.length.should.be.equal(1);
-                  done()
-                });
+          async.waterfall([
+            function(cb) {
+              helpers.getTradelines(function(error, response, body) {
+                cb(error, body.data[0]);
               });
-            });
+            },
+            function(tradeline, cb) {
+              helpers.cart.addTradeline(tradeline.id, function(error) {
+                cb(error, tradeline);
+              });
+            },
+            function(tradeline, cb) {
+              helpers.cart.addTradeline(tradeline.id, function(error) {
+                cb(error, tradeline);
+              });
+            },
+            function(tradeline, cb) {
+              helpers.cart.addTradeline(tradeline.id, function(error) {
+                cb(error);
+              });
+            },
+            function(cb) {
+              helpers.cart.getTradelines(function(error, response, body) {
+                cb(error, body);
+              });
+            }
+          ], function(error, body) {
+            body.data.length.should.be.equal(1);
+            done(error)
           });
         });
 
         it("returns 400 if there is no id", function(done) {
           helpers.cart.addTradeline(null, function(error, response) {
             response.statusCode.should.be.equal(400);
-            done();
+            done(error);
           });
         });
       });
@@ -1774,29 +1802,45 @@ describe('init', function () {
             response.statusCode.should.be.equal(200);
             body.data.should.be.an.Array;
             body.itemsInCart.should.be.an.Integer;
-            done();
+            done(error);
           });
         });
       });
 
       describe("deleting a tradeline", function(){
         it("should be able to delete a tradeline", function(done){
-          helpers.getTradelines(function(error, response, body) {
-            var tradeline = body.data[0];
-
-            helpers.cart.addTradeline(tradeline.id, function() {
-              helpers.cart.getTradelines(function(error, response, body) {
-                body.data.length.should.be.equal(1);
-
-                helpers.cart.deleteTradeline(tradeline.id, function() {
-                  response.statusCode.should.be.equal(200);
-                  helpers.cart.getTradelines(function(error, response, body) {
-                    body.data.length.should.be.equal(0);
-                    done();
-                  });
-                });
+          async.waterfall([
+            function(cb) {
+              helpers.getTradelines(function(error, response, body) {
+                var tradeline = body.data[0];
+                cb(error, tradeline);
               });
-            });
+            },
+            function(tradeline, cb) {
+              helpers.cart.addTradeline(tradeline.id, function(error) {
+                cb(error, tradeline);
+              });
+            },
+            function(tradeline, cb) {
+              helpers.cart.getTradelines(function(error, respoonse, body) {
+                body.data.length.should.be.equal(1);
+                cb(error, tradeline);
+              });
+            },
+            function(tradeline, cb) {
+              helpers.cart.deleteTradeline(tradeline.id, function(error, response) {
+                response.statusCode.should.be.equal(200);
+                cb(error);
+              });
+            },
+            function(cb) {
+              helpers.cart.getTradelines(function(error, response, body) {
+                cb(error, body);
+              });
+            }
+          ], function(error, body) {
+            body.data.length.should.be.equal(0);
+            done(error);
           });
         });
       });
