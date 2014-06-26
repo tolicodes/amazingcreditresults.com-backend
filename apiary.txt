@@ -235,6 +235,69 @@ GET /api/v1/myself
     }]
 }
 
+Update information about currently authenticated user - name, ssn, birthday are editable
+PUT /api/v1/myself
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+> Content-Type: application/json; charset=utf-8
+{
+    "name": {
+      "familyName": "Zorg",
+      "givenName": "Jean Batist",
+      "middleName": "Emmanuele"
+    },
+    "ssn":11111,
+    "birthday":"01-01-1982"
+}
+< 202
+< Content-Type: application/json; charset=utf-8
+{
+    "id": "5370a4fa25777db9531ffa91",
+    "huntKey": "iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv",
+    "email": "owner@example.org",
+    "name": {
+        "familyName": "Zorg",
+        "givenName": "Jean Batist",
+        "middleName": "Emmanuele"
+    },
+    "title": "Mr.",
+    "phone": "",
+    "altPhone": "",
+    "state": "",
+    "city": "",
+    "zip": "",
+    "street1": "",
+    "street2": "",
+    "gravatar": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
+    "gravatar30": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
+    "gravatar50": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
+    "gravatar80": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
+    "gravatar100": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=100&d=wavatar&r=g",
+    "ssn":11111,
+    "birthday":"01-01-1982",
+    "root": true,
+    "roles": {
+        "owner": true
+    },
+    "accountVerified": false,
+    "profile": {
+        "answer1": "",
+        "answer2": "",
+        "answer3": ""
+    },
+    "isBanned": false
+}
++++++
+< 400
+< Content-Type: application/json; charset=utf-8
+{
+  "Error":"Authorization required!",
+   "status": "Error",
+    "errors": [{
+      "code": 400,
+      "message": "Authorization required!"
+    }]
+}
+
 
 -- Buyer/Seller/Owner transactions --
 
@@ -265,7 +328,7 @@ Saving Buyer answers to questions on dashboard
 POST /api/v1/buyer/saveQuestionnaireAnswers
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json; charset=utf-8
-{ "answer1": "1", "answer2":"2", "answer3":"3", "needQuestionnaire":true,}
+{ "answer1": "1", "answer2":"2", "answer3":"3"}
 < 202
 < Content-Type: application/json
 {
@@ -640,6 +703,8 @@ GET /api/v1/admin/clients
             "city": "",
             "zip": "",
             "street1": "",
+            "ssn":11111,
+            "birthday":"01-01-1982"
             "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
             "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
             "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
@@ -676,6 +741,8 @@ GET /api/v1/admin/clients
             "city": "",
             "zip": "",
             "street1": "",
+            "ssn":11111,
+            "birthday":"01-01-1982"
             "gravatar": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=80&d=wavatar&r=g",
             "gravatar30": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=30&d=wavatar&r=g",
             "gravatar50": "https://secure.gravatar.com/avatar/b5fca0fa34000c908d46313ed1d737e0.jpg?s=50&d=wavatar&r=g",
@@ -720,6 +787,9 @@ GET /api/v1/admin/clients/{:id}
             "city": "",
             "zip": "",
             "street1": "",
+            "street2": "",
+            "ssn":11111,
+            "birthday":"01-01-1982"
             "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
             "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
             "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
@@ -764,6 +834,8 @@ PUT /api/v1/admin/clients/{:id}
     "zip": "",
     "street1": "aaa",
     "street2": "bbb",
+    "ssn":11111,
+    "birthday":"01-01-1982",
     "roles": {
         "owner": false,
         "buyer": true,
@@ -797,6 +869,8 @@ PUT /api/v1/admin/clients/{:id}
     "zip": "",
     "street1": "aaa",
     "street2": "bbb",
+    "ssn":11111,
+    "birthday":"01-01-1982",
     "roles": {
         "owner": false,
         "buyer": true,
