@@ -55,7 +55,7 @@ exports.formatUserForOwner = function (user) {
       'answer3': user.profile ? user.profile.answer3 : ''
     },
     'isBanned': user.isBanned,
-    'balance': utilities.formatMoney(user.profile.balance || 0)
+    'balance': utilities.formatMoney(user.profile ? (user.profile.balance || 0) : 0)
   };
 };
 
