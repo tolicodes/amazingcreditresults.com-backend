@@ -19,24 +19,52 @@ module.exports = exports = function (core) {
 
   core.app.get('/api/v1/admin/clients', ensureOwner, function (request, response) {
     var page = request.query.page || 1,
-      order = request.query.order || '+_id';
+      perPage = request.query.perPage || 100,
+      order = request.query.order || '+_id',
+      skip = (page - 1) * perPage,
+      filter = {};
 
-    request.model.User
-      .find({
-        //todo - parameters for limiting output
-      })
-      .limit(100)
-      .sort(order)
-      .skip() //todo - pagination
-      .exec(function (error, usersFound) {
-        if (error) {
-          throw error;
-        } else {
-          var usersPrepared = usersFound.map(formatUser);
-          response.status(200);
-          response.json({'page': page, 'data': usersPrepared});
-        }
-      });
+    ['owner', 'buyer', 'seller'].map(function (role) {
+      if (request.query[role]) {
+        filter.roles = filter.roles || {};
+        filter.roles[role] = request.query[role] ? true : false;
+      }
+    });
+
+    if (request.query.isBanned) {
+      filter.isBanned = request.query.isBanned ? true : false;
+    }
+
+    core.async.parallel({
+      'metadata': function (cb) {
+        request.model.User
+          .count(filter)
+          .exec(function (error, numberOfClients) {
+            if (error) {
+              cb(error);
+            } else {
+              cb(null, {
+                'users': numberOfClients,
+                'page': page,
+                'perPage': perPage,
+                'order': order,
+                'filter': filter
+              });
+            }
+          });
+      },
+      'data': function (cb) {
+        request.model.User
+          .find(filter)
+          .limit(perPage)
+          .sort(order)
+          .skip(skip)
+          .exec(cb);
+      }
+    }, function (error, obj) {
+      response.status(200);
+      response.json({'metadata': obj.metadata, 'data': obj.data.map(formatUser)});
+    });
   });
 
   core.app.get('/api/v1/admin/clients/:id', ensureOwner, function (request, response) {
@@ -45,8 +73,17 @@ module.exports = exports = function (core) {
         throw error;
       } else {
         if (user) {
-          response.status(200);
-          response.json({'data': formatUser(user)});
+          request.model.Transaction
+            .find({'client': user._id})
+            .sort('-timestamp')
+            .exec(function (error, transactionsFound) {
+              if (error) {
+                throw error;
+              } else {
+                response.status(200);
+                response.json({'data': formatUser(user), 'transactions': transactionsFound});
+              }
+            });
         } else {
           response.status(404);
           response.json({
@@ -151,13 +188,13 @@ module.exports = exports = function (core) {
       'givenName'
       //'middleName' //not mandatory for now
     ].map(function (s) {
-      if (request.body.name && request.body.name[s] && typeof request.body.name[s] === 'string') {
-        isOk = true;
-      } else {
-        isOk = false;
-        missed = s;
-      }
-    });
+        if (request.body.name && request.body.name[s] && typeof request.body.name[s] === 'string') {
+          isOk = true;
+        } else {
+          isOk = false;
+          missed = s;
+        }
+      });
 
     if (isOk) {
       request.model.User.create({
