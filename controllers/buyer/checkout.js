@@ -63,7 +63,7 @@ module.exports = exports = function (core) {
               'client': request.user.id,
               'amount': obj.cost,
               'type': 'checkout',
-              'tradelinesBought': properTradeLineIds
+              'tradeLinesBought': properTradeLineIds
             }, function (error) {
               if (error) {
                 cb(error);
@@ -80,6 +80,11 @@ module.exports = exports = function (core) {
         function (transactionIssued, cb) {
           if (transactionIssued) {
 //todo
+//for every good Tradeline set the userdAus ++, and add userId in buyers
+//flush up cart from user profile
+//save user profile
+
+
             cb(null, true);
           } else {
             cb(null, null);
