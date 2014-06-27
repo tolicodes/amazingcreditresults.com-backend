@@ -569,7 +569,8 @@ POST /api/v1/cart/checkout
 < 202
 < Content-Type: application/json
 {
-    "status": "ok"
+    "status": "ok",
+    "transactionId": "5396002cb5282e71211d4f74"
 }
 +++++
 < 403
