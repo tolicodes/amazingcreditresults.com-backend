@@ -70,24 +70,28 @@ module.exports = exports = function (core) {
       request.model.Transaction.find({'client': request.user._id})
         .sort('+timestamp')
         .exec(function (error, transactionsFound) {
-          var balance = 0,
-            transactionsFormatted = [];
-          transactionsFound.map(function (t) {
-            transactionsFormatted.push({
-              'id': t.id,
-              'timestamp': t.timestamp,
-              'amount': t.amount,
-              'type': t.type
+          if (error) {
+            throw error;
+          } else {
+            var balance = 0,
+              transactionsFormatted = [];
+            transactionsFound.map(function (t) {
+              transactionsFormatted.push({
+                'id': t.id,
+                'timestamp': t.timestamp,
+                'amount': t.amount,
+                'type': t.type
+              });
+              balance = balance + t.amount;
             });
-            balance = balance + t.amount;
-          });
 
-          response.json({
-            'data': {
-              'balance': balance,
-              'transactions': transactionsFormatted
-            }
-          });
+            response.json({
+              'data': {
+                'balance': balance,
+                'transactions': transactionsFormatted
+              }
+            });
+          }
         });
     } else {
       response.status(400);
