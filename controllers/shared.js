@@ -34,8 +34,8 @@ module.exports = exports = function (core) {
       });
 
       ['birthday', 'ssn'].map(function (n) {
-        if (request.body.name[n]) {
-          request.user.profile[n] = request.body.profile[n];
+        if (request.body[n]) {
+          request.user.profile[n] = request.body[n];
         }
       });
 
