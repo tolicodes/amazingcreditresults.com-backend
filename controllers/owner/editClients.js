@@ -412,8 +412,8 @@ module.exports = exports = function (core) {
             if (error) {
               throw error;
             } else {
-              response.status(201);
-              response.json({'status': 'Ok'})
+              response.status(202);
+              response.json({'status': 'Ok'});
             }
           });
         } else {

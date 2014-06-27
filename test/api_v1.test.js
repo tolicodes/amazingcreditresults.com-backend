@@ -4,7 +4,7 @@ var request = require('request'),
   fs = require('fs'),
   path = require('path'),
   backend = require('./../index.js'),
-  async  = require('async'),
+  async = require('async'),
   port = 3001,
   testId = Math.floor(Math.random() * 10000),
   ownerHuntKey,
@@ -1733,71 +1733,71 @@ describe('init', function () {
     });
   });
 
-  describe('Buyer', function() {
+  describe('Buyer', function () {
     describe('cart', function () {
-      describe('adding tradelines', function() {
+      describe('adding tradelines', function () {
 
-        it('should be able to add a tradeline to a cart', function(done) {
+        it('should be able to add a tradeline to a cart', function (done) {
           async.waterfall([
-            function(cb) {
-              helpers.getTradelines(function(error, response, body) {
+            function (cb) {
+              helpers.getTradelines(function (error, response, body) {
                 cb(error, body.data[0]);
               });
             },
-            function(tradeline, cb) {
-              helpers.cart.addTradeline(tradeline.id, function(error, response) {
+            function (tradeline, cb) {
+              helpers.cart.addTradeline(tradeline.id, function (error, response) {
                 cb(error, response);
               });
             }
-          ], function(error, response) {
-            response.statusCode.should.be.equal(201);
+          ], function (error, response) {
+            response.statusCode.should.be.equal(202);
             done(error);
           });
         });
 
-        it("doesn't add the same item twice", function(done) {
+        it("doesn't add the same item twice", function (done) {
           async.waterfall([
-            function(cb) {
-              helpers.getTradelines(function(error, response, body) {
+            function (cb) {
+              helpers.getTradelines(function (error, response, body) {
                 cb(error, body.data[0]);
               });
             },
-            function(tradeline, cb) {
-              helpers.cart.addTradeline(tradeline.id, function(error) {
+            function (tradeline, cb) {
+              helpers.cart.addTradeline(tradeline.id, function (error) {
                 cb(error, tradeline);
               });
             },
-            function(tradeline, cb) {
-              helpers.cart.addTradeline(tradeline.id, function(error) {
+            function (tradeline, cb) {
+              helpers.cart.addTradeline(tradeline.id, function (error) {
                 cb(error, tradeline);
               });
             },
-            function(tradeline, cb) {
-              helpers.cart.addTradeline(tradeline.id, function(error) {
+            function (tradeline, cb) {
+              helpers.cart.addTradeline(tradeline.id, function (error) {
                 cb(error);
               });
             },
-            function(cb) {
-              helpers.cart.getTradelines(function(error, response, body) {
+            function (cb) {
+              helpers.cart.getTradelines(function (error, response, body) {
                 cb(error, body);
               });
             }
-          ], function(error, body) {
+          ], function (error, body) {
             body.data.length.should.be.equal(1);
             done(error)
           });
         });
 
-        it("returns 400 if there is no id", function(done) {
-          helpers.cart.addTradeline(null, function(error, response) {
+        it("returns 400 if there is no id", function (done) {
+          helpers.cart.addTradeline(null, function (error, response) {
             response.statusCode.should.be.equal(400);
             done(error);
           });
         });
       });
 
-      describe("list of tradelines", function() {
-        it('should return list of tradelines', function(done) {
+      describe("list of tradelines", function () {
+        it('should return list of tradelines', function (done) {
           helpers.cart.getTradelines(function (error, response, body) {
             response.statusCode.should.be.equal(200);
             body.data.should.be.an.Array;
@@ -1807,38 +1807,38 @@ describe('init', function () {
         });
       });
 
-      describe("deleting a tradeline", function(){
-        it("should be able to delete a tradeline", function(done){
+      describe("deleting a tradeline", function () {
+        it("should be able to delete a tradeline", function (done) {
           async.waterfall([
-            function(cb) {
-              helpers.getTradelines(function(error, response, body) {
+            function (cb) {
+              helpers.getTradelines(function (error, response, body) {
                 var tradeline = body.data[0];
                 cb(error, tradeline);
               });
             },
-            function(tradeline, cb) {
-              helpers.cart.addTradeline(tradeline.id, function(error) {
+            function (tradeline, cb) {
+              helpers.cart.addTradeline(tradeline.id, function (error) {
                 cb(error, tradeline);
               });
             },
-            function(tradeline, cb) {
-              helpers.cart.getTradelines(function(error, respoonse, body) {
+            function (tradeline, cb) {
+              helpers.cart.getTradelines(function (error, respoonse, body) {
                 body.data.length.should.be.equal(1);
                 cb(error, tradeline);
               });
             },
-            function(tradeline, cb) {
-              helpers.cart.deleteTradeline(tradeline.id, function(error, response) {
-                response.statusCode.should.be.equal(200);
+            function (tradeline, cb) {
+              helpers.cart.deleteTradeline(tradeline.id, function (error, response) {
+                response.statusCode.should.be.equal(202);
                 cb(error);
               });
             },
-            function(cb) {
-              helpers.cart.getTradelines(function(error, response, body) {
+            function (cb) {
+              helpers.cart.getTradelines(function (error, response, body) {
                 cb(error, body);
               });
             }
-          ], function(error, body) {
+          ], function (error, body) {
             body.data.length.should.be.equal(0);
             done(error);
           });
@@ -1846,13 +1846,60 @@ describe('init', function () {
       });
 
     });
+  });
 
-  })
+  describe('Owner uploads funds to Buyer account', function () {
+    it('Owner uploads the funds', function (done) {
+      request({
+        'method': 'POST',
+        'url': 'http://localhost:' + port + '/api/v1/admin/clients/balance/' + userId,
+        'headers': {'huntKey': ownerHuntKey},
+        'form': {'amount': 1, 'notes': 'Merry Christmas, fuck you!'},
+        'json': true
+      }, function (error, response, body) {
+        if (error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(202);
+          body.status.should.be.equal('Ok');
+          done();
+        }
+      });
+    });
+
+    it('Owner can check that he uploaded the funds', function (done) {
+      request({
+        'method': 'GET',
+        'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
+        'headers': {'huntKey': ownerHuntKey},
+        'form': {'amount': 1, 'notes': 'Merry Christmas, fuck you!'},
+        'json': true
+      }, function (error, response, body) {
+        if (error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(200);
+          body.transactions.should.be.an.Array;
+          body.transactions.length.should.be.equal(1);
+
+          var transactionFound = false;
+          body.transactions.map(function (t) {
+            if (t.amount == 1 && t.type == 'ownerUpload') {
+              transactionFound = true;
+            }
+          });
+          transactionFound.should.be.true;
+
+          done();
+        }
+      });
+    });
+  });
 });
 
 
 var helpers = {
-  getTradelines: function(cb) {
+  getTradelines: function (cb) {
     request({
       'method': 'GET',
       'url': 'http://localhost:' + port + '/api/v1/tradelines',
@@ -1862,7 +1909,7 @@ var helpers = {
   },
 
   cart: {
-    addTradeline: function(id, cb) {
+    addTradeline: function (id, cb) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/cart/tradelines',
@@ -1872,7 +1919,7 @@ var helpers = {
       }, cb);
     },
 
-    deleteTradeline: function(id, cb) {
+    deleteTradeline: function (id, cb) {
       request({
         'method': 'DELETE',
         'url': 'http://localhost:' + port + '/api/v1/cart/tradelines/' + id,
@@ -1881,7 +1928,7 @@ var helpers = {
       }, cb);
     },
 
-    getTradelines: function(cb) {
+    getTradelines: function (cb) {
       request({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/cart/tradelines',
