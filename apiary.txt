@@ -509,6 +509,7 @@ GET /api/v1/cart/tradelines
 Add tradelines to cart
 POST /api/v1/cart/tradelines
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+{"id":"5387c1c7a1e6fd5948e266cd"}
 < 202
 < Content-Type: application/json; charset=utf-8
 {"status":"Ok"}
