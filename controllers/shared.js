@@ -35,6 +35,7 @@ module.exports = exports = function (core) {
       request.user.profile = request.user.profile || {};
       request.user.profile.birthday = request.body.birthday;
       request.user.profile.ssn = request.body.ssn;
+      request.user.markModified('profile');//fucking marvelous
 
 //      console.log(request.body);
 //      console.log(request.user);
