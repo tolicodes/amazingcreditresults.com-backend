@@ -25,6 +25,7 @@ module.exports = exports = function (core) {
         if (error) {
           throw error;
         } else {
+          response.status(202);
           response.json(formatUser(request.user));
         }
       });
