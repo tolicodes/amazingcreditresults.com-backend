@@ -33,8 +33,8 @@ module.exports = exports = function (core) {
         }
       });
 
-      request.user.profile.birthday = request.body.birthday;
-      request.user.profile.ssn = request.body.ssn;
+      request.user.set('profile.birthday', request.body.birthday);
+      request.user.set('profile.ssn', request.body.ssn);
 
       request.user.save(function (error) {
         if (error) {
