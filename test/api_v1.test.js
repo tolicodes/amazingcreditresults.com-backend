@@ -577,7 +577,7 @@ describe('init', function () {
       it('works with `huntKey` as `POST` form parameter', function (done) {
         request({
           'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/myself',
+          'url': 'http://localhost:' + port + '/auth/myself',
           'form': {'huntKey': huntKeys[0]}
         }, function (error, response, body) {
           testingCallback(error, response, body, done);
@@ -587,7 +587,7 @@ describe('init', function () {
       it('works with `huntKey` as `PUT` form parameter', function (done) {
         request({
           'method': 'PUT',
-          'url': 'http://localhost:' + port + '/api/v1/myself',
+          'url': 'http://localhost:' + port + '/auth/myself',
           'form': {'huntKey': huntKeys[0]}
         }, function (error, response, body) {
           testingCallback(error, response, body, done);
@@ -597,7 +597,7 @@ describe('init', function () {
       it('works with `huntKey` as `DELETE` form parameter', function (done) {
         request({
           'method': 'DELETE',
-          'url': 'http://localhost:' + port + '/api/v1/myself',
+          'url': 'http://localhost:' + port + '/auth/myself',
           'form': {'huntKey': huntKeys[0]}
         }, function (error, response, body) {
           testingCallback(error, response, body, done);
@@ -609,7 +609,7 @@ describe('init', function () {
       it('works with `huntKey` as custom header for GET response', function (done) {
         request({
           'method': 'GET',
-          'url': 'http://localhost:' + port + '/api/v1/myself',
+          'url': 'http://localhost:' + port + '/auth/myself',
           'headers': {'huntKey': huntKeys[0]}
         }, function (error, response, body) {
           testingCallback(error, response, body, done);
@@ -619,7 +619,7 @@ describe('init', function () {
       it('works with `huntKey` as custom header for POST response', function (done) {
         request({
           'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/myself',
+          'url': 'http://localhost:' + port + '/auth/myself',
           'headers': {'huntKey': huntKeys[0]}
         }, function (error, response, body) {
           testingCallback(error, response, body, done);
@@ -629,7 +629,7 @@ describe('init', function () {
       it('works with `huntKey` as custom header for PUT response', function (done) {
         request({
           'method': 'PUT',
-          'url': 'http://localhost:' + port + '/api/v1/myself',
+          'url': 'http://localhost:' + port + '/auth/myself',
           'headers': {'huntKey': huntKeys[0]}
         }, function (error, response, body) {
           testingCallback(error, response, body, done);
@@ -639,7 +639,7 @@ describe('init', function () {
       it('works with `huntKey` as custom header for DELETE response', function (done) {
         request({
           'method': 'DELETE',
-          'url': 'http://localhost:' + port + '/api/v1/myself',
+          'url': 'http://localhost:' + port + '/auth/myself',
           'headers': {'huntKey': huntKeys[0]}
         }, function (error, response, body) {
           testingCallback(error, response, body, done);

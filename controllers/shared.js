@@ -3,29 +3,13 @@ var formatUser = require('./formatter.js').formatUserForOwner,
 
 //GET request to get current authorized users parameters in form of json
 module.exports = exports = function (core) {
-  function f4myself(request, response) {
-    if (request.user) {
-      response.json(formatUser(request.user));
-    } else {
-      response.status(400);
-      response.json({
-        'status': 'Error',
-        'errors': [
-          {
-            'code': 400,
-            'message': 'Authorization required!'
-          }
-        ]
-      });
-    }
-  }
-
-  core.app.all('/api/v1/myself', f4myself);
-  core.app.all('/auth/myself', f4myself); //not used and can be deprecated
 
 //Seller, Buyer, Owner can update their names, birthday, ssn
 //https://oselot.atlassian.net/browse/ACR-51
   core.app.put('/api/v1/myself', function (request, response) {
+    console.log(request.body);
+    console.log(request.user);
+
     if (request.user) {
       ['familyName', 'givenName', 'middleName'].map(function (n) {
         if (request.body.name[n]) {
@@ -36,10 +20,6 @@ module.exports = exports = function (core) {
       request.user.profile.birthday = request.body.birthday;
       request.user.profile.ssn = request.body.ssn;
       request.user.markModified('profile');//fucking marvelous
-
-//      console.log(request.body);
-//      console.log(request.user);
-
 
       request.user.save(function (error) {
         if (error) {
@@ -61,6 +41,26 @@ module.exports = exports = function (core) {
       });
     }
   });
+
+  function f4myself(request, response) {
+    if (request.user) {
+      response.json(formatUser(request.user));
+    } else {
+      response.status(400);
+      response.json({
+        'status': 'Error',
+        'errors': [
+          {
+            'code': 400,
+            'message': 'Authorization required!'
+          }
+        ]
+      });
+    }
+  }
+
+  core.app.get('/api/v1/myself', f4myself);
+  core.app.all('/auth/myself', f4myself); //only used for unit tests!
 
 //show current user balance
 //https://oselot.atlassian.net/browse/ACR-387#
