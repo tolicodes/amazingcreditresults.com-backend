@@ -319,7 +319,17 @@ GET /api/v1/account
         ]
     }
 }
-
++++++
+< 400
+< Content-Type: application/json; charset=utf-8
+{
+  "Error":"Authorization required!",
+   "status": "Error",
+    "errors": [{
+      "code": 400,
+      "message": "Authorization required!"
+    }]
+}
 
 
 -- Buyer dashboard --
@@ -347,6 +357,17 @@ POST /api/v1/buyer/saveQuestionnaireAnswers
   },
   "root": false,
   "accountVerified": true
+}
++++++
+< 400
+< Content-Type: application/json; charset=utf-8
+{
+  "Error":"Authorization required!",
+   "status": "Error",
+    "errors": [{
+      "code": 400,
+      "message": "Authorization required!"
+    }]
 }
 
 
@@ -430,9 +451,26 @@ GET /api/v1/tradelines
     ]
 }
 +++++
+< 403
+< Content-Type: application/json; charset=utf-8
+{
+    "status": "Error",
+    "errors": [{
+        "code": 403,
+        "message": "Access Denied!"
+    }]
+}
++++++
 < 401
-< Content-Type: application/json
-{"Code":401, "Error":"Authorization required"}
+< Content-Type: application/json; charset=utf-8
+{
+  "Error":"Authorization required!",
+   "status": "Error",
+    "errors": [{
+      "code": 400,
+      "message": "Authorization required!"
+    }]
+}
 
 
 -- Buyer cart (unstable) --
@@ -446,18 +484,83 @@ GET /api/v1/cart/items
     "itemsInCart":0,
     "data":[]
 }
-
++++++
+< 403
+< Content-Type: application/json; charset=utf-8
+{
+    "status": "Error",
+    "errors": [{
+        "code": 403,
+        "message": "Access Denied!"
+    }]
+}
++++++
+< 401
+< Content-Type: application/json; charset=utf-8
+{
+  "Error":"Authorization required!",
+   "status": "Error",
+    "errors": [{
+      "code": 400,
+      "message": "Authorization required!"
+    }]
+}
 
 Add tradelines to cart
 POST /api/v1/cart/items
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
-< 201
-
+< 202
+< Content-Type: application/json; charset=utf-8
+{"status":"Ok"}
++++++
+< 403
+< Content-Type: application/json; charset=utf-8
+{
+    "status": "Error",
+    "errors": [{
+        "code": 403,
+        "message": "Access Denied!"
+    }]
+}
++++++
+< 401
+< Content-Type: application/json; charset=utf-8
+{
+  "Error":"Authorization required!",
+   "status": "Error",
+    "errors": [{
+      "code": 400,
+      "message": "Authorization required!"
+    }]
+}
 
 Remove tradeline from cart
 DELETE /api/v1/cart/items/5396002cb5282e71211d4f74
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
-< 200
+< 202
+< Content-Type: application/json; charset=utf-8
+{"status":"Ok"}
++++++
+< 403
+< Content-Type: application/json; charset=utf-8
+{
+    "status": "Error",
+    "errors": [{
+        "code": 403,
+        "message": "Access Denied!"
+    }]
+}
++++++
+< 401
+< Content-Type: application/json; charset=utf-8
+{
+  "Error":"Authorization required!",
+   "status": "Error",
+    "errors": [{
+      "code": 400,
+      "message": "Authorization required!"
+    }]
+}
 
 
 Checkout
@@ -468,7 +571,27 @@ POST /api/v1/cart/checkout
 {
     "status": "ok"
 }
-
++++++
+< 403
+< Content-Type: application/json; charset=utf-8
+{
+    "status": "Error",
+    "errors": [{
+        "code": 403,
+        "message": "Access Denied!"
+    }]
+}
++++++
+< 401
+< Content-Type: application/json; charset=utf-8
+{
+  "Error":"Authorization required!",
+   "status": "Error",
+    "errors": [{
+      "code": 400,
+      "message": "Authorization required!"
+    }]
+}
 
 
 -- Owner api for header based authorization

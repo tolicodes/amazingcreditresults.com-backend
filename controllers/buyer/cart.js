@@ -40,7 +40,8 @@ module.exports = exports = function (core) {
                 if (error) {
                   throw error;
                 } else {
-                  response.send(201);
+                  response.status(202);
+                  response.json({'status': 'Ok'});
                 }
               });
             } else {
@@ -95,7 +96,8 @@ module.exports = exports = function (core) {
         if (error) {
           throw error;
         } else {
-          response.send(200);
+          response.status(202);
+          response.json({'status':'Ok'});
         }
       });
     } else {
