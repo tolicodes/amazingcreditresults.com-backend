@@ -13,7 +13,7 @@ module.exports = exports = function (core) {
     if (request.user) {
       ['familyName', 'givenName', 'middleName'].map(function (n) {
         if (request.body.name[n]) {
-          request.user.name = request.body.name[n];
+          request.user.name[n] = request.body.name[n];
         }
       });
       request.user.profile = request.user.profile || {};
