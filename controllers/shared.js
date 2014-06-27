@@ -32,12 +32,12 @@ module.exports = exports = function (core) {
           request.user.name = request.body.name[n];
         }
       });
+      request.user.profile = request.user.profile || {};
+      request.user.profile.birthday = request.body.birthday;
+      request.user.profile.ssn = request.body.ssn;
 
-      request.user.set('profile.birthday', request.body.birthday);
-      request.user.set('profile.ssn', request.body.ssn);
-
-      console.log(request.body);
-      console.log(request.user);
+//      console.log(request.body);
+//      console.log(request.user);
 
 
       request.user.save(function (error) {
