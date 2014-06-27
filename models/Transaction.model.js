@@ -50,17 +50,21 @@ module.exports = exports = function (core) {
         transactionsFound.map(function (t) {
           balance = balance + t.amount;
         });
-        core.model.User.findById(doc.id, function (error, userFound) {
+        core.model.User.findById(doc.client, function (error, userFound) {
           if (error) {
             throw error;
           } else {
-            userFound.profile = userFound.profile || {};
-            userFound.profile.balance = balance;
-            userFound.save(function (error) {
-              if (error) {
-                throw error;
-              }
-            });
+            if (userFound) {
+              userFound.profile = userFound.profile || {};
+              userFound.profile.balance = balance;
+              userFound.save(function (error) {
+                if (error) {
+                  throw error;
+                }
+              });
+            } else {
+              throw new Error('Unable to find the reciever of transaction #' + doc.id);
+            }
           }
         });
       }
