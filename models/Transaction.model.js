@@ -30,6 +30,10 @@ module.exports = exports = function (core) {
     });
   }, 'Unable to find client!');
 
+  TransactionSchema.options.toJSON.transform = function (doc, ret) {
+    ret.date = ret.date.toDateString();
+  };
+
   TransactionSchema.virtual('type')
     .get(function () {
       return types[this._type];
