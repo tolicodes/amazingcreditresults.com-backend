@@ -6,6 +6,8 @@ module.exports = exports = function (core) {
       '_type': { type: Number, min: 0, max: 3, default: 0 },
       'amount': { type: Number, min: -100000, max: 100000, default: 0, required: true  },
       'notes': String,
+      'date': Date,
+      'paidBy': String,
       'timestamp': {type: Date, default: Date.now()}
     },
     {

@@ -1854,7 +1854,7 @@ describe('init', function () {
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/admin/clients/balance/' + userId,
         'headers': {'huntKey': ownerHuntKey},
-        'form': {'amount': 1, 'notes': 'Merry Christmas, fuck you!'},
+        'form': {'amount': 1, 'notes': 'Merry Christmas, fuck you!', date: '2014-05-03', paidBy: 'Credit Card'},
         'json': true
       }, function (error, response, body) {
         if (error) {
@@ -1884,7 +1884,7 @@ describe('init', function () {
 
           var transactionFound = false;
           body.transactions.map(function (t) {
-            if (t.amount == 1 && t.type == 'ownerUpload') {
+            if (t.amount == 1 && t.type == 'ownerUpload' && t.date == '2014-05-03T00:00:00.000Z' && t.paidBy == 'Credit Card') {
               transactionFound = true;
             }
           });

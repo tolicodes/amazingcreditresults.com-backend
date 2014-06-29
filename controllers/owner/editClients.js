@@ -407,7 +407,9 @@ module.exports = exports = function (core) {
             'client': userFound._id,
             'type': 'ownerUpload',
             'amount': request.body.amount,
-            'notes': request.body.notes.toString() + 'Transaction issued by Owner ' + request.user.email
+            'notes': request.body.notes.toString() + 'Transaction issued by Owner ' + request.user.email,
+            'date': request.body.date,
+            'paidBy': request.body.paidBy
           }, function (error) {
             if (error) {
               throw error;
