@@ -181,7 +181,7 @@ Hunt.extendRoutes(function (core) {
   });
 });
 
-Hunt.on('start', function (evnt) {
+Hunt.once('start', function (evnt) {
 //populating database with test data in development environment!
   if (Hunt.config.env === 'development') {
     require('./lib/populateDatabase.js')(Hunt); //uncomment to repopulate database on every start
