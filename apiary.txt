@@ -245,8 +245,8 @@ PUT /api/v1/myself
       "givenName": "Jean Batist",
       "middleName": "Emmanuele"
     },
-    "ssn":11111,
-    "birthday":"01-01-1982"
+    "ssn":"111-111-111",
+    "birthday":"Fri Jan 27 1982 20:49:36 GMT+0400 (MSK)"
 }
 < 202
 < Content-Type: application/json; charset=utf-8
@@ -1186,17 +1186,36 @@ POST /api/v1/owner/bulkImport
 < 200
 < Content-Type: Content-type: application/json
 
+
 Issue balance adjustment for client. Amount can be positive (give money to client) and negative (take money from client)
 POST /api/v1/admin/clients/balance/5396002cb5282e71211d4f74
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json; charset=utf-8
 {
  "amount":"1",
- "notes":"Merry Christmas, f*ck you!"
+ "notes":"Merry Christmas, f*ck you!",
+ "date":"Sat May 03 2014",
+ "paidBy":"Credit Card"
 }
 < 201
 < Content-Type: Content-type: application/json
-{"status":"Ok"}
+{
+ "status":"Ok",
+ "transactionId":"4256002aa5282e71211ef354"
+}
++++++
+< 402
+< Content-Type: Content-type: application/json
+{
+    "needToPay": 3000,
+    "status": "Error",
+    "errors": [{
+      "code": 402,
+      "message": "Insufficient balance! Payment required!"
+    }
+  ]
+}
+
 
 
 
