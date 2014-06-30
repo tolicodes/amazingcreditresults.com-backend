@@ -384,6 +384,7 @@ GET /api/v1/tradelines
     "data": [
         {
             "id": "5387c1c7a1e6fd5948e266cc",
+            "inCart": true,
             "seller": "5370a4fa25777db9531ffa91",
             "dateOpen": "2014-05-29T23:24:55.294Z",
             "availableAus": 15,
@@ -406,6 +407,7 @@ GET /api/v1/tradelines
         },
         {
             "id": "5387c1c7a1e6fd5948e266cd",
+            "inCart": true,
             "seller": "5370a4fa25777db9531ffa91",
             "dateOpen": "2014-05-29T23:24:55.294Z",
             "availableAus": 15,
@@ -428,6 +430,7 @@ GET /api/v1/tradelines
         },
         {
             "id": "5388dd22e87f5b444eaf1c8e",
+            "inCart": true,
             "seller": "5370a4fa25777db9531ffa91",
             "dateOpen": "2014-05-30T19:33:54.022Z",
             "availableAus": 15,
