@@ -24,6 +24,9 @@ module.exports = exports = function(core){
                 'cost': t.cost,
                 'notes': t.notes,
 //*/
+//https://oselot.atlassian.net/browse/ACR-409
+                'inCart': (request.user.profile && request.user.profile.cart && request.user.profile.cart[t.id]) ? true : false,
+
                 'seller': t.seller,
                 'statementDate': t.statementDate,
                 'dateOpen': t.dateOpen,
