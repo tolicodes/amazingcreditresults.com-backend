@@ -1884,7 +1884,6 @@ describe('init', function () {
 
           var transactionFound = false;
           body.transactions.map(function (t) {
-            debugger;
             if (t.amount == 1 && t.type == 'ownerUpload' && t.date == 'Sat May 03 2014' && t.paidBy == 'Credit Card') {
               transactionFound = true;
             }
