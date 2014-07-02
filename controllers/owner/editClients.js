@@ -254,8 +254,16 @@ module.exports = exports = function (core) {
       } else {
         var welcomeLink = welcomeLinkGenerator();
         if ((userFound.roles && userFound.roles.owner === true) || userFound.root) {
-          response.status(400); //not sure about js with it
-          response.json({'error': 'Unable to send welcome link to owner!'});
+          response.status(400);
+          response.json({
+            'status': 'Error',
+            'errors': [
+              {
+                'code': 400,
+                'message': 'Unable to send welcome link to owner!'
+              }
+            ]
+          });
         } else {
           core.async.waterfall([
             function (cb) {
@@ -310,8 +318,16 @@ module.exports = exports = function (core) {
       } else {
         var welcomeLink = welcomeLinkGenerator();
         if ((userFound.roles && userFound.roles.owner === true) || userFound.root) {
-          response.status(400); //not sure about js with it
-          response.json({'error': 'Unable to send password reset link to owner!'});
+          response.status(400);
+          response.json({
+            'status': 'Error',
+            'errors': [
+              {
+                'code': 400,
+                'message': 'Unable to send password reset link to owner!'
+              }
+            ]
+          });
         } else {
           core.async.waterfall([
             function (cb) {
