@@ -5,6 +5,7 @@ var request = require('request'),
   path = require('path'),
   backend = require('./../index.js'),
   async = require('async'),
+  _ = require('underscore'),
   port = 3001,
   testId = Math.floor(Math.random() * 10000),
   ownerHuntKey,
@@ -1895,6 +1896,39 @@ describe('init', function () {
       });
     });
   });
+
+  describe('Owner', function() {
+    describe('editing clients', function() {
+      it('can delete a client', function(done){
+        async.waterfall([
+          function (cb) {
+            helpers.clients.list(function (error, response, body) {
+              cb(error, findBuyer(body))
+            });
+          },
+          function (buyer, cb) {
+            helpers.clients.del(buyer.id, function (error, response) {
+              response.statusCode.should.be.equal(200);
+              cb(error, buyer);
+            });
+          },
+          function (buyer, cb) {
+            helpers.clients.get(buyer.id, function (error, response, body) {
+              var buyer = body.data;
+              cb(error, buyer);
+            });
+          }
+        ], function (error, buyer) {
+          buyer.isBanned.should.be.true;
+          done(error);
+        });
+
+        function findBuyer(body) {
+          return _.find(body.data, function(user){ return user.roles.buyer; });
+        }
+      });
+    })
+  });
 });
 
 
@@ -1908,6 +1942,34 @@ var helpers = {
     }, cb);
   },
 
+  clients: {
+    list: function (cb) {
+      request({
+        'method': 'GET',
+        'url': 'http://localhost:' + port + '/api/v1/admin/clients',
+        'headers': {'huntKey': ownerHuntKey},
+        json: true
+      }, cb);
+    },
+
+    get: function (id, cb) {
+      request({
+        'method': 'GET',
+        'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + id,
+        'headers': {'huntKey': ownerHuntKey},
+        json: true
+      }, cb);
+    },
+
+    del: function(id, cb) {
+      request({
+        'method': 'DELETE',
+        'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + id,
+        'headers': {'huntKey': ownerHuntKey},
+        json: true
+      }, cb);
+    }
+  },
   cart: {
     addTradeline: function (id, cb) {
       request({

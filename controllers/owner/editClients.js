@@ -355,19 +355,22 @@ module.exports = exports = function (core) {
 
   core.app.delete('/api/v1/admin/clients/:id', ensureOwner, function (request, response) {
     if (request.params.id) {
-      request.model.User.findOne({
+      request.model.User.findOneAndUpdate({
         '_id': request.params.id,
         '$or': [
           {'roles.buyer': true},
           {'roles.seller': true}
         ]
-      }, function (error, userFound) {
+      },
+      {
+        isBanned: true
+      },
+      function (error, userFound) {
         if (error) {
           throw error;
         } else {
           if (userFound) {
-            userFound.isBanned = true;
-            response.status(201);
+            response.status(200);
             response.json({'data': formatUser(userFound)});
           } else {
             response.status(404);
