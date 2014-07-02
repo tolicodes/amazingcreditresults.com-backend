@@ -1,7 +1,8 @@
 //controller for owner users to edit the clients list
 var welcomeLinkGenerator = require('./../../lib/welcome.js'),
-  formatUser = require('./../formatter.js').formatUserForOwner,
+  formatUser  = require('./../formatter.js').formatUserForOwner,
   ensureOwner = require('./../../lib/middleware.js').ensureOwner;
+  utilities   = require('./../../lib/utilities');
 
 module.exports = exports = function (core) {
 
@@ -370,50 +371,31 @@ module.exports = exports = function (core) {
   });
 
   core.app.delete('/api/v1/admin/clients/:id', ensureOwner, function (request, response) {
-    if (request.params.id) {
-      request.model.User.findOneAndUpdate({
-        '_id': request.params.id,
-        '$or': [
-          {'roles.buyer': true},
-          {'roles.seller': true}
-        ]
-      },
-      {
-        isBanned: true
-      },
-      function (error, userFound) {
+    if (!request.params.id) {
+      return utilities.error(400, 'ID is missed!', response);
+    }
+
+    request.model.User.findById(request.params.id, function (error, userFound) {
+      if (error) {
+        throw error;
+      }
+
+      if (!userFound) {
+        return utilities.error(404, 'User with this ID do not exists!', response);
+      }
+
+      if (!userFound.roles.buyer && !userFound.roles.seller) {
+        return utilities.error(400, 'Only buyers and sellers can be removed', response);
+      }
+
+      userFound.update({isBanned: true}, function(error) {
         if (error) {
           throw error;
-        } else {
-          if (userFound) {
-            response.status(200);
-            response.json({'data': formatUser(userFound)});
-          } else {
-            response.status(404);
-            response.json({
-              'status': 'Error',
-              'errors': [
-                {
-                  'code': 404,
-                  'message': 'User with this ID do not exists!'
-                }
-              ]
-            });
-          }
         }
+
+        response.send(200);
       });
-    } else {
-      response.status(400);
-      response.json({
-        'status': 'Error',
-        'errors': [
-          {
-            'code': 400,
-            'message': 'ID is missed!'
-          }
-        ]
-      });
-    }
+    });
   });
 
   core.app.post('/api/v1/admin/clients/balance/:id', ensureOwner, function (request, response) {
