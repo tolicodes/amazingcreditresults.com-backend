@@ -189,13 +189,13 @@ module.exports = exports = function (core) {
       'givenName'
       //'middleName' //not mandatory for now
     ].map(function (s) {
-        if (request.body.name && request.body.name[s] && typeof request.body.name[s] === 'string') {
-          isOk = true;
-        } else {
-          isOk = false;
-          missed = s;
-        }
-      });
+      if (request.body.name && request.body.name[s] && typeof request.body.name[s] === 'string') {
+        isOk = true;
+      } else {
+        isOk = false;
+        missed = s;
+      }
+    });
 
     if (isOk) {
       request.model.User.create({

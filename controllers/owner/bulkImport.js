@@ -41,15 +41,15 @@ module.exports = exports = function (core) {
                     'givenName': user.givenName || '',
                     'middleName': user.middleName || ''
                   },
-                  'profile':{
-                    'title':user.title,
-                    'phone':user.phone,
-                    'altPhone':user.altPhone,
+                  'profile': {
+                    'title': user.title,
+                    'phone': user.phone,
+                    'altPhone': user.altPhone,
                     'state': user.state,
                     'city': user.city,
                     'zip': user.zip,
-                    'street1':user.street1,
-                    'street2':user.street2
+                    'street1': user.street1,
+                    'street2': user.street2
                   },
                   'apiKey': core.rack(),
                   'email': user.email,

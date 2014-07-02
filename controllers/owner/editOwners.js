@@ -208,7 +208,7 @@ module.exports = exports = function (core) {
                     'isBanned': true
                   }});
                 }
-              })
+              });
             } else {
               response.status(404);
               response.json({

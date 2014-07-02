@@ -7,7 +7,10 @@ module.exports = exports = function (core) {
     var tradelineIds = request.user.profile ? (Object.keys(request.user.profile.cart || {})) : [];
     core.async.map(tradelineIds,
       function (id, cb) {
-        request.model.TradeLine.findById(id, cb).populate('product')
+        request.model.TradeLine
+          .findById(id)
+          .populate('product')
+          .exec(cb);
       },
       function (error, tradeLinesFound) {
         if (error) {
@@ -97,7 +100,7 @@ module.exports = exports = function (core) {
           throw error;
         } else {
           response.status(202);
-          response.json({'status':'Ok'});
+          response.json({'status': 'Ok'});
         }
       });
     } else {
