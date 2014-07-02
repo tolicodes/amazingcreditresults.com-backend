@@ -393,7 +393,7 @@ module.exports = exports = function (core) {
           throw error;
         }
 
-        response.send(200);
+        response.send(200, null);
       });
     });
   });
