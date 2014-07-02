@@ -1903,7 +1903,7 @@ describe('init', function () {
         async.waterfall([
           function (cb) {
             helpers.clients.list(function (error, response, body) {
-              cb(error, findBuyer(body))
+              cb(error, findWithRole('buyer', body))
             });
           },
           function (buyer, cb) {
@@ -1922,11 +1922,29 @@ describe('init', function () {
           buyer.isBanned.should.be.true;
           done(error);
         });
-
-        function findBuyer(body) {
-          return _.find(body.data, function(user){ return user.roles.buyer; });
-        }
       });
+
+      it("can't delete an owner", function(done){
+        async.waterfall([
+          function (cb) {
+            helpers.clients.list(function (error, response, body) {
+              cb(error, findWithRole('owner', body))
+            });
+          },
+          function (buyer, cb) {
+            helpers.clients.del(buyer.id, function (error, response) {
+              cb(error, response);
+            });
+          }
+        ], function (error, response) {
+          response.statusCode.should.be.equal(400);
+          done(error);
+        });
+      });
+
+      function findWithRole(role, body) {
+        return _.find(body.data, function(user){ return user.roles[role]; });
+      }
     })
   });
 });
