@@ -75,7 +75,7 @@ module.exports = exports = function (core) {
               if (error) {
                 cb(error);
               } else {
-                paymentTransactionId = tCreated[0].id; //todo - test it!!!
+                paymentTransactionId = tCreated.id;
                 cb(null, true);
               }
             });
