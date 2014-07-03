@@ -4,8 +4,10 @@ var ensureBuyerOrOwner = require('../../lib/middleware.js').ensureBuyerOrOwner,
 module.exports = exports = function (core) {
   core.app.post('/api/v1/cart/checkout', ensureBuyerOrOwner, function (request, response) {
     var tradelineIds = request.user.profile ? (Object.keys(request.user.profile.cart || {})) : [],
+      tradelines = [],
       properTradeLineIds = [],
       toPay = 0,
+      sumCost = 0,
       paymentTransactionId;
 
     core.async.waterfall(
@@ -31,21 +33,24 @@ module.exports = exports = function (core) {
             'cost': function (c) {
 //calculate the cost of all tradelines Buyer want to buyer
 //also drop non active transactiosn, and with
-              var sumCost = 0;
+
               core.async.map(tradelineIds,
                 function (tradeLineId, cc) {
-                  request.model.TradeLine.findById(tradeLineId, function (error, tradeLineFound) {
-                    if (error) {
-                      cc(error);
-                    } else {
-                      if ((tradeLineFound.totalAus - tradeLineFound.usedAus) > 0 && tradeLineFound.active) {
+                  request.model.TradeLine.findById(tradeLineId)
+                    .populate('product')
+                    .exec(function (error, tradeLineFound) {
+                      if (error) {
+                        cc(error);
+                      } else {
+                        if ((tradeLineFound.totalAus - tradeLineFound.usedAus) > 0 && tradeLineFound.active) {
 //https://oselot.atlassian.net/wiki/display/ACR/Inventory+Table+Requirements
-                        sumCost = sumCost + tradeLineFound.cost;
-                        properTradeLineIds.push(tradeLineFound.id);
+                          sumCost = sumCost + tradeLineFound.cost;
+                          properTradeLineIds.push(tradeLineFound.id);
+                          tradelines.push(tradeLineFound);
+                        }
+                        cc(null);
                       }
-                      cc(null);
-                    }
-                  });
+                    });
                 },
                 function (error) {
                   if (error) {
@@ -122,6 +127,15 @@ module.exports = exports = function (core) {
             response.json({
               'status': 'Ok',
               'transactionId': paymentTransactionId
+            });
+            request.user.notifyByEmail({
+              'layout': false,
+              'template': 'emails/checkoutBuyer',
+              'subject': 'Checkout confirmation',
+              'tradeLinesInCart': tradelines,
+              'total': sumCost,
+              'user': request.user,
+              'date': new Date()
             });
           } else {
             response.status(402); //http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
