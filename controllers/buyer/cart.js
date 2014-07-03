@@ -116,8 +116,4 @@ module.exports = exports = function (core) {
       });
     }
   });
-
-  core.app.post('/api/v1/cart/checkout', ensureBuyerOrOwner, function (request, response) {
-    response.send('okay');
-  });
 };
