@@ -9,6 +9,7 @@ GET /api/v1/buyer/needToSetPassword/:welcomeLink
 < 200
 < Content-Type: application/json; charset=utf-8
 {
+    "email": "johndoe@example.org",
     "needToSetPassword": true,
     "name":{
         "familyName": "Doe",
@@ -20,6 +21,7 @@ GET /api/v1/buyer/needToSetPassword/:welcomeLink
 < 200
 < Content-Type: application/json; charset=utf-8
 {
+    "email": "johndoe@example.org",
     "needToSetPassword": false,
     "name":{
         "familyName": "Doe",

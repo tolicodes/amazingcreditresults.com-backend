@@ -171,6 +171,7 @@ module.exports = exports = function (core) {
               if (!userFound.accountVerified) {
 //2. The first time a Buyer clicks the link, s/he will see a prompt asking to create a password
                 response.json({
+                  'email': userFound.email,
                   'needToSetPassword': true,
                   'name': {
                     'familyName': userFound.name.familyName, //http://schema.org/familyName
@@ -181,6 +182,7 @@ module.exports = exports = function (core) {
               } else {
 //3. The second time a Buyer click the link, s/he will be prompted for the password
                 response.json({
+                  'email': userFound.email,
                   'needToSetPassword': false,
                   'name': {
                     'familyName': userFound.name.familyName, //http://schema.org/familyName
