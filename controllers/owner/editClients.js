@@ -230,7 +230,8 @@ module.exports = exports = function (core) {
           throw error;
         } else {
           response.status(201);
-          response.json(formatUser(userCreated));
+          response.redirect('/api/v1/admin/clients/' + userCreated.id);
+//          response.json(formatUser(userCreated));
         }
       });
     } else {
