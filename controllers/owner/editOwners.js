@@ -79,8 +79,8 @@ module.exports = exports = function (core) {
               throw err;
             } else {
               response.status(201);
-              response.redirect('/api/v1/admin/owners/' + userCreated.id);
-              //response.json({'data': formatOwner(userCreated)});
+              //response.redirect('/api/v1/admin/owners/' + userCreated.id);
+              response.json({'data': formatOwner(userCreated)});
             }
           });
         }
