@@ -17,6 +17,5 @@ notifications:
     email:
         recipients:
             - anatolij@oselot.com
-            - anatolij.nowak@yandex.ru
-         on_success: change
-         on_failure: always
+        on_success: change
+        on_failure: always
