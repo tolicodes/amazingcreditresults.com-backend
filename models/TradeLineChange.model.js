@@ -156,7 +156,7 @@ module.exports = exports = function (core) {
     if (user && user.roles && user.roles.owner === true) {
       switch (status) {
         case 1:
-          core.model.TradeLines.findById(change.tradeLine, function (error, TradeLineFound) {
+          core.model.TradeLine.findById(change.tradeLine, function (error, TradeLineFound) {
             if (error) {
               callback(error);
             } else {

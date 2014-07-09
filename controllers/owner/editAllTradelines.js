@@ -83,6 +83,94 @@ module.exports = exports = function (core) {
       });
   });
 
+  //ACR-254
+  core.app.post(/^\/api\/v1\/owner\/tradelines\/([0-9a-f]+)\/changeset\/([0-9a-f]+)\/approve$/, ensureUserIsOwnerMiddleware, function (request, response) {
+    var tradeLineId = request.params[0],
+      changeId = request.params[1];
+    core.async.parallel({
+      'tradeLine': function (cb) {
+        request.model.TradeLine.findById(tradeLineId, cb);
+      },
+      'tradeLineChange': function (cb) {
+        request.model.TradeLineChange.findOne({'_id': changeId, 'tradeLine': tradeLineId}, cb);
+      }
+    }, function (error, obj) {
+      if (error) {
+        throw error;
+      } else {
+        if (obj.tradeLine && obj.tradeLineChange) {
+          obj.tradeLineChange.approve(request.user, function (err) {
+            if (err) {
+              throw err;
+            } else {
+              response.json({
+                'tradeLine': obj.tradeLine,
+                'tradeLineChange': obj.tradeLineChange,
+                'status': 'approve'
+              });
+            }
+          });
+        } else {
+          response.status(404);
+          response.json({
+            'status': 'Error',
+            'errors': [
+              {
+                'code': 404,
+                'message': 'Tradeline or TradelineChange with this IDs do not exists!'
+              }
+            ]
+          });
+
+        }
+      }
+    });
+  });
+
+  core.app.post(/^\/api\/v1\/owner\/tradelines\/([0-9a-f]+)\/changeset\/([0-9a-f]+)\/deny$/, ensureUserIsOwnerMiddleware, function (request, response) {
+    var tradeLineId = request.params[0],
+      changeId = request.params[1];
+    core.async.parallel({
+      'tradeLine': function (cb) {
+        request.model.TradeLine.findById(tradeLineId, cb);
+      },
+      'TradeLineChanges': function (cb) {
+        request.model.TradeLineChange.findOne({'_id': changeId, 'tradeLine': tradeLineId}, cb);
+      }
+    }, function (error, obj) {
+      if (error) {
+        throw error;
+      } else {
+        if (obj.tradeLine && obj.tradeLineChange) {
+          obj.tradeLineChange.deny(request.user, function (err) {
+            if (err) {
+              throw err;
+            } else {
+              response.json({
+                'tradeLine': obj.tradeLine,
+                'tradeLineChange': obj.tradeLineChange,
+                'status': 'deny'
+              });
+            }
+          });
+        } else {
+          response.status(404);
+          response.json({
+            'status': 'Error',
+            'errors': [
+              {
+                'code': 404,
+                'message': 'Tradeline or TradelineChange with this IDs do not exists!'
+              }
+            ]
+          });
+
+        }
+      }
+    });
+  });
+
+
   core.app.post('/api/v1/owner/tradelines', ensureUserIsOwnerMiddleware, function (request, response) {
     var fields = {};
     [
@@ -186,92 +274,4 @@ module.exports = exports = function (core) {
       }
     );
   });
-
-//ACR-254
-  core.app.post(/^\/api\/v1\/owner\/tradelines\/([0-9a-f]+)\/changeset\/([0-9a-f]+)\/approve$/, function (request, response) {
-    var tradeLineId = request.params[0],
-      changeId = request.params[1];
-    core.async.parallel({
-      'tradeLine': function (cb) {
-        request.model.TradeLine.findById(tradeLineId, cb);
-      },
-      'tradeLineChange': function (cb) {
-        request.model.TradeLineChange.find({'_id': changeId, 'tradeLine': tradeLineId}, cb);
-      }
-    }, function (error, obj) {
-      if (error) {
-        throw error;
-      } else {
-        if (obj.tradeLine && obj.tradeLineChange) {
-          obj.tradeLineChange.approve(request.user, function (err) {
-            if (err) {
-              throw err;
-            } else {
-              response.json({
-                'tradeLine': obj.tradeLine,
-                'tradeLineChange': obj.tradeLineChange,
-                'status': 'approve'
-              });
-            }
-          });
-        } else {
-          response.status(404);
-          response.json({
-            'status': 'Error',
-            'errors': [
-              {
-                'code': 404,
-                'message': 'Tradeline or TradelineChange with this IDs do not exists!'
-              }
-            ]
-          });
-
-        }
-      }
-    });
-  });
-
-  core.app.post(/^\/api\/v1\/owner\/tradelines\/([0-9a-f]+)\/changeset\/([0-9a-f]+)\/deny$/, function (request, response) {
-    var tradeLineId = request.params[0],
-      changeId = request.params[1];
-    core.async.parallel({
-      'tradeLine': function (cb) {
-        request.model.TradeLine.findById(tradeLineId, cb);
-      },
-      'TradeLineChanges': function (cb) {
-        request.model.TradeLineChange.find({'_id': changeId, 'tradeLine': tradeLineId}, cb);
-      }
-    }, function (error, obj) {
-      if (error) {
-        throw error;
-      } else {
-        if (obj.tradeLine && obj.tradeLineChange) {
-          obj.tradeLineChange.deny(request.user, function (err) {
-            if (err) {
-              throw err;
-            } else {
-              response.json({
-                'tradeLine': obj.tradeLine,
-                'tradeLineChange': obj.tradeLineChange,
-                'status': 'deny'
-              });
-            }
-          });
-        } else {
-          response.status(404);
-          response.json({
-            'status': 'Error',
-            'errors': [
-              {
-                'code': 404,
-                'message': 'Tradeline or TradelineChange with this IDs do not exists!'
-              }
-            ]
-          });
-
-        }
-      }
-    });
-  });
-
 };
