@@ -2097,7 +2097,7 @@ describe('init', function () {
           }
         });
       });
-      it('owner can reject tradeline changes', function (done) {
+      it('owner can reject first tradeline changes', function (done) {
         request({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId1 + '/changeset/' + changesId + '/deny',
@@ -2113,7 +2113,7 @@ describe('init', function () {
           }
         });
       });
-      it('owner actually rejects tradeline changes', function (done) {
+      it('owner actually rejects first tradeline changes', function (done) {
         request({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId1,
@@ -2162,7 +2162,7 @@ describe('init', function () {
           }
         });
       });
-      it('owner can accept tradeline changes', function (done) {
+      it('owner can accept second tradeline changes', function (done) {
         request({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId2 + '/changeset/' + changesId + '/approve',
@@ -2178,7 +2178,7 @@ describe('init', function () {
           }
         });
       });
-      it('owner actually accepts tradeline changes', function (done) {
+      it('owner actually accepts second tradeline changes', function (done) {
         request({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId2,

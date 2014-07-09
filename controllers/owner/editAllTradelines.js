@@ -188,7 +188,7 @@ module.exports = exports = function (core) {
   });
 
 //ACR-254
-  core.app.post(/^\/api\/v1\/owner\/tradelines\/([a-f0-9]+)\/changeset\/([a-f0-9]+)\/approve/, function (request, response) {
+  core.app.post(/^\/api\/v1\/owner\/tradelines\/([0-9a-f]+)\/changeset\/([0-9a-f]+)\/approve$/, function (request, response) {
     var tradeLineId = request.params[0],
       changeId = request.params[1];
     core.async.parallel({
@@ -231,7 +231,7 @@ module.exports = exports = function (core) {
     });
   });
 
-  core.app.post(/^\/api\/v1\/owner\/tradelines\/([a-f0-9]+)\/changeset\/([a-f0-9]+)\/deny/, function (request, response) {
+  core.app.post(/^\/api\/v1\/owner\/tradelines\/([0-9a-f]+)\/changeset\/([0-9a-f]+)\/deny$/, function (request, response) {
     var tradeLineId = request.params[0],
       changeId = request.params[1];
     core.async.parallel({
