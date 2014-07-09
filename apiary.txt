@@ -1770,6 +1770,215 @@ GET /api/v1/owner/tradelines/:id
 }
 
 
+Approve tradeline changes
+POST /api/v1/owner/tradelines/539600305d26169409f1b51c/changeset/539600305d26169409f1b51d/approve
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 201
+< Content-Type: application/json
+{
+  "tradeLine": {
+        "tradeLine": "539600305d26169409f1b51c",
+        "cost": 999,
+        "currentBalance": 9999,
+        "cashLimit": 9999,
+        "creditLimit": 9999,
+        "price": 1099,
+        "usedAus": 6,
+        "totalAus": 11,
+        "product": "5396002f5d26169409f1b517",
+        "createdAt": "2014-06-09T18:42:52.392Z",
+        "active": false,
+        "status": "pending",
+        "availableAus": 5,
+        "moRating": "Gold",
+        "bcRating": "Bronze",
+        "ncRating": "None",
+        "id": "539600305d26169409f1b51d"
+  },
+  "tradeLineChange": {
+      "seller":{
+           "id": "5396002cb5282e71211d4f77",
+          "name": {},
+          "gravatar": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+          "gravatar30": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=30&d=wavatar&r=g",
+          "gravatar50": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=50&d=wavatar&r=g",
+          "gravatar80": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+          "gravatar100": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=100&d=wavatar&r=g",
+          "online": false
+      },
+      "issuer": {
+          "id": "5396002cb5282e71211d4f77",
+          "name": {},
+          "gravatar": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+          "gravatar30": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=30&d=wavatar&r=g",
+          "gravatar50": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=50&d=wavatar&r=g",
+          "gravatar80": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+          "gravatar100": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=100&d=wavatar&r=g",
+          "online": false
+      },
+      "tradeLine": "539600305d26169409f1b51c",
+      "cost": 999,
+      "currentBalance": 9999,
+      "cashLimit": 9999,
+      "creditLimit": 9999,
+      "price": 1099,
+      "usedAus": 6,
+      "totalAus": 11,
+      "product": "5396002f5d26169409f1b517",
+      "createdAt": "2014-06-09T18:42:52.392Z",
+      "active": false,
+      "status": "pending",
+      "availableAus": 5,
+      "moRating": "Gold",
+      "bcRating": "Bronze",
+      "ncRating": "None",
+      "id": "539600305d26169409f1b51d"
+  },
+  "status": "approve"
+}
++++++
+< 404
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 404,
+        "message": "Tradeline with this id do not exists!"
+        }
+    ]
+}
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 401,
+        "message": "Authorization required!"
+        }
+    ]
+}
+
+
+Reject tradeline changes
+POST /api/v1/owner/tradelines/539600305d26169409f1b51c/changeset/539600305d26169409f1b51d/deny
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 201
+< Content-Type: application/json
+{
+  "tradeLine": {
+        "tradeLine": "539600305d26169409f1b51c",
+        "cost": 999,
+        "currentBalance": 9999,
+        "cashLimit": 9999,
+        "creditLimit": 9999,
+        "price": 1099,
+        "usedAus": 6,
+        "totalAus": 11,
+        "product": "5396002f5d26169409f1b517",
+        "createdAt": "2014-06-09T18:42:52.392Z",
+        "active": false,
+        "status": "pending",
+        "availableAus": 5,
+        "moRating": "Gold",
+        "bcRating": "Bronze",
+        "ncRating": "None",
+        "id": "539600305d26169409f1b51d"
+  },
+  "tradeLineChange": {
+      "seller":{
+           "id": "5396002cb5282e71211d4f77",
+          "name": {},
+          "gravatar": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+          "gravatar30": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=30&d=wavatar&r=g",
+          "gravatar50": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=50&d=wavatar&r=g",
+          "gravatar80": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+          "gravatar100": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=100&d=wavatar&r=g",
+          "online": false
+      },
+      "issuer": {
+          "id": "5396002cb5282e71211d4f77",
+          "name": {},
+          "gravatar": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+          "gravatar30": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=30&d=wavatar&r=g",
+          "gravatar50": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=50&d=wavatar&r=g",
+          "gravatar80": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=80&d=wavatar&r=g",
+          "gravatar100": "https://secure.gravatar.com/avatar/115fbf4f18739a0a8ce60c49c9e85af1.jpg?s=100&d=wavatar&r=g",
+          "online": false
+      },
+      "tradeLine": "539600305d26169409f1b51c",
+      "cost": 999,
+      "currentBalance": 9999,
+      "cashLimit": 9999,
+      "creditLimit": 9999,
+      "price": 1099,
+      "usedAus": 6,
+      "totalAus": 11,
+      "product": "5396002f5d26169409f1b517",
+      "createdAt": "2014-06-09T18:42:52.392Z",
+      "active": false,
+      "status": "pending",
+      "availableAus": 5,
+      "moRating": "Gold",
+      "bcRating": "Bronze",
+      "ncRating": "None",
+      "id": "539600305d26169409f1b51d"
+  },
+  "status": "approve"
+}
++++++
+< 404
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 404,
+        "message": "Tradeline with this id do not exists!"
+        }
+    ]
+}
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 401,
+        "message": "Authorization required!"
+        }
+    ]
+}
+
+
+
 Update (patch) one tradeline, ratings can be 'None','Bronze','Silver','Gold'
 PUT /api/v1/owner/tradelines/:id
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv

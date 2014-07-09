@@ -2074,6 +2074,7 @@ describe('init', function () {
     });
 
     describe('Owner rejects first tradeline', function () {
+      var changesId;
       it('owner can see current tradeline revision amont this tradeline revisions', function (done) {
         request({
           'method': 'GET',
@@ -2091,15 +2092,31 @@ describe('init', function () {
             var c = body.changes[0];
             c.issuer.id.should.be.equal(body.data.seller.id);
             c.moRating.should.be.equal('Gold');
+            changesId = c.id;
             done();
           }
         });
       });
-      it('owner can reject tradeline');
+      it('owner can reject tradeline changes', function (done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId1 + '/changeset/' + changesId + '/deny',
+          'json': true,
+          'headers': {'huntKey': ownerHuntKey}
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(200);
+            done()
+          }
+        });
+      });
       it('owner actually rejects tradeline changes');
     });
 
     describe('Owner accepts second tradeline', function () {
+      var changesId;
       it('owner can see current tradeline revision amont this tradeline revisions', function (done) {
         request({
           'method': 'GET',
@@ -2117,11 +2134,26 @@ describe('init', function () {
             var c = body.changes[0];
             c.issuer.id.should.be.equal(body.data.seller.id);
             c.moRating.should.be.equal('Gold');
+            changesId = c.id;
             done();
           }
         });
       });
-      it('owner can reject tradeline');
+      it('owner can accept tradeline changes', function (done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId1 + '/changeset/' + changesId + '/approve',
+          'json': true,
+          'headers': {'huntKey': ownerHuntKey}
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(200);
+            done()
+          }
+        });
+      });
       it('owner actually rejects tradeline changes');
     });
   });
