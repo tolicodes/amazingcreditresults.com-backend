@@ -299,7 +299,7 @@ describe('init', function () {
 
     });
   });
-//*/
+
   describe('Owner can upload CSV file with clients', function () {
     //todo - with clustering this test behaves strange
     var ownerHuntKey1;
@@ -345,7 +345,7 @@ describe('init', function () {
 
     });
   });
-//*/
+
   describe('Owners can create other owner', function () {
     it('performs Owners login', function (done) {
       request({
@@ -1946,7 +1946,7 @@ describe('init', function () {
       });
     });
 
-    it('seller can see the list of products avaible', function(done){
+    it('seller can see the list of products avaible', function (done) {
       request({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/seller/products',
@@ -1968,24 +1968,24 @@ describe('init', function () {
       async.parallel({
         'tr1': function (cb) {
           request({
-            'method':'POST',
-            'url':'http://localhost:'+port+'/api/v1/seller/tradelines',
-            'json':true,
-            'body':{
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/api/v1/seller/tradelines',
+            'json': true,
+            'body': {
               'totalAus': 15,
               'creditLimit': 0,
               'cashLimit': 0,
               'balance': 100,
               'cost': 1000,
-              'price':1100,
+              'price': 1100,
               'product': productId,
               'ncRating': 'None',
               'bcRating': 'Bronze',
               'moRating': 'Silver'
             },
-            'headers':{'huntKey':sellerHuntKey}
-          }, function(error, response, body){
-            if(error){
+            'headers': {'huntKey': sellerHuntKey}
+          }, function (error, response, body) {
+            if (error) {
               cb(error);
             } else {
               response.statusCode.should.be.equal(201);
@@ -1996,24 +1996,24 @@ describe('init', function () {
         },
         'tr2': function (cb) {
           request({
-            'method':'POST',
-            'url':'http://localhost:'+port+'/api/v1/seller/tradelines',
-            'json':true,
-            'body':{
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/api/v1/seller/tradelines',
+            'json': true,
+            'body': {
               'totalAus': 15,
               'creditLimit': 0,
               'cashLimit': 0,
               'balance': 100,
               'cost': 1000,
-              'price':1200,
+              'price': 1200,
               'product': productId,
               'ncRating': 'None',
               'bcRating': 'Bronze',
               'moRating': 'Silver'
             },
-            'headers':{'huntKey':sellerHuntKey}
-          }, function(error, response, body){
-            if(error){
+            'headers': {'huntKey': sellerHuntKey}
+          }, function (error, response, body) {
+            if (error) {
               cb(error);
             } else {
               response.statusCode.should.be.equal(201);
@@ -2027,74 +2027,157 @@ describe('init', function () {
       });
     });
 
-    it('Seller creates new revisions for each of tradelines');
+    it('Seller creates new revisions for each of tradelines', function (done) {
+      async.parallel({
+        'tr1': function (cb) {
+          request({
+            'method': 'PUT',
+            'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradelineId1,
+            'json': true,
+            'body': {
+              'product': productId,
+              'moRating': 'Gold'
+            },
+            'headers': {'huntKey': sellerHuntKey}
+          }, function (error, response, body) {
+            if (error) {
+              cb(error);
+            } else {
+              response.statusCode.should.be.equal(202);
+              cb(null);
+            }
+          });
+        },
+        'tr2': function (cb) {
+          request({
+            'method': 'PUT',
+            'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradelineId2,
+            'json': true,
+            'body': {
+              'product': productId,
+              'moRating': 'Gold'
+            },
+            'headers': {'huntKey': sellerHuntKey}
+          }, function (error, response, body) {
+            if (error) {
+              cb(error);
+            } else {
+              response.statusCode.should.be.equal(202);
+              cb(null);
+            }
+          });
+        }
+      }, function (error, obj) {
+        done(error);
+      });
 
-    describe('Owner rejects first tradeline', function(){
-      it('owner can see tradeline revisions');
+    });
+
+    describe('Owner rejects first tradeline', function () {
+      it('owner can see current tradeline revision amont this tradeline revisions', function (done) {
+        request({
+          'method': 'GET',
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId1,
+          'json': true,
+          'headers': {'huntKey': ownerHuntKey}
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(200);
+            body.data.id.should.be.equal(tradelineId1);
+            body.changes.should.be.an.Array;
+            body.changes.length.should.be.equal(1);
+            var c = body.changes[0];
+            c.issuer.id.should.be.equal(body.data.seller.id);
+            c.moRating.should.be.equal('Gold');
+            done();
+          }
+        });
+      });
       it('owner can reject tradeline');
       it('owner actually rejects tradeline changes');
     });
 
-    describe('Owner accepts second tradeline', function(){
-      it('owner can see tradeline revisions');
+    describe('Owner accepts second tradeline', function () {
+      it('owner can see current tradeline revision amont this tradeline revisions', function (done) {
+        request({
+          'method': 'GET',
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId2,
+          'json': true,
+          'headers': {'huntKey': ownerHuntKey}
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(200);
+            body.data.id.should.be.equal(tradelineId2);
+            body.changes.should.be.an.Array;
+            body.changes.length.should.be.equal(1);
+            var c = body.changes[0];
+            c.issuer.id.should.be.equal(body.data.seller.id);
+            c.moRating.should.be.equal('Gold');
+            done();
+          }
+        });
+      });
       it('owner can reject tradeline');
       it('owner actually rejects tradeline changes');
     });
   });
 
 
-  describe('Owner', function () {
-    describe('editing clients', function () {
-      it('can delete a client', function (done) {
-        async.waterfall([
-          function (cb) {
-            helpers.clients.list(function (error, response, body) {
-              cb(error, findWithRole('buyer', body))
-            });
-          },
-          function (buyer, cb) {
-            helpers.clients.del(buyer.id, function (error, response) {
-              response.statusCode.should.be.equal(200);
-              cb(error, buyer);
-            });
-          },
-          function (buyer, cb) {
-            helpers.clients.get(buyer.id, function (error, response, body) {
-              var buyer = body.data;
-              cb(error, buyer);
-            });
-          }
-        ], function (error, buyer) {
-          buyer.isBanned.should.be.true;
-          done(error);
-        });
+  describe('Owner editing clients', function () {
+    it('can delete a client', function (done) {
+      async.waterfall([
+        function (cb) {
+          helpers.clients.list(function (error, response, body) {
+            cb(error, findWithRole('buyer', body))
+          });
+        },
+        function (buyer, cb) {
+          helpers.clients.del(buyer.id, function (error, response) {
+            response.statusCode.should.be.equal(200);
+            cb(error, buyer);
+          });
+        },
+        function (buyer, cb) {
+          helpers.clients.get(buyer.id, function (error, response, body) {
+            var buyer = body.data;
+            cb(error, buyer);
+          });
+        }
+      ], function (error, buyer) {
+        buyer.isBanned.should.be.true;
+        done(error);
       });
+    });
 
-      it("can't delete an owner", function (done) {
-        async.waterfall([
-          function (cb) {
-            helpers.clients.list(function (error, response, body) {
-              cb(error, findWithRole('owner', body))
-            });
-          },
-          function (buyer, cb) {
-            helpers.clients.del(buyer.id, function (error, response) {
-              cb(error, response);
-            });
-          }
-        ], function (error, response) {
-          response.statusCode.should.be.equal(400);
-          done(error);
-        });
+    it("can't delete an owner", function (done) {
+      async.waterfall([
+        function (cb) {
+          helpers.clients.list(function (error, response, body) {
+            cb(error, findWithRole('owner', body))
+          });
+        },
+        function (buyer, cb) {
+          helpers.clients.del(buyer.id, function (error, response) {
+            cb(error, response);
+          });
+        }
+      ], function (error, response) {
+        response.statusCode.should.be.equal(400);
+        done(error);
       });
+    });
 
-      function findWithRole(role, body) {
-        return _.find(body.data, function (user) {
-          return user.roles[role];
-        });
-      }
-    })
+    function findWithRole(role, body) {
+      return _.find(body.data, function (user) {
+        return user.roles[role];
+      });
+    }
   });
+
 });
 
 
