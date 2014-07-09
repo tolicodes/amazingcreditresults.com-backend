@@ -2108,11 +2108,34 @@ describe('init', function () {
             done(error);
           } else {
             response.statusCode.should.be.equal(200);
+            body.status.should.be.equal('deny');
             done()
           }
         });
       });
-      it('owner actually rejects tradeline changes');
+      it('owner actually rejects tradeline changes', function (done) {
+        request({
+          'method': 'GET',
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId1,
+          'json': true,
+          'headers': {'huntKey': ownerHuntKey}
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(200);
+            body.data.id.should.be.equal(tradelineId1);
+            body.data.moRating.should.be.equal('Silver');
+            body.changes.should.be.an.Array;
+            body.changes.length.should.be.equal(1);
+            var c = body.changes[0];
+            c.issuer.id.should.be.equal(body.data.seller.id);
+            c.moRating.should.be.equal('Gold');
+            changesId = c.id;
+            done();
+          }
+        });
+      });
     });
 
     describe('Owner accepts second tradeline', function () {
@@ -2142,7 +2165,7 @@ describe('init', function () {
       it('owner can accept tradeline changes', function (done) {
         request({
           'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId1 + '/changeset/' + changesId + '/approve',
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId2 + '/changeset/' + changesId + '/approve',
           'json': true,
           'headers': {'huntKey': ownerHuntKey}
         }, function (error, response, body) {
@@ -2150,11 +2173,34 @@ describe('init', function () {
             done(error);
           } else {
             response.statusCode.should.be.equal(200);
+            body.status.should.be.equal('approve');
             done()
           }
         });
       });
-      it('owner actually rejects tradeline changes');
+      it('owner actually accepts tradeline changes', function (done) {
+        request({
+          'method': 'GET',
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId2,
+          'json': true,
+          'headers': {'huntKey': ownerHuntKey}
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(200);
+            body.data.id.should.be.equal(tradelineId1);
+            body.data.moRating.should.be.equal('Gold')
+            body.changes.should.be.an.Array;
+            body.changes.length.should.be.equal(1);
+            var c = body.changes[0];
+            c.issuer.id.should.be.equal(body.data.seller.id);
+            c.moRating.should.be.equal('Gold');
+            changesId = c.id;
+            done();
+          }
+        });
+      });
     });
   });
 

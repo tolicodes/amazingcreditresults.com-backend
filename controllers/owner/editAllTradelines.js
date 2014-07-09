@@ -196,7 +196,7 @@ module.exports = exports = function (core) {
         request.model.TradeLine.findById(tradeLineId, cb);
       },
       'tradeLineChange': function (cb) {
-        request.model.TradeLine.find({'_id': changeId, 'tradeLine': tradeLineId}, cb);
+        request.model.TradeLineChange.find({'_id': changeId, 'tradeLine': tradeLineId}, cb);
       }
     }, function (error, obj) {
       if (error) {
@@ -238,8 +238,8 @@ module.exports = exports = function (core) {
       'tradeLine': function (cb) {
         request.model.TradeLine.findById(tradeLineId, cb);
       },
-      'tradeLineChange': function (cb) {
-        request.model.TradeLine.find({'_id': changeId, 'tradeLine': tradeLineId}, cb);
+      'TradeLineChanges': function (cb) {
+        request.model.TradeLineChange.find({'_id': changeId, 'tradeLine': tradeLineId}, cb);
       }
     }, function (error, obj) {
       if (error) {
@@ -253,7 +253,7 @@ module.exports = exports = function (core) {
               response.json({
                 'tradeLine': obj.tradeLine,
                 'tradeLineChange': obj.tradeLineChange,
-                'status': 'approve'
+                'status': 'deny'
               });
             }
           });
