@@ -256,9 +256,9 @@ describe('init', function () {
           if (error) {
             done(error);
           } else {
-            response.statusCode.should.be.equal(201);
+            response.statusCode.should.be.equal(202);
             var bodyParsed = JSON.parse(body);
-            bodyParsed.Code.should.be.equal(201);
+            bodyParsed.Code.should.be.equal(202);
             bodyParsed.Success.should.be.equal('Welcome!');
             bodyParsed.huntKey.should.be.a.String;
             buyerHuntKey = bodyParsed.huntKey;
@@ -1259,9 +1259,9 @@ describe('init', function () {
         if (error) {
           done(error);
         } else {
-          response.statusCode.should.be.equal(201);
+          response.statusCode.should.be.equal(202);
           var bodyParsed = JSON.parse(body);
-          bodyParsed.Code.should.be.equal(201);
+          bodyParsed.Code.should.be.equal(202);
           bodyParsed.huntKey.should.be.a.String;
           sellerHuntKey = bodyParsed.huntKey;
           done();
@@ -1574,24 +1574,21 @@ describe('init', function () {
             var bodyParsed = JSON.parse(body);
             console.log(bodyParsed);
             bodyParsed.status.should.be.equal('Tradeline archived');
-            done();
-            /*/
-             request({
-             'method': 'GET',
-             'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradeLineId,
-             'headers': { 'huntKey': sellerHuntKey }
-             }, function (err, response1, body1) {
-             if (err) {
-             done(error);
-             } else {
-             response1.statusCode.should.be.equal(200);
-             var bodyParsed = JSON.parse(body1);
-             bodyParsed.data.id.should.be.equal(tradeLineId);
-             bodyParsed.data.active.should.be.false;
-             done();
-             }
-             });
-             //*/
+            request({
+              'method': 'GET',
+              'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradeLineId,
+              'headers': { 'huntKey': sellerHuntKey }
+            }, function (err, response1, body1) {
+              if (err) {
+                done(error);
+              } else {
+                response1.statusCode.should.be.equal(200);
+                var bodyParsed = JSON.parse(body1);
+                bodyParsed.data.id.should.be.equal(tradeLineId);
+                bodyParsed.data.active.should.be.false;
+                done();
+              }
+            });
           }
         });
       });
@@ -1898,9 +1895,162 @@ describe('init', function () {
     });
   });
 
-  describe('Owner', function() {
-    describe('editing clients', function() {
-      it('can delete a client', function(done){
+  describe('Seller creates two tradelines and made revisions for them, and Owner rejects first one, and approves second one', function () {
+    var tradelineId1,
+      tradelineId2,
+      productId,
+      sellerHuntKey;
+
+    before(function (done) {
+//getting huntKey for seller of Grace Doe
+      request({
+        'method': 'POST',
+        'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+        'json': true,
+        'form': {
+          'apiKey': 'a4544afb66dedba584e4a',
+          'password': 'test123'
+        }
+      }, function (error, response, body) {
+        if (error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(202);
+          response.body.Success.should.be.equal('Welcome!');
+          sellerHuntKey = body.huntKey;
+          done();
+        }
+      });
+    });
+
+    it('seller is able to access /api/v1/myself at first to see, if it has proper huntKey', function (done) {
+      request({
+        'method': 'GET',
+        'url': 'http://localhost:' + port + '/api/v1/myself',
+        'headers': {'huntKey': sellerHuntKey}
+      }, function (error, response, body) {
+        if (error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(200);
+          var bodyParsed = JSON.parse(body);
+          bodyParsed.huntKey.should.be.equal(sellerHuntKey);
+          bodyParsed.roles.seller.should.be.true;
+          sellerId = bodyParsed.id;
+          done();
+        }
+      });
+    });
+
+    it('seller can see the list of products avaible', function(done){
+      request({
+        'method': 'GET',
+        'url': 'http://localhost:' + port + '/api/v1/seller/products',
+        'headers': {'huntKey': sellerHuntKey}
+      }, function (error, response, body) {
+        if (error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(200);
+          var bodyParsed = JSON.parse(body);
+          bodyParsed.data.should.be.an.Array;
+          productId = bodyParsed.data[0].id;
+          done();
+        }
+      });
+    });
+
+    it('Seller creates 2 tradelines', function (done) {
+      async.parallel({
+        'tr1': function (cb) {
+          request({
+            'method':'POST',
+            'url':'http://localhost:'+port+'/api/v1/seller/tradelines',
+            'json':true,
+            'body':{
+              'totalAus': 15,
+              'creditLimit': 0,
+              'cashLimit': 0,
+              'balance': 100,
+              'cost': 1000,
+              'price':1100,
+              'product': productId,
+              'ncRating': 'None',
+              'bcRating': 'Bronze',
+              'moRating': 'Silver'
+            },
+            'headers':{'huntKey':sellerHuntKey}
+          }, function(error, response, body){
+            if(error){
+              cb(error);
+            } else {
+              response.statusCode.should.be.equal(201);
+              tradelineId1 = body.data.id;
+              body.data.creditLimit.should.be.equal(0);
+              body.data.cost.should.be.equal(1000);
+              body.data.price.should.be.equal(1100);
+              body.data.product.should.be.equal(productId);
+              cb(null);
+            }
+          });
+        },
+        'tr2': function (cb) {
+          request({
+            'method':'POST',
+            'url':'http://localhost:'+port+'/api/v1/seller/tradelines',
+            'json':true,
+            'body':{
+              'totalAus': 15,
+              'creditLimit': 0,
+              'cashLimit': 0,
+              'balance': 100,
+              'cost': 1000,
+              'price':1200,
+              'product': productId,
+              'ncRating': 'None',
+              'bcRating': 'Bronze',
+              'moRating': 'Silver'
+            },
+            'headers':{'huntKey':sellerHuntKey}
+          }, function(error, response, body){
+            if(error){
+              cb(error);
+            } else {
+              response.statusCode.should.be.equal(201);
+              tradelineId2 = body.data.id;
+              body.data.totalAus.should.be.equal(15);
+              body.data.creditLimit.should.be.equal(0);
+              body.data.cost.should.be.equal(1000);
+              body.data.price.should.be.equal(1100);
+              body.data.product.should.be.equal(productId);
+              cb(null);
+            }
+          });
+        }
+      }, function (error, obj) {
+        done(error);
+      });
+    });
+
+    it('Seller creates new revisions for each of tradelines');
+
+    describe('Owner rejects first tradeline', function(){
+      it('owner can see tradeline revisions');
+      it('owner can reject tradeline');
+      it('owner actually rejects tradeline changes');
+    });
+
+    describe('Owner accepts second tradeline', function(){
+      it('owner can see tradeline revisions');
+      it('owner can reject tradeline');
+      it('owner actually rejects tradeline changes');
+    });
+  });
+
+
+  describe('Owner', function () {
+    describe('editing clients', function () {
+      it('can delete a client', function (done) {
         async.waterfall([
           function (cb) {
             helpers.clients.list(function (error, response, body) {
@@ -1925,7 +2075,7 @@ describe('init', function () {
         });
       });
 
-      it("can't delete an owner", function(done){
+      it("can't delete an owner", function (done) {
         async.waterfall([
           function (cb) {
             helpers.clients.list(function (error, response, body) {
@@ -1944,7 +2094,9 @@ describe('init', function () {
       });
 
       function findWithRole(role, body) {
-        return _.find(body.data, function(user){ return user.roles[role]; });
+        return _.find(body.data, function (user) {
+          return user.roles[role];
+        });
       }
     })
   });
@@ -1980,7 +2132,7 @@ var helpers = {
       }, cb);
     },
 
-    del: function(id, cb) {
+    del: function (id, cb) {
       request({
         'method': 'DELETE',
         'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + id,

@@ -98,9 +98,9 @@ module.exports = exports = function (core) {
         } else {
           if (userFound) {
             if (userFound.verifyPassword(request.body.password)) {
-              response.status(201);
+              response.status(202);
               response.json({
-                'Code': 201,
+                'Code': 202,
                 'Success': 'Welcome!',
                 'huntKey': userFound.apiKey
               });
