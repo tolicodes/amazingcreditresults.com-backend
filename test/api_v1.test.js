@@ -2037,6 +2037,9 @@ describe('init', function () {
               'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradelineId1,
               'json': true,
               'body': {
+                'totalAus': 14,
+                'cost': 1000,
+                'price': 1100,
                 'product': productId,
                 'moRating': 'Gold'
               },
@@ -2056,6 +2059,9 @@ describe('init', function () {
               'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradelineId2,
               'json': true,
               'body': {
+                'totalAus': 14,
+                'cost': 1000,
+                'price': 1100,
                 'product': productId,
                 'moRating': 'Gold'
               },
@@ -2077,7 +2083,8 @@ describe('init', function () {
     });
     describe('Owner rejects first tradeline', function () {
       var changesId;
-      it('owner can see current tradeline revision amont this tradeline revisions', function (done) {
+      //'owner can see current tradeline revision amont this tradeline revisions',
+      before(function (done) {
         request({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId1,
@@ -2116,7 +2123,8 @@ describe('init', function () {
           }
         });
       });
-      it('owner actually rejects first tradeline changes', function (done) {
+      //'owner actually rejects first tradeline changes'
+      after(function (done) {
         request({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId1,
@@ -2143,7 +2151,8 @@ describe('init', function () {
 
     describe('Owner accepts second tradeline', function () {
       var changesId;
-      it('owner can see current tradeline revision amont this tradeline revisions', function (done) {
+      //'owner can see current tradeline revision amont this tradeline revisions',
+      before(function (done) {
         request({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId2,
@@ -2166,7 +2175,7 @@ describe('init', function () {
         });
       });
 
-      it('owner can accept second tradeline changes', function (done) {
+      it('Owner can accept second tradeline changes', function (done) {
         request({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId2 + '/changeset/' + changesId + '/approve',
@@ -2182,7 +2191,8 @@ describe('init', function () {
           }
         });
       });
-      it('owner actually accepts second tradeline changes', function (done) {
+//'owner actually accepts second tradeline changes',
+      after(function (done) {
         request({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId2,
@@ -2193,8 +2203,8 @@ describe('init', function () {
             done(error);
           } else {
             response.statusCode.should.be.equal(200);
-            body.data.id.should.be.equal(tradelineId1);
-            body.data.moRating.should.be.equal('Gold')
+            body.data.id.should.be.equal(tradelineId2);
+            body.data.moRating.should.be.equal('Gold');
             body.changes.should.be.an.Array;
             body.changes.length.should.be.equal(1);
             var c = body.changes[0];
