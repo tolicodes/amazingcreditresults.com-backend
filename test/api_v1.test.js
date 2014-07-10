@@ -1927,152 +1927,154 @@ describe('init', function () {
       });
     });
 
-    it('seller is able to access /api/v1/myself at first to see, if it has proper huntKey', function (done) {
-      request({
-        'method': 'GET',
-        'url': 'http://localhost:' + port + '/api/v1/myself',
-        'headers': {'huntKey': sellerHuntKey}
-      }, function (error, response, body) {
-        if (error) {
+
+    describe('preparing...', function () {
+      it('seller is able to access /api/v1/myself at first to see, if it has proper huntKey', function (done) {
+        request({
+          'method': 'GET',
+          'url': 'http://localhost:' + port + '/api/v1/myself',
+          'headers': {'huntKey': sellerHuntKey}
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(200);
+            var bodyParsed = JSON.parse(body);
+            bodyParsed.huntKey.should.be.equal(sellerHuntKey);
+            bodyParsed.roles.seller.should.be.true;
+            sellerId = bodyParsed.id;
+            done();
+          }
+        });
+      });
+
+      it('seller can see the list of products avaible', function (done) {
+        request({
+          'method': 'GET',
+          'url': 'http://localhost:' + port + '/api/v1/seller/products',
+          'headers': {'huntKey': sellerHuntKey}
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(200);
+            var bodyParsed = JSON.parse(body);
+            bodyParsed.data.should.be.an.Array;
+            productId = bodyParsed.data[0].id;
+            done();
+          }
+        });
+      });
+
+      it('Seller creates 2 tradelines', function (done) {
+        async.parallel({
+          'tr1': function (cb) {
+            request({
+              'method': 'POST',
+              'url': 'http://localhost:' + port + '/api/v1/seller/tradelines',
+              'json': true,
+              'body': {
+                'totalAus': 15,
+                'creditLimit': 0,
+                'cashLimit': 0,
+                'balance': 100,
+                'cost': 1000,
+                'price': 1100,
+                'product': productId,
+                'ncRating': 'None',
+                'bcRating': 'Bronze',
+                'moRating': 'Silver'
+              },
+              'headers': {'huntKey': sellerHuntKey}
+            }, function (error, response, body) {
+              if (error) {
+                cb(error);
+              } else {
+                response.statusCode.should.be.equal(201);
+                tradelineId1 = body.data.id;
+                cb(null);
+              }
+            });
+          },
+          'tr2': function (cb) {
+            request({
+              'method': 'POST',
+              'url': 'http://localhost:' + port + '/api/v1/seller/tradelines',
+              'json': true,
+              'body': {
+                'totalAus': 15,
+                'creditLimit': 0,
+                'cashLimit': 0,
+                'balance': 100,
+                'cost': 1000,
+                'price': 1200,
+                'product': productId,
+                'ncRating': 'None',
+                'bcRating': 'Bronze',
+                'moRating': 'Silver'
+              },
+              'headers': {'huntKey': sellerHuntKey}
+            }, function (error, response, body) {
+              if (error) {
+                cb(error);
+              } else {
+                response.statusCode.should.be.equal(201);
+                tradelineId2 = body.data.id;
+                cb(null);
+              }
+            });
+          }
+        }, function (error, obj) {
           done(error);
-        } else {
-          response.statusCode.should.be.equal(200);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.huntKey.should.be.equal(sellerHuntKey);
-          bodyParsed.roles.seller.should.be.true;
-          sellerId = bodyParsed.id;
-          done();
-        }
+        });
       });
-    });
 
-    it('seller can see the list of products avaible', function (done) {
-      request({
-        'method': 'GET',
-        'url': 'http://localhost:' + port + '/api/v1/seller/products',
-        'headers': {'huntKey': sellerHuntKey}
-      }, function (error, response, body) {
-        if (error) {
+      it('Seller creates new revisions for each of tradelines', function (done) {
+        async.parallel({
+          'tr1': function (cb) {
+            request({
+              'method': 'PUT',
+              'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradelineId1,
+              'json': true,
+              'body': {
+                'product': productId,
+                'moRating': 'Gold'
+              },
+              'headers': {'huntKey': sellerHuntKey}
+            }, function (error, response, body) {
+              if (error) {
+                cb(error);
+              } else {
+                response.statusCode.should.be.equal(202);
+                cb(null);
+              }
+            });
+          },
+          'tr2': function (cb) {
+            request({
+              'method': 'PUT',
+              'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradelineId2,
+              'json': true,
+              'body': {
+                'product': productId,
+                'moRating': 'Gold'
+              },
+              'headers': {'huntKey': sellerHuntKey}
+            }, function (error, response, body) {
+              if (error) {
+                cb(error);
+              } else {
+                response.statusCode.should.be.equal(202);
+                cb(null);
+              }
+            });
+          }
+        }, function (error, obj) {
           done(error);
-        } else {
-          response.statusCode.should.be.equal(200);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.data.should.be.an.Array;
-          productId = bodyParsed.data[0].id;
-          done();
-        }
+        });
+
       });
     });
-
-    it('Seller creates 2 tradelines', function (done) {
-      async.parallel({
-        'tr1': function (cb) {
-          request({
-            'method': 'POST',
-            'url': 'http://localhost:' + port + '/api/v1/seller/tradelines',
-            'json': true,
-            'body': {
-              'totalAus': 15,
-              'creditLimit': 0,
-              'cashLimit': 0,
-              'balance': 100,
-              'cost': 1000,
-              'price': 1100,
-              'product': productId,
-              'ncRating': 'None',
-              'bcRating': 'Bronze',
-              'moRating': 'Silver'
-            },
-            'headers': {'huntKey': sellerHuntKey}
-          }, function (error, response, body) {
-            if (error) {
-              cb(error);
-            } else {
-              response.statusCode.should.be.equal(201);
-              tradelineId1 = body.data.id;
-              cb(null);
-            }
-          });
-        },
-        'tr2': function (cb) {
-          request({
-            'method': 'POST',
-            'url': 'http://localhost:' + port + '/api/v1/seller/tradelines',
-            'json': true,
-            'body': {
-              'totalAus': 15,
-              'creditLimit': 0,
-              'cashLimit': 0,
-              'balance': 100,
-              'cost': 1000,
-              'price': 1200,
-              'product': productId,
-              'ncRating': 'None',
-              'bcRating': 'Bronze',
-              'moRating': 'Silver'
-            },
-            'headers': {'huntKey': sellerHuntKey}
-          }, function (error, response, body) {
-            if (error) {
-              cb(error);
-            } else {
-              response.statusCode.should.be.equal(201);
-              tradelineId2 = body.data.id;
-              cb(null);
-            }
-          });
-        }
-      }, function (error, obj) {
-        done(error);
-      });
-    });
-
-    it('Seller creates new revisions for each of tradelines', function (done) {
-      async.parallel({
-        'tr1': function (cb) {
-          request({
-            'method': 'PUT',
-            'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradelineId1,
-            'json': true,
-            'body': {
-              'product': productId,
-              'moRating': 'Gold'
-            },
-            'headers': {'huntKey': sellerHuntKey}
-          }, function (error, response, body) {
-            if (error) {
-              cb(error);
-            } else {
-              response.statusCode.should.be.equal(202);
-              cb(null);
-            }
-          });
-        },
-        'tr2': function (cb) {
-          request({
-            'method': 'PUT',
-            'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradelineId2,
-            'json': true,
-            'body': {
-              'product': productId,
-              'moRating': 'Gold'
-            },
-            'headers': {'huntKey': sellerHuntKey}
-          }, function (error, response, body) {
-            if (error) {
-              cb(error);
-            } else {
-              response.statusCode.should.be.equal(202);
-              cb(null);
-            }
-          });
-        }
-      }, function (error, obj) {
-        done(error);
-      });
-
-    });
-
     describe('Owner rejects first tradeline', function () {
       var changesId;
       it('owner can see current tradeline revision amont this tradeline revisions', function (done) {
@@ -2107,7 +2109,8 @@ describe('init', function () {
           if (error) {
             done(error);
           } else {
-            response.statusCode.should.be.equal(200);
+            //response.statusCode.should.be.equal(200);
+            console.log(body);
             body.status.should.be.equal('deny');
             done()
           }
@@ -2162,6 +2165,7 @@ describe('init', function () {
           }
         });
       });
+
       it('owner can accept second tradeline changes', function (done) {
         request({
           'method': 'POST',
