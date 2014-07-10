@@ -60,7 +60,7 @@ Hunt.extendMiddleware(function (core) {
         'errors': [
           {
             'code': 403,
-            'message': 'Access denied! You user account is banned!'
+            'message': ((request.user.roles && request.user.roles.owner) ? 'Access denied! your account has been deactivated!' : 'Access denied! You user account is banned!')
           }
         ]
       });
