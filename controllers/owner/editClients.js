@@ -144,8 +144,7 @@ module.exports = exports = function (core) {
 
     request.model.User.findOneAndUpdate(
       {
-        '_id': request.params.id,
-        'root': false
+        '_id': request.params.id
       },
       patch,
       {
