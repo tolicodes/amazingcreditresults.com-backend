@@ -19,10 +19,10 @@ module.exports = exports = function (core) {
       '_ncRating', '_bcRating', '_moRating',
       'ncRating', 'bcRating', 'moRating',
       'cost', 'price', 'active'].map(function (field) {
-      if (request.query[field]) {
-        filter[field] = request.query[field];
-      }
-    });
+        if (request.query[field]) {
+          filter[field] = request.query[field];
+        }
+      });
     request.model.TradeLine
       .find(filter)
       .skip(request.query.skip || 0)
@@ -178,10 +178,10 @@ module.exports = exports = function (core) {
       'creditLimit', 'cashLimit', 'currentBalance', 'ncRating', 'statementDate',
       'bcRating', 'moRating', 'cost', 'notes'
     ].map(function (field) {
-      if (request.body[field]) {
-        fields[field] = request.body[field];
-      }
-    });
+        if (request.body[field]) {
+          fields[field] = request.body[field];
+        }
+      });
     var newTradeLine = new request.model.TradeLine(fields);
     newTradeLine.save(function (error, tradelineCreated) {
       if (error) {
@@ -209,11 +209,11 @@ module.exports = exports = function (core) {
             'creditLimit', 'cashLimit', 'currentBalance', 'ncRating', 'statementDate',
             'bcRating', 'moRating', 'cost', 'notes'
           ].map(function (field) {
-            if (request.body[field]) {
-              tradeLineFound[field] = request.body[field];
-              tradeLineChange[field] = request.body[field];
-            }
-          });
+              if (request.body[field]) {
+                tradeLineFound[field] = request.body[field];
+                tradeLineChange[field] = request.body[field];
+              }
+            });
           core.async.parallel({
             'tradeline': function (cb) {
               tradeLineFound.save(cb);
