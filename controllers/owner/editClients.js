@@ -115,7 +115,7 @@ module.exports = exports = function (core) {
       patch.accountVerified = request.body.accountVerified;
     }
 
-    if (request.body.accountVerified === true || request.body.accountVerified === false) {
+    if (request.body.isBanned === true || request.body.isBanned === false) {
       patch.isBanned = request.body.isBanned;
     }
 
