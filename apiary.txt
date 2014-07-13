@@ -76,6 +76,16 @@ POST /api/v1/buyer/setPassword
     "status": "Error",
     "errors": [{
         "code": 400,
+        "message": "Old password was used!!!"
+    }]
+}
++++++
+< 400
+< Content-Type: application/json; charset=utf-8
+{
+    "status": "Error",
+    "errors": [{
+        "code": 400,
         "message": "Missed parameter - `apiKey`",
         "field":"apiKey"
     },

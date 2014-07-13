@@ -16,25 +16,39 @@ module.exports = exports = function (core) {
               var apiKeyAge = Date.now() - userFound.apiKeyCreatedAt.getTime();
               if (apiKeyAge < core.config.passport.apiKeyOutdates) {
 //key is fresh
-                userFound.accountVerified = true;
-                userFound.apiKeyCreatedAt = Date.now();
-                userFound.setPassword(request.body.password, function (error) {
-                  if (error) {
-                    throw error;
-                  } else {
-                    userFound.notifyByEmail({
-                      'subject': 'Your password is changed!',
-                      'template': 'emails/updPassword',
-                      'name': userFound.name,
-                      'ip': request.ip
-                    });
-                    response.status(201);
-                    response.json({
-                      'Code': 201,
-                      'Success': 'Password is set!'
-                    });
-                  }
-                });
+                if (userFound.verifyPassword(request.body.password)) {
+                  response.status(400);
+                  response.json({
+                    'status': 'Error',
+                    'errors': [
+                      {
+                        'code': 400,
+                        'message': 'Old password was used!'
+                      }
+                    ]
+                  });
+
+                } else {
+                  userFound.accountVerified = true;
+                  userFound.apiKeyCreatedAt = Date.now();
+                  userFound.setPassword(request.body.password, function (error) {
+                    if (error) {
+                      throw error;
+                    } else {
+                      userFound.notifyByEmail({
+                        'subject': 'Your password is changed!',
+                        'template': 'emails/updPassword',
+                        'name': userFound.name,
+                        'ip': request.ip
+                      });
+                      response.status(201);
+                      response.json({
+                        'Code': 201,
+                        'Success': 'Password is set!'
+                      });
+                    }
+                  });
+                }
               } else {
 //key is outdated
                 response.status(400);
@@ -219,6 +233,6 @@ module.exports = exports = function (core) {
           }
         }
       }
-      );
+    );
   });
 };
