@@ -1617,7 +1617,7 @@ describe('init', function () {
           bodyParsed.errors.should.containEql(
             {
               'code': 403,
-              'message': 'Access denied! You user account is banned!'
+              'message': 'Access denied! your account has been deactivated!'
             });
 
           done();
