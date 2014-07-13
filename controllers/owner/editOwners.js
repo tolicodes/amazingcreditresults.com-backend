@@ -117,7 +117,8 @@ module.exports = exports = function (core) {
           '$or': [
             {'roles.owner': true},
             {'root': true}
-          ]}, function (error, ownerFound) {
+          ]
+        }, function (error, ownerFound) {
           if (error) {
             throw error;
           } else {
@@ -126,14 +127,14 @@ module.exports = exports = function (core) {
                 ['familyName', 'middleName', 'givenName'].map(function (n) {
                   if (request.body.name[n]) {
                     ownerFound.name[n] = request.body.name[n];
-                  }
+                }
                 });
               }
 
               function cb(error) {
                 if (error) {
                   throw error;
-                } else {
+              } else {
                   response.status(202);
                   response.json({'data': {
                     'id': ownerFound.id,
@@ -143,11 +144,24 @@ module.exports = exports = function (core) {
                     'roles': ownerFound.roles,
                     'isBanned': ownerFound.isBanned
                   }});
-                }
+              }
               }
 
               if (request.body.password) {
-                ownerFound.setPassword(request.body.password, cb); //it also saves him/her
+                if (ownerFound.verifyPassword(request.body.password)) {
+                  response.status(400);
+                  response.json({
+                    'status': 'Error',
+                    'errors': [
+                      {
+                        'code': 400,
+                        'message': 'Old password was used!'
+                      }
+                    ]
+                  });
+                } else {
+                  ownerFound.setPassword(request.body.password, cb); //it also saves him/her
+                }
               } else {
                 ownerFound.save(cb);
               }
