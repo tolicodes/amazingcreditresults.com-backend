@@ -12,13 +12,13 @@
     "type": "git",
     "url": "git@github.com:oselot/amazingcreditresults.com-backend.git"
   },
-  "author": "Anatolij Ostroumov",
+  "author": "Anatolij Ostroumov <ostroumov095@gmail.com> (https://github.com/vodolaz095)",
   "license": "proprietary",
   "dependencies": {
     "async": ">=0.9.0",
     "connect-multiparty": ">=1.0.5",
     "fast-csv": ">=0.4.0",
-    "hunt": "https://api.github.com/repos/vodolaz095/hunt/tarball/master",
+    "hunt": "0.1.4",
     "moment": ">=2.7.0",
     "stripe": "latest",
     "forever": ">=0.11.1"
