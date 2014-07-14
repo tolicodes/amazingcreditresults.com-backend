@@ -251,8 +251,7 @@ module.exports = exports = function (core) {
         'reportsToExperian',
         'reportsToEquifax',
         'reportsToTransunion',
-        'notes',
-        'owner'
+        'notes'
       ])
     } else {
       callback(null, false); //non authorized user cannot edit anything!
