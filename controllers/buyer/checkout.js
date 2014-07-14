@@ -1,5 +1,4 @@
-var ensureBuyerOrOwner = require('../../lib/middleware.js').ensureBuyerOrOwner,
-  formatter = require('../formatter');
+var ensureBuyerOrOwner = require('../../lib/middleware.js').ensureBuyerOrOwner;
 
 module.exports = exports = function (core) {
   core.app.post('/api/v1/cart/checkout', ensureBuyerOrOwner, function (request, response) {
