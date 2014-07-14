@@ -21,6 +21,19 @@ var hunt = require('hunt'),
 //      'apiKeyOutdates': 5*24*60*60*1000 //ttl of api key for buyer to authorize - 5 dayes
       'apiKeyOutdates': 60 * 60 * 1000 //ttl of api key for buyer to authorize - 1 day //https://oselot.atlassian.net/browse/ACR-20
     },
+    'echoSign': {
+      'auth': {
+        'userCredentials': {
+          'email': 'nowak@oselot.com',
+          'password': process.env.ECHOSIGN_PASSWORD,
+          'apiKey': 'XBB2LU56J2QXI3U'
+        },
+        'applicationCredentials': {
+          'applicationSecret': '439f97c0aeb7c3cae5662fd6c811a45d',
+          'applicationId': '9EBI7CH3EY3M7M'
+        }
+      }
+    },
     'emailConfig': process.env.AMAZING_AMAZON_USE_SES ? {
       host: 'email-smtp.us-east-1.amazonaws.com',
       port: 587,
