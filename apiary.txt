@@ -1545,6 +1545,325 @@ DELETE /api/v1/owner/products/{:id}
     ]
 }
 
+-- Owner resource to edit products (experimental via HRW package) --
+
+List all products
+GET /api/v2/products
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 200
+< Content-Type: application/json
+{
+    "status": "Ok",
+    "data": [
+        {
+            "id": "53adb74d6b7719ef31025229",
+            "name": "Gemoroi 1",
+            "bank": "Sperbank (testing)",
+            "type": "MasterCard",
+            "ncRating": "None",
+            "bcRating": "None",
+            "moRating": "None",
+            "improvingShortCreditHistory": "None",
+            "improvingBadCreditScore": "None",
+            "improvingMaxedOutCredit": "None",
+            "reportsToExperian": false,
+            "reportsToEquifax": false,
+            "reportsToTransunion": false,
+            "notes": "This is your problem."
+        },
+        {
+            "id": "53adb74d6b7719ef31025229",
+            "name": "Gemoroi 1",
+            "bank": "Sperbank (testing)",
+            "type": "MasterCard",
+            "ncRating": "None",
+            "bcRating": "None",
+            "moRating": "None",
+            "improvingShortCreditHistory": "None",
+            "improvingBadCreditScore": "None",
+            "improvingMaxedOutCredit": "None",
+            "reportsToExperian": false,
+            "reportsToEquifax": false,
+            "reportsToTransunion": false,
+            "notes": "This is your problem."
+        }
+    ],
+    "metadata": {
+        "modelName": "Product",
+        "fieldsAccessible": [
+            "id",
+            "name",
+            "bank",
+            "type",
+            "ncRating",
+            "bcRating",
+            "moRating",
+            "improvingShortCreditHistory",
+            "improvingBadCreditScore",
+            "improvingMaxedOutCredit",
+            "reportsToExperian",
+            "reportsToEquifax",
+            "reportsToTransunion",
+            "notes"
+        ],
+        "page": 1,
+        "itemsPerPage": 10,
+        "numberOfPages": 0,
+        "count": 1
+    }
+}
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Authorization required!"
+        }
+    ]
+}
+
+
+Get one product by id
+GET /api/v2/products/537e7a9567b9f6d7f81d13b6
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 200
+< Content-Type: application/json
+{
+    "status": "Ok",
+    "data": {
+        "id": "53adb74d6b7719ef31025229",
+        "name": "Gemoroi 1",
+        "bank": "Sperbank (testing)",
+        "type": "MasterCard",
+        "ncRating": "None",
+        "bcRating": "None",
+        "moRating": "None",
+        "improvingShortCreditHistory": "None",
+        "improvingBadCreditScore": "None",
+        "improvingMaxedOutCredit": "None",
+        "reportsToExperian": false,
+        "reportsToEquifax": false,
+        "reportsToTransunion": false,
+        "notes": "This is your problem."
+    }
+}
++++++
+< 404
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 404,
+        "message": "Product with this id do not exists!"
+        }
+    ]
+}
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Authorization required!"
+        }
+    ]
+}
+
+
+Create new product
+POST /api/v2/products
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+> Content-Type: application/json
+{
+    "name":"Visa Gemoroi 0",
+    "bank":"Sperbank (testing)",
+    "type":"MasterCard",
+    "ncRating":"None",
+    "bcRating":"Silver",
+    "moRating":"Gold",
+    "reportsToExperian":false,
+    "reportsToEquifax": false,
+    "reportsToTransunion": false,
+    "improvingShortCreditHistory": "None",
+    "improvingBadCreditScore": "Silver",
+    "improvingMaxedOutCredit": "Gold",
+    "notes":"Some notes seen only by Owners"
+}
+< 201
+< Location: /api/v2/products/537e7a9567b9f6d7f81d13b6
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 401,
+        "message": "Authorization required!"
+        }
+    ]
+}
+
+
+Update (patch) product
+PUT /api/v2/products/{:id}
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+> Content-Type: application/json
+{
+    "name":"Visa Gemoroi 0",
+    "bank":"Sperbank (testing)",
+    "type":"MasterCard",
+    "ncRating":"None",
+    "bcRating":"Silver",
+    "moRating":"Gold",
+    "reportsToExperian":false,
+    "reportsToEquifax": false,
+    "reportsToTransunion": false,
+    "improvingShortCreditHistory": "None",
+    "improvingBadCreditScore": "Silver",
+    "improvingMaxedOutCredit": "Gold"
+}
+< 202
+< Content-Type: application/json
+{
+    "data": {
+        "name":"Visa Gemoroi 0",
+        "bank":"Sperbank (testing)",
+        "type":"MasterCard",
+        "ncRating":"None",
+        "bcRating":"Silver",
+        "moRating":"Gold",
+        "reportsToExperian":false,
+        "reportsToEquifax": false,
+        "reportsToTransunion": false,
+        "improvingShortCreditHistory": "None",
+        "improvingBadCreditScore": "Silver",
+        "improvingMaxedOutCredit": "Gold"
+    }
+}
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 401,
+        "message": "Authorization required!"
+        }
+    ]
+}
+
+
+Delete product
+DELETE /api/v2/products/{:id}
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 202
+< Content-Type: application/json
+{"status": "deleted"}
++++++
+< 403
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 403,
+        "message": "Access denied!"
+        }
+    ]
+}
++++++
+< 400
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 400,
+        "message": "Product with this ID is used by Tradelines!"
+        }
+    ]
+}
++++++
+< 400
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 400,
+        "message": "ID is not defined!"
+        }
+    ]
+}
++++++
+< 401
+< Content-Type: application/json
+{
+    "status": "Error",
+    "errors": [
+        {
+        "code": 401,
+        "message": "Authorization required!"
+        }
+    ]
+}
+
 
 -- Owner resource to edit tradelines --
 
