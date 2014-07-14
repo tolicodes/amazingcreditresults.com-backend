@@ -32,8 +32,12 @@ module.exports = exports = function (core) {
       }
     });
 
-    if (request.query.isBanned) {
-      filter.isBanned = request.query.isBanned ? true : false;
+    if (request.query.isBanned === 'true') {
+      filter.isBanned = true;
+    }
+
+    if (request.query.isBanned === 'false') {
+      filter.isBanned = false;
     }
 
     core.async.parallel({
