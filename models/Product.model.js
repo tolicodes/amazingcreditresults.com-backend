@@ -16,7 +16,8 @@ module.exports = exports = function (core) {
       'maximumAus': { type: Number, min: 0, max: 15 },
       '_improvingShortCreditHistory': { type: Number, min: 0, max: 3, default: 0 },
       '_improvingBadCreditScore': { type: Number, min: 0, max: 3, default: 0 },
-      '_improvingMaxedOutCredit': { type: Number, min: 0, max: 3, default: 0 }
+      '_improvingMaxedOutCredit': { type: Number, min: 0, max: 3, default: 0 },
+      'owner': { type: core.mongoose.Schema.Types.ObjectId, ref: 'User' }
     },
     {
       toObject: { getters: true, virtuals: true },
@@ -143,6 +144,125 @@ module.exports = exports = function (core) {
       'notes': this.notes
     };
   };
+
+  //HRW specific
+  ProductSchema.statics.canCreate = function (user, callback) {
+    if (user && (user.roles && user.roles.owner) || user.root) { //only authorized user can create new article
+      callback(null, true, 'owner');
+    } else {
+      callback(null, false);
+    }
+  };
+
+  ProductSchema.statics.listFilter = function (user, callback) {
+    if (user) {
+      if ((user.roles && user.roles.owner) || user.root) {
+        callback(null, {}, [
+          'id',
+          'name',
+          'bank',
+          'type',
+          'ncRating',
+          'bcRating',
+          'moRating',
+          'improvingShortCreditHistory',
+          'improvingBadCreditScore',
+          'improvingMaxedOutCredit',
+          'reportsToExperian',
+          'reportsToEquifax',
+          'reportsToTransunion',
+          'notes'
+        ]);
+      } else {
+        callback(null, {}, [
+          'id',
+          'name',
+          'bank',
+          'type',
+          'ncRating',
+          'bcRating',
+          'moRating',
+          'improvingShortCreditHistory',
+          'improvingBadCreditScore',
+          'improvingMaxedOutCredit',
+          'reportsToExperian',
+          'reportsToEquifax',
+          'reportsToTransunion'
+        ]);
+      }
+    } else {
+      callback(null, false); //non authorized user cannot list anything!
+    }
+  };
+
+  ProductSchema.methods.canRead = function (user, callback) {
+    if (user) {
+      if ((user.roles && user.roles.owner) || user.root) {
+        callback(null, true, [
+          'id',
+          'name',
+          'bank',
+          'type',
+          'ncRating',
+          'bcRating',
+          'moRating',
+          'improvingShortCreditHistory',
+          'improvingBadCreditScore',
+          'improvingMaxedOutCredit',
+          'reportsToExperian',
+          'reportsToEquifax',
+          'reportsToTransunion',
+          'notes', 'owner'
+        ], ['owner']);
+      } else {
+        callback(null, true, [
+          'id',
+          'name',
+          'bank',
+          'type',
+          'ncRating',
+          'bcRating',
+          'moRating',
+          'improvingShortCreditHistory',
+          'improvingBadCreditScore',
+          'improvingMaxedOutCredit',
+          'reportsToExperian',
+          'reportsToEquifax',
+          'reportsToTransunion'
+        ]);
+      }
+    } else {
+      callback(null, false); //non authorized user cannot list anything!
+    }
+  };
+
+  ProductSchema.methods.canUpdate = function (user, callback) {
+    if (user && ((user.roles && user.roles.owner) || user.root)) {
+      callback(null, true, [
+        'name',
+        'bank',
+        'type',
+        'ncRating',
+        'bcRating',
+        'moRating',
+        'improvingShortCreditHistory',
+        'improvingBadCreditScore',
+        'improvingMaxedOutCredit',
+        'reportsToExperian',
+        'reportsToEquifax',
+        'reportsToTransunion',
+        'notes',
+        'owner'
+      ])
+    } else {
+      callback(null, false); //non authorized user cannot edit anything!
+    }
+  };
+
+  ProductSchema.methods.canDelete = function (user, callback) {
+    callback(null, false);
+  };
+
 
   return core.mongoConnection.model('Product', ProductSchema);
 };

@@ -1,4 +1,5 @@
 var hunt = require('hunt'),
+  hrw = require('hrw'),
   Hunt = hunt({
 //    'hostUrl':'https://dev.amazingcreditresults.com/', //for example
     'redisUrl': process.env.AMAZING_REDIS_URL || 'redis://localhost:6379',
@@ -98,6 +99,11 @@ Hunt.extendRoutes(require('./controllers/shared.js'));
 
 //processing payment notifications from stripe
 Hunt.extendRoutes(require('./controllers/stripe/webhooks.js'));
+
+//RESTfull api via HRW
+
+hrw(Hunt, { 'modelName': 'Product', 'mountPoint': '/api/v2/products'});
+
 
 //Development route to test error catcher middleware
 if (Hunt.config.env === 'development') {

@@ -21,7 +21,8 @@
     "hunt": "https://api.github.com/repos/vodolaz095/hunt/tarball/master",
     "moment": ">=2.7.0",
     "stripe": "latest",
-    "forever": ">=0.11.1"
+    "forever": ">=0.11.1",
+    "hrw": "git+ssh://git@github.com:oselot/hrw.git"
   },
   "devDependencies": {
     "request": "2.34.0",
