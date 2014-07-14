@@ -260,9 +260,8 @@ module.exports = exports = function (core) {
   };
 
   ProductSchema.methods.canDelete = function (user, callback) {
-    callback(null, false);
+    callback(null, (user && ((user.roles && user.roles.owner) || user.root)));
   };
-
 
   return core.mongoConnection.model('Product', ProductSchema);
 };
