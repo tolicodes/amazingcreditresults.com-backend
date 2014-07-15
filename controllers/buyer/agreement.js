@@ -35,6 +35,7 @@ module.exports = exports = function (core) {
         },
         function (id, cb) {
           transientDocumentId = id;
+          console.log('transientDocumentId is: ', id);
           doSign.doRequest({
             'url': 'https://secure.echosign.com:443/api/rest/v2/agreements',
             'json': {
