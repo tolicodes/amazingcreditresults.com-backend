@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Agreement</title>
+</head>
+<body>
+<div align="right">
+    <date>
+        I,
+        <first name>
+            <last name> agree to buy
+                <productname>. Something something
+                    <customfield1>
+                        <signature>
+
+</div>
+<div align="center">
+    <h1>Agreement</h1>
+</div>
+<p>I, <b>{{user.name.givenName}} {{user.name.familyName}}</b>, agree to buy this items:</p>
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Product</th>
+        <th>Date open</th>
+        <th>ncRating</th>
+        <th>bcRating</th>
+        <th>moRating</th>
+        <th>Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#tradeLinesInCart}}
+    <tr>
+        <td>{{id}}</td>
+        <td>{{#product}}{{bank}} {{type}} {{name}}{{/product}}</td>
+        <td></td>
+        <td>{{ncRating}}</td>
+        <td>{{bcRating}}</td>
+        <td>{{moRating}}</td>
+        <td>${{price}}</td>
+    </tr>
+    {{/tradeLinesInCart}}
+    </tbody>
+    <tfoot>
+    <tr>
+        <td colspan="6">Total:</td>
+        <td>${{total}}</td>
+    </tr>
+    </tfoot>
+</table>
+
+<p>Bla, bla, bla.</p>
+
+<p>La-la-la</p>
+
+<p></p>
+
+<p>Dai mne tri rublya!</p>
+
+<p>Signed with blood:</p>
+<hr>
+
+</body>
+</html>

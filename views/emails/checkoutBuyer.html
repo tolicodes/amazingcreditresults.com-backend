@@ -1,38 +1,40 @@
 <div dir="ltr">
     <p>{{user.name.givenName}} {{user.name.familyName}},</p>
+
     <p>You have bought this tradelines:</p>
     <table border="1">
         <thead>
-            <tr>
-                <th>ID</th>
-                <th>Product</th>
-                <th>Date open</th>
-                <th>ncRating</th>
-                <th>bcRating</th>
-                <th>moRating</th>
-                <th>Price</th>
-            </tr>
+        <tr>
+            <th>ID</th>
+            <th>Product</th>
+            <th>Date open</th>
+            <th>ncRating</th>
+            <th>bcRating</th>
+            <th>moRating</th>
+            <th>Price</th>
+        </tr>
         </thead>
         <tbody>
-{{#tradeLinesInCart}}
-            <tr>
-                <td>{{id}}</td>
-                <td>{{#product}}{{bank}} {{type}} {{name}}{{/product}}</td>
-                <td></td>
-                <td>{{ncRating}}</td>
-                <td>{{bcRating}}</td>
-                <td>{{moRating}}</td>
-                <td>${{price}}</td>
-            </tr>
-{{/tradeLinesInCart}}
+        {{#tradeLinesInCart}}
+        <tr>
+            <td>{{id}}</td>
+            <td>{{#product}}{{bank}} {{type}} {{name}}{{/product}}</td>
+            <td></td>
+            <td>{{ncRating}}</td>
+            <td>{{bcRating}}</td>
+            <td>{{moRating}}</td>
+            <td>${{price}}</td>
+        </tr>
+        {{/tradeLinesInCart}}
         </tbody>
         <tfoot>
-            <tr>
-                <td colspan="6">Total:</td>
-                <td>${{total}}</td>
-            </tr>
+        <tr>
+            <td colspan="6">Total:</td>
+            <td>${{total}}</td>
+        </tr>
         </tfoot>
     </table>
     <p>Thank you for working with us!</p>
-    <p>Out manager will contact you shortly!</p>
+
+    <p>Our manager will contact you shortly!</p>
 </div>
