@@ -87,6 +87,7 @@ Hunt.extendMiddleware(function (core) {
 //loading different controllers for buyers
 Hunt.extendRoutes(require('./controllers/buyer/login.js'));
 Hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
+Hunt.extendRoutes(require('./controllers/buyer/agreement.js'));
 
 //loading controller for inventory table
 Hunt.extendRoutes(require('./controllers/buyer/tradelines.js'));
