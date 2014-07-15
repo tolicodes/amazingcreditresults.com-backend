@@ -344,6 +344,106 @@ GET /api/v1/account
 }
 
 
+-- Buyer/Seller verification procedures--
+
+Issue verification by SMS message by https://getprove.com/
+GET /api/v1/verifyPhone
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 200
+< Content-Type: application/json; charset=utf-8
+{
+  "status":"Ok",
+  "phoneVerified"': true,
+  "message": "Phone of +15553396972 is verified!"
+}
++++++
+< 202
+< Content-Type: application/json; charset=utf-8
+{
+  "status":"Ok",
+  "phoneVerified"': false,
+  "message": "Phone of +15553396972  will be verified!"
+}
++++++
+< 401
+< Content-Type: application/json; charset=utf-8
+{
+   "status": "Error",
+    "errors": [{
+      "code": 401,
+      "message": "Authorization required!"
+    }]
+}
++++++
+< 403
+< Content-Type: application/json; charset=utf-8
+{
+    "status": "Error",
+    "errors": [{
+        "code": 403,
+        "message": "Access Denied!"
+    }]
+}
+
+
+Submit PIN code for verification by SMS message by https://getprove.com/
+POST /api/v1/verifyPhone
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+> Content-Type: application/json; charset=utf-8
+{ "pin": "00000"}
+< 200
+< Content-Type: application/json; charset=utf-8
+{
+  "status":"Ok",
+  "phoneVerified"': true,
+  "message": "Phone of +15553396972 is verified!"
+}
++++++
+< 400
+< Content-Type: application/json; charset=utf-8
+{
+    "status": "Error",
+    "errors": [{
+      "code": 401,
+      "message": "Pin code is invalid!",
+      "field":"pin"
+    }]
+}
++++++
+< 400
+< Content-Type: application/json; charset=utf-8
+{
+    "status": "Error",
+    "errors": [{
+      "code": 401,
+      "message": "Pin code is missed!",
+      "field":"pin"
+    }]
+}
++++++
+< 401
+< Content-Type: application/json; charset=utf-8
+{
+   "status": "Error",
+    "errors": [{
+      "code": 401,
+      "message": "Authorization required!"
+    }]
+}
++++++
+< 403
+< Content-Type: application/json; charset=utf-8
+{
+    "status": "Error",
+    "errors": [{
+        "code": 403,
+        "message": "Access Denied!"
+    }]
+}
+
+
+
+
 -- Buyer dashboard --
 
 Saving Buyer answers to questions on dashboard

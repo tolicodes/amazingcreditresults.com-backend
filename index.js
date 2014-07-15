@@ -21,6 +21,7 @@ var hunt = require('hunt'),
 //      'apiKeyOutdates': 5*24*60*60*1000 //ttl of api key for buyer to authorize - 5 dayes
       'apiKeyOutdates': 60 * 60 * 1000 //ttl of api key for buyer to authorize - 1 day //https://oselot.atlassian.net/browse/ACR-20
     },
+    'getProveApiKey': 'sk_test_TvGbvfhSC8Rfv9UcUt80czar',
     'echoSign': {
       'auth': {
         'userCredentials': {

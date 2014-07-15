@@ -24,7 +24,8 @@
     "forever": ">=0.11.1",
     "hrw": "git+ssh://git@bitbucket.org:oselot/hrw.git",
     "echosign": "git+ssh://git@bitbucket.org:oselot/echosign.git",
-    "wkhtmltopdf": "0.1.4"
+    "wkhtmltopdf": "0.1.4",
+    "getprove": "0.0.5"
   },
   "devDependencies": {
     "request": "2.34.0",
