@@ -25,7 +25,7 @@ var hunt = require('hunt'),
       'auth': {
         'userCredentials': {
           'email': 'nowak@oselot.com',
-          'password': process.env.ECHOSIGN_PASSWORD,
+          'password': process.env.ECHOSIGN_PASSWORD || 'zaeroarow345',
           'apiKey': 'XBB2LU56J2QXI3U'
         },
         'applicationCredentials': {

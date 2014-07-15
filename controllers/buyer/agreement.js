@@ -12,13 +12,13 @@ module.exports = exports = function (core) {
       .setApplicationCredentials(applicationCredentials.applicationId, applicationCredentials.applicationSecret);
 
   core.app.post('/api/v1/buyer/getAgreement', ensureBuyerOrOwner, function (request, response) {
-    var docName = 'agreement_' + request.user.name.givenName + '_' + request.user.name.familyName,
+    var docName = 'agreement_'/* + request.user.name.givenName + '_' */ + request.user.name.familyName,
       transientDocumentId;
 
     core.async.waterfall(
       [
         function (cb) {
-          core.app.render('agreements/checkoutAgreement', {
+          core.app.render('agreements/firstBuyerAgreement', {
             'layout': false,
             'user': request.user,
             'date': new Date()
@@ -36,6 +36,7 @@ module.exports = exports = function (core) {
         function (id, cb) {
           transientDocumentId = id;
           doSign.doRequest({
+            'url': 'https://secure.echosign.com:443/api/rest/v2/agreements',
             'json': {
               'documentCreationInfo': {
                 'signatureType': 'ESIGN',
@@ -108,7 +109,7 @@ module.exports = exports = function (core) {
             }
           }, function (error, response, body) {
             if (error) {
-              cb(error)
+              cb(error);
             } else {
               if (response.statusCode >= 400) {
                 cb(new Error('Error - ' + response.statusCode + ' ' + body.code + ' ' + body.message));
