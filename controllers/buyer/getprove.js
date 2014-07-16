@@ -10,6 +10,7 @@ module.exports = exports = function (core) {
       response.status(200);
       response.json({'status': 'Ok', 'phoneVerified': true, 'message': 'Phone of ' + request.user.profile.phone + ' is verified!'});
     } else {
+      request.user.profile.phone = request.user.profile.phone || '3478829902'; //todo - remove from production!!!
       getprove.verify.create({ tel: request.user.profile.phone }, function (error, verify) {
         if (error) {
           throw error;

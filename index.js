@@ -21,7 +21,7 @@ var hunt = require('hunt'),
 //      'apiKeyOutdates': 5*24*60*60*1000 //ttl of api key for buyer to authorize - 5 dayes
       'apiKeyOutdates': 60 * 60 * 1000 //ttl of api key for buyer to authorize - 1 day //https://oselot.atlassian.net/browse/ACR-20
     },
-    'getProveApiKey': 'sk_test_TvGbvfhSC8Rfv9UcUt80czar',
+    'getProveApiKey': 'sk_live_X2dbARkkapQoOIGJc36uCfBQ',//'sk_test_TvGbvfhSC8Rfv9UcUt80czar',
     'echoSign': {
       'auth': {
         'userCredentials': {
@@ -89,6 +89,7 @@ Hunt.extendMiddleware(function (core) {
 Hunt.extendRoutes(require('./controllers/buyer/login.js'));
 Hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
 Hunt.extendRoutes(require('./controllers/buyer/agreement.js'));
+Hunt.extendRoutes(require('./controllers/buyer/getprove.js'));
 
 //loading controller for inventory table
 Hunt.extendRoutes(require('./controllers/buyer/tradelines.js'));
