@@ -1,11 +1,11 @@
-var ensureBuyerOrOwner = require('../../lib/middleware.js').ensureBuyerOrOwner;
+var ensureBuyerOrSeller = require('../../../lib/middleware.js').ensureBuyerOrOwner;
 //https://github.com/getprove/prove-api/
 
 
 module.exports = exports = function (core) {
   var getprove = require('getprove')(core.config.getProveApiKey);
 
-  core.app.get('/api/v1/verifyPhone', ensureBuyerOrOwner, function (request, response) {
+  core.app.get('/api/v1/verifyPhone', ensureBuyerOrSeller, function (request, response) {
     if (request.user.profile && request.user.profile.phoneVerified) {
       response.status(200);
       response.json({'status': 'Ok', 'phoneVerified': true, 'message': 'Phone of ' + request.user.profile.phone + ' is verified!'});
@@ -29,7 +29,7 @@ module.exports = exports = function (core) {
     }
   });
 
-  core.app.post('/api/v1/verifyPhone', function (request, response) {
+  core.app.post('/api/v1/verifyPhone', ensureBuyerOrSeller, function (request, response) {
     if (request.body.pin) {
       getprove.verify.pin(request.user.profile.phoneVerificationId, request.body.pin, function (err, verify) {
         if (err) {
