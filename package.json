@@ -25,10 +25,10 @@
     "hrw": "git+ssh://git@bitbucket.org:oselot/hrw.git",
     "echosign": "git+ssh://git@bitbucket.org:oselot/echosign.git",
     "wkhtmltopdf": "0.1.4",
-    "getprove": "0.0.5"
+    "getprove": "0.0.5",
+    "request": "2.34.0"
   },
   "devDependencies": {
-    "request": "2.34.0",
     "mocha": "1.18.2",
     "should": "3.3.1",
     "underscore": "^1.6.0"
