@@ -95,7 +95,7 @@ Hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
 Hunt.extendRoutes(require('./controllers/buyer/verifications/echosign.js'));
 Hunt.extendRoutes(require('./controllers/buyer/verifications/getprove.js'));
 Hunt.extendRoutes(require('./controllers/buyer/verifications/called.in.js'));
-Hunt.extendRoutes(require('./controllers/buyer/verifications/areyouhuman.js'));
+Hunt.extendRoutes(require('./controllers/buyer/verifications/areyouahuman.js'));
 
 //loading controller for inventory table
 Hunt.extendRoutes(require('./controllers/buyer/tradelines.js'));
