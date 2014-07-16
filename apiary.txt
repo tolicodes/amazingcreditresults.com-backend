@@ -344,7 +344,7 @@ GET /api/v1/account
 }
 
 
--- Buyer/Seller verification procedures--
+-- Buyer/Seller verification procedures --
 
 Issue verification by SMS message by https://getprove.com/
 GET /api/v1/verifyPhone
@@ -441,6 +441,10 @@ POST /api/v1/verifyPhone
     }]
 }
 
+'Are you a Human' verification.
+GET /api/v1/areyouahuman?huntKey={:huntKey}
+< 200
+< Content-Type: text/html; charset=utf-8
 
 
 
