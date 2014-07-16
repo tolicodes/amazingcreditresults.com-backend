@@ -1,8 +1,8 @@
 //controller for owner users to edit the clients list
 var welcomeLinkGenerator = require('./../../lib/welcome.js'),
-  formatUser  = require('./../formatter.js').formatUserForOwner,
+  formatUser = require('./../../lib/formatter.js').formatUserForOwner,
   ensureOwner = require('./../../lib/middleware.js').ensureOwner;
-  utilities   = require('./../../lib/utilities');
+utilities = require('./../../lib/utilities');
 
 module.exports = exports = function (core) {
 
@@ -192,13 +192,13 @@ module.exports = exports = function (core) {
       'givenName'
       //'middleName' //not mandatory for now
     ].map(function (s) {
-      if (request.body.name && request.body.name[s] && typeof request.body.name[s] === 'string') {
-        isOk = true;
-      } else {
-        isOk = false;
-        missed = s;
-      }
-    });
+        if (request.body.name && request.body.name[s] && typeof request.body.name[s] === 'string') {
+          isOk = true;
+        } else {
+          isOk = false;
+          missed = s;
+        }
+      });
 
     if (isOk) {
       request.model.User.create({
@@ -392,7 +392,7 @@ module.exports = exports = function (core) {
         return utilities.error(400, 'Only buyers and sellers can be removed', response);
       }
 
-      userFound.update({isBanned: true}, function(error) {
+      userFound.update({isBanned: true}, function (error) {
         if (error) {
           throw error;
         }
