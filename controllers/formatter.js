@@ -27,6 +27,7 @@ exports.formatUserForOwner = function (user) {
     },
     'title': user.profile ? (user.profile.title || 'Mr.') : 'Mr.',
     'phone': user.profile ? (user.profile.phone || '') : '',
+    'phoneVerified': user.profile ? (user.profile.phoneVerified ? true : false) : false,
     'altPhone': user.profile ? (user.profile.altPhone || '') : '',
     'state': user.profile ? (user.profile.state || '') : '',
     'city': user.profile ? (user.profile.city || '') : '',
