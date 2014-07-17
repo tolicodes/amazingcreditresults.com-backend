@@ -22,6 +22,9 @@ var hunt = require('hunt'),
       'apiKeyOutdates': 60 * 60 * 1000 //ttl of api key for buyer to authorize - 1 day //https://oselot.atlassian.net/browse/ACR-20
     },
     'getProveApiKey': 'sk_live_X2dbARkkapQoOIGJc36uCfBQ',//'sk_test_TvGbvfhSC8Rfv9UcUt80czar',
+    'calledIn': {
+      'some': 'keys'
+    },
     'areYouAHuman': {
       'publisherKey': 'b940b3d9b8c42968e398d6042617944d3f0005c5',
       'scoringKey': 'dd286f8cd506dc324e2c8558c4f005bc617adee9'
