@@ -1,4 +1,4 @@
-var formatUser = require('./formatter.js').formatUserForOwner,
+var formatUser = require('./../lib/formatter.js').formatUserForOwner,
   ensureBuyerOrOwner = require('./../lib/middleware.js').ensureBuyerOrOwner;
 
 //GET request to get current authorized users parameters in form of json

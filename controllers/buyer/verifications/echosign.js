@@ -1,4 +1,4 @@
-var ensureBuyerOrOwner = require('../../lib/middleware.js').ensureBuyerOrOwner,
+var ensureBuyerOrSeller = require('../../../lib/middleware.js').ensureBuyerOrSeller,
   DoSign = require('echosign'),
   os = require('os'),
   wkhtmltopdf = require('wkhtmltopdf');
@@ -11,7 +11,7 @@ module.exports = exports = function (core) {
       .setUserCredentials(userCredentials.email, userCredentials.password, userCredentials.apiKey)
       .setApplicationCredentials(applicationCredentials.applicationId, applicationCredentials.applicationSecret);
 
-  core.app.post('/api/v1/buyer/getAgreement', ensureBuyerOrOwner, function (request, response) {
+  core.app.post('/api/v1/buyer/getAgreement', ensureBuyerOrSeller, function (request, response) {
     var docName = 'agreement_'/* + request.user.name.givenName + '_' */ + request.user.name.familyName,
       transientDocumentId;
 
@@ -135,7 +135,7 @@ module.exports = exports = function (core) {
     );
   });
 
-  core.app.put('/api/v1/buyer/signAgreement', ensureBuyerOrOwner, function (request, response) {
+  core.app.put('/api/v1/buyer/signAgreement', ensureBuyerOrSeller, function (request, response) {
     response.json({
       'user': request.user,
       'body': request.body

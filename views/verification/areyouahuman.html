@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Are you a human?</title>
+</head>
+<body>
+{{#verified}}
+<h1>You are human!</h1>
+{{/verified}}
+
+
+{{^verified}}
+{{#sessionSecret}}
+<iframe style="border: none;" height="0" width="0"
+        src="https://ws.areyouahuman.com/ws/recordConversion/{{sessionSecret}}"></iframe>
+<h1>You are a human!</h1>
+<script type="text/javascript">
+    setTimeout(window.location.reload, 1000);
+</script>
+{{/sessionSecret}}
+
+{{^sessionSecret}}
+<script src="https://ws.areyouahuman.com/ws/script/{{publisherKey}}" type="text/javascript"
+        language="JavaScript"></script>
+<h1>Please, verify, that you are a human!</h1>
+
+<form method="POST" action="/api/v1/areyouahuman?huntKey={{myself.apiKey}}">
+    <div id="AYAH"></div>
+    <input type="submit" value="I am human!"/>
+</form>
+{{/sessionSecret}}
+{{/verified}}
+</body>
+</html>

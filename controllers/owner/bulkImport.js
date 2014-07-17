@@ -6,7 +6,7 @@ var csv = require('fast-csv'),
     'autoFiles': false
   }),
   ensureUserIsOwnerMiddleware = require('./../../lib/middleware.js').ensureOwner,
-  formatUser = require('./../formatter.js').formatUserForOwner;
+  formatUser = require('./../../lib/formatter.js').formatUserForOwner;
 
 module.exports = exports = function (core) {
   core.app.get('/api/v1/owner/clientsExample.csv', ensureUserIsOwnerMiddleware, function (request, response) {

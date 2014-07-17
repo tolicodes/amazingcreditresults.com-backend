@@ -21,11 +21,16 @@ var hunt = require('hunt'),
 //      'apiKeyOutdates': 5*24*60*60*1000 //ttl of api key for buyer to authorize - 5 dayes
       'apiKeyOutdates': 60 * 60 * 1000 //ttl of api key for buyer to authorize - 1 day //https://oselot.atlassian.net/browse/ACR-20
     },
+    'getProveApiKey': 'sk_live_X2dbARkkapQoOIGJc36uCfBQ',//'sk_test_TvGbvfhSC8Rfv9UcUt80czar',
+    'areYouAHuman': {
+      'publisherKey': 'b940b3d9b8c42968e398d6042617944d3f0005c5',
+      'scoringKey': 'dd286f8cd506dc324e2c8558c4f005bc617adee9'
+    },
     'echoSign': {
       'auth': {
         'userCredentials': {
           'email': 'nowak@oselot.com',
-          'password': process.env.ECHOSIGN_PASSWORD || 'zaeroarow345',
+          'password': process.env.ECHOSIGN_PASSWORD,
           'apiKey': 'XBB2LU56J2QXI3U'
         },
         'applicationCredentials': {
@@ -87,7 +92,10 @@ Hunt.extendMiddleware(function (core) {
 //loading different controllers for buyers
 Hunt.extendRoutes(require('./controllers/buyer/login.js'));
 Hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
-Hunt.extendRoutes(require('./controllers/buyer/agreement.js'));
+Hunt.extendRoutes(require('./controllers/buyer/verifications/echosign.js'));
+Hunt.extendRoutes(require('./controllers/buyer/verifications/getprove.js'));
+Hunt.extendRoutes(require('./controllers/buyer/verifications/called.in.js'));
+Hunt.extendRoutes(require('./controllers/buyer/verifications/areyouahuman.js'));
 
 //loading controller for inventory table
 Hunt.extendRoutes(require('./controllers/buyer/tradelines.js'));
