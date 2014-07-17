@@ -232,9 +232,52 @@ module.exports = exports = function (core) {
         if (error) {
           throw error;
         } else {
-          response.status(201);
-          //response.redirect('/api/v1/admin/clients/' + userCreated.id);
-          response.json(formatUser(userCreated));
+//https://oselot.atlassian.net/browse/ACR-454
+          if (request.body.doNotSendEmail) {
+            response.status(201);
+            response.set('Location', '/api/v1/admin/clients/' + userCreated.id);
+            response.json(formatUser(userCreated));
+          } else {
+            var welcomeLink = welcomeLinkGenerator();
+            core.async.waterfall([
+              function (cb) {
+                userCreated.keychain.welcomeLink = welcomeLink;
+                userCreated.apiKeyCreatedAt = Date.now();
+                userCreated.markModified('keychain');
+                userCreated.invalidateSession(cb);
+              },
+              function (newApiKey, cb) {
+//              welcomeLink = core.config.hostUrl+'buyer/welcome/'+welcomeLink;
+                welcomeLink = core.config.hostUrl + '#login/' + welcomeLink;
+                var tpl = 'emails/welcomeBuyer';
+                if (userCreated.roles && userCreated.roles.buyer) {
+                  tpl = 'emails/welcomeBuyer';
+                }
+                if (userCreated.roles && userCreated.roles.seller) {
+                  tpl = 'emails/welcomeSeller';
+                }
+                userCreated.notifyByEmail({
+                  'layout': false,
+                  'template': tpl,
+                  'subject': 'Site access hyperlink to enter site',//todo - change to something more meaningfull
+                  'name': userCreated.name,
+                  'welcomeLink': welcomeLink,
+                  'phone': userCreated.profile.phone,
+                  'street1': userCreated.profile.street1,
+                  'date': frmDt(new Date())
+                });
+                cb();
+              }
+            ], function (err) {
+              if (err) {
+                throw err;
+              } else {
+                response.status(201);
+                response.set('Location', '/api/v1/admin/clients/' + userCreated.id);
+                response.json(formatUser(userCreated));
+              }
+            });
+          }
         }
       });
     } else {
