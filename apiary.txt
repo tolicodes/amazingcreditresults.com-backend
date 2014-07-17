@@ -1149,6 +1149,7 @@ POST /api/v1/admin/clients
       "givenName" : "John",
       "middleName" : "Theodor"
     },
+    "doNotSendEmail": true,
     "email":"johndoe@example.org",
     "title":"Mr.",
     "phone": "555-339-69-72",
