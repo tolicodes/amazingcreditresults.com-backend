@@ -233,7 +233,7 @@ module.exports = exports = function (core) {
           throw error;
         } else {
 //https://oselot.atlassian.net/browse/ACR-454
-          if (request.body.doNotSendEmail) {
+          if (request.body.doNotSendEmail === 'true') {
             response.status(201);
             response.set('Location', '/api/v1/admin/clients/' + userCreated.id);
             response.json(formatUser(userCreated));
