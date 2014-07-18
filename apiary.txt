@@ -1011,7 +1011,7 @@ GET /api/v1/admin/clients
 
 
 Owner gets one client by id
-GET /api/v1/admin/clients/{:id}
+GET /api/v1/admin/clients/538b612c7f61bdb5eadffe22
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
 < Content-Type: application/json
@@ -1055,11 +1055,67 @@ GET /api/v1/admin/clients/{:id}
             },
             "isBanned":false
     }
+    "preSelectedTradeLines": [
+    {
+            "id": "5387c1c7a1e6fd5948e266cc",
+            "inCart": true,
+            "seller": "5370a4fa25777db9531ffa91",
+            "dateOpen": "2014-05-29T23:24:55.294Z",
+            "availableAus": 15,
+            "product": {
+                "id": "53876e1e6b7719ef3102521e",
+                "name": "Gemoroi 0",
+                "bank": "Sperbank (testing)",
+                "reportsToExperian": false,
+                "reportsToEquifax": false,
+                "reportsToTransunion": false,
+                "ncRating": "None",
+                "bcRating": "None",
+                "moRating": "None",
+                "type": "MasterCard"
+            },
+            "price": 1100,
+            "ncRating": "Bronze",
+            "bcRating": "Bronze",
+            "moRating": "Bronze"
+        },
+        {
+            "id": "5387c1c7a1e6fd5948e266cd",
+            "inCart": true,
+            "seller": "5370a4fa25777db9531ffa91",
+            "dateOpen": "2014-05-29T23:24:55.294Z",
+            "availableAus": 15,
+            "product": {
+                "id": "53876e1e6b7719ef3102521e",
+                "name": "Gemoroi 0",
+                "bank": "Sperbank (testing)",
+                "reportsToExperian": false,
+                "reportsToEquifax": false,
+                "reportsToTransunion": false,
+                "ncRating": "None",
+                "bcRating": "None",
+                "moRating": "None",
+                "type": "MasterCard"
+            },
+            "price": 1100,
+            "ncRating": "Bronze",
+            "bcRating": "Bronze",
+            "moRating": "Bronze"
+        }
+    ],
+    "transactions": [
+        {
+            "id": "53ab38233db1d9ad4e5532db",
+            "timestamp": "2014-06-25T20:54:45.771Z",
+            "amount": 1,
+            "type": "ownerUpload"
+        }
+    ]
 }
 
 
 Owner updates buyer. The behavior is actually patch - the fields mentioned in accepted request are only updated. https://oselot.atlassian.net/browse/ACR-108
-PUT /api/v1/admin/clients/{:id}
+PUT /api/v1/admin/clients/538b612c7f61bdb5eadffe22
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json; charset=utf-8
 {
@@ -1093,7 +1149,8 @@ PUT /api/v1/admin/clients/{:id}
         "answer2": "",
         "answer3": ""
     },
-    "isBanned": false
+    "isBanned": false,
+    "preSelectTradeLines":['5396002cb5282e71211d4f74','5396002cb5282e71211d4f76']
 }
 < 201
 < Content-Type: application/json
@@ -1128,7 +1185,8 @@ PUT /api/v1/admin/clients/{:id}
         "answer2": "",
         "answer3": ""
     },
-    "isBanned": false
+    "isBanned": false,
+    "preSelectTradeLines":['5396002cb5282e71211d4f74','5396002cb5282e71211d4f76']
 }
 +++++
 < 404
