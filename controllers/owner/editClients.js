@@ -1,8 +1,9 @@
 //controller for owner users to edit the clients list
 var welcomeLinkGenerator = require('./../../lib/welcome.js'),
   formatUser = require('./../../lib/formatter.js').formatUserForOwner,
-  ensureOwner = require('./../../lib/middleware.js').ensureOwner;
-utilities = require('./../../lib/utilities');
+  formatTradelineForBuyer = require('./../../lib/formatter.js').formatTradelineForBuyer,
+  ensureOwner = require('./../../lib/middleware.js').ensureOwner,
+  utilities = require('./../../lib/utilities');
 
 module.exports = exports = function (core) {
 
@@ -78,17 +79,40 @@ module.exports = exports = function (core) {
         throw error;
       } else {
         if (user) {
-          request.model.Transaction
-            .find({'client': user._id})
-            .sort('-timestamp')
-            .exec(function (error, transactionsFound) {
-              if (error) {
-                throw error;
-              } else {
-                response.status(200);
-                response.json({'data': formatUser(user), 'transactions': transactionsFound});
-              }
-            });
+          core.async.parallel({
+            'data': function (cb) {
+              cb(null, formatUser(user));
+            },
+            'transactions': function (cb) {
+              request.model.Transaction
+                .find({'client': user._id})
+                .sort('-timestamp')
+                .exec(cb);
+            },
+            'preSelectedTradeLines': function (cb) {
+              var tlIdAr = (user.profile && user.profile.preSelectTradeLines) ? user.profile.preSelectTradeLines : [];
+              core.async.map(tlIdAr, function (id, clbk) {
+                request.model.TradeLines.findById(id, function (error, tradeLineFound) {
+                  if (error) {
+                    clbk(error);
+                  } else {
+                    if (tradeLineFound) {
+                      clbk(null, formatTradelineForBuyer(tradeLineFound));
+                    } else {
+                      clbk(null);
+                    }
+                  }
+                });
+              }, cb);
+            }
+          }, function (error, obj) {
+            if (error) {
+              throw error;
+            } else {
+              response.status(200);
+              response.json(obj);
+            }
+          });
         } else {
           response.status(404);
           response.json({
@@ -128,11 +152,18 @@ module.exports = exports = function (core) {
         patch['name.' + a] = request.body.name[a];
       }
     });
-    ['title', 'street1', 'street2', 'phone', 'altPhone', 'state', 'city', 'ssn', 'birthday', 'zip', 'needQuestionnaire'].map(function (b) {
+
+    [
+      'title', 'street1', 'street2',
+      'phone', 'altPhone', 'state',
+      'city', 'ssn', 'birthday',
+      'zip', 'needQuestionnaire'
+    ].map(function (b) {
       if (request.body[b]) {
         patch['profile.' + b] = request.body[b];
       }
     });
+
     if (request.body.roles) {
       ['seller', 'buyer'].map(function (role) {
         if (request.body.roles[role] === true || request.body.roles[role] === false) {
@@ -144,6 +175,10 @@ module.exports = exports = function (core) {
       if (rolesToSet) {
         patch.roles = roles;
       }
+    }
+
+    if (request.body.preSelectTradeLines && Array.isArray(request.body.preSelectTradeLines)) {
+      patch.profile.preSelectTradeLines = request.body.preSelectTradeLines;
     }
 
     request.model.User.findOneAndUpdate(
