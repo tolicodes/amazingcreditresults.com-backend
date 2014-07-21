@@ -159,10 +159,13 @@ Hunt.extendRoutes(function (core) {
 Hunt.extendRoutes(function (core) {
   core.app.use(function (error, request, response, next) {
 //http://mongoosejs.com/docs/validation.html
-    if (core.config.env === 'development') {
-      console.error(error);
-      console.error(error.stack);
-    }
+//    if (core.config.env === 'development') {
+    console.log('============================================');
+    console.error(error);
+    console.error(error.stack);
+    console.log('============================================');
+
+//    }
 
     if (error.code === 11000) {
       response.status(400);
