@@ -18,7 +18,7 @@
     "async": ">=0.9.0",
     "connect-multiparty": ">=1.0.5",
     "fast-csv": ">=0.4.0",
-    "hunt": "0.1.4",
+    "hunt": "0.1.5",
     "moment": ">=2.7.0",
     "stripe": "latest",
     "forever": ">=0.11.1",
