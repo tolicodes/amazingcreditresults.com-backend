@@ -22,7 +22,7 @@
     "moment": ">=2.7.0",
     "stripe": "latest",
     "forever": ">=0.11.1",
-    "hrw": "git+ssh://git@github.com:oselot/hunt-mongoose-rest.git",
+    "hunt-mongoose-rest": "git+ssh://git@github.com:oselot/hunt-mongoose-rest.git",
     "echosign": "git+ssh://git@github.com:oselot/echosign.git",
     "wkhtmltopdf": "0.1.4",
     "getprove": "0.0.5",

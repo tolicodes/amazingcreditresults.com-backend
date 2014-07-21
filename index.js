@@ -1,5 +1,5 @@
 var hunt = require('hunt'),
-  hrw = require('hrw'),
+  hrw = require('hunt-mongoose-rest'),
   Hunt = hunt({
 //    'hostUrl':'https://dev.amazingcreditresults.com/', //for example
     'redisUrl': process.env.AMAZING_REDIS_URL || 'redis://localhost:6379',
