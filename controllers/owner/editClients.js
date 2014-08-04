@@ -261,7 +261,7 @@ module.exports = exports = function (core) {
           'birthday': request.body.birthday
         },
         'roles': {
-          'buyer': request.body.roles ? request.body.roles.buyer : true,
+          'buyer': true,
           'seller': request.body.roles ? request.body.roles.seller : false
         },
         'root': false
