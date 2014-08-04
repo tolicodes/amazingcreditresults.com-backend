@@ -3,6 +3,8 @@ var welcomeLinkGenerator = require('./../../lib/welcome.js'),
   formatUser = require('./../../lib/formatter.js').formatUserForOwner,
   formatTradelineForBuyer = require('./../../lib/formatter.js').formatTradelineForBuyer,
   ensureOwner = require('./../../lib/middleware.js').ensureOwner,
+  curl = require('request'),
+  xml2js = require('xml2js'),
   utilities = require('./../../lib/utilities');
 
 module.exports = exports = function (core) {
@@ -159,10 +161,10 @@ module.exports = exports = function (core) {
       'city', 'ssn', 'birthday',
       'zip', 'needQuestionnaire'
     ].map(function (b) {
-      if (request.body[b]) {
-        patch['profile.' + b] = request.body[b];
-      }
-    });
+        if (request.body[b]) {
+          patch['profile.' + b] = request.body[b];
+        }
+      });
 
     if (request.body.roles) {
       ['seller', 'buyer'].map(function (role) {
@@ -499,6 +501,72 @@ module.exports = exports = function (core) {
             } else {
               response.status(202);
               response.json({'status': 'Ok'});
+            }
+          });
+        } else {
+          response.status(404);
+          response.json({
+            'status': 'Error',
+            'errors': [
+              {
+                'code': 404,
+                'message': 'User with this ID do not exists!'
+              }
+            ]
+          });
+        }
+      }
+    });
+  });
+
+  core.app.post('/api/v1/admin/clients/verifyssn/:id', ensureOwner, function (request, response) {
+    request.model.User.findById(request.params.id, function (error, userFound) {
+      if (error) {
+        throw error;
+      } else {
+        if (userFound) {
+          var builder = new xml2js.Builder(),
+            content = builder.buildObject({
+              'PlatformRequest': {
+                'Credentials': {
+                  'Username': core.config.evs.username,
+                  'Password': core.config.evs.password
+                },
+                'CustomerReference': userFound.id,
+                'Identity': {
+                  'Ssn': (userFound.profile && userFound.profile.ssn) ? userFound.profile.ssn : '111-111-111'
+                }
+              }
+            });
+          /*/
+           var content = '<?xml version="1.0" encoding="utf-8"?>' +
+           '<PlatformRequest>' +
+           '<Credentials>' +
+           '<Username>' + core.config.evs.username + '</Username>' +
+           '<Password>' + core.config.evs.password + '</Password>' +
+           '</Credentials>' +
+           '<CustomerReference>' + userFound.id + '</CustomerReference>' +
+           '<Identity>' +
+           '<Ssn>' + userFound.profile.ssn + '</Ssn>' +
+           '</Identity>' +
+           '</PlatformRequest>';
+           //*/
+          curl({
+            'method': 'POST',
+            'url': 'https://identiflo.everification.net/WebServices/Integrated/Main/V200/SSNLookup',
+            'body': content
+          }, function (error, res, body) {
+            if (error) {
+              throw error;
+            } else {
+              var parser = new xml2js.Parser();
+              parser.parseString(body, function (error, result) {
+                if (error) {
+                  throw error;
+                } else {
+                  response.json(result);
+                }
+              });
             }
           });
         } else {

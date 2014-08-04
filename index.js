@@ -1,6 +1,6 @@
-var hunt = require('hunt'),
+var Hunt = require('hunt'),
   hrw = require('hunt-mongoose-rest'),
-  Hunt = hunt({
+  hunt = Hunt({
 //    'hostUrl':'https://dev.amazingcreditresults.com/', //for example
     'redisUrl': process.env.AMAZING_REDIS_URL || 'redis://localhost:6379',
     'mongoUrl': process.env.AMAZING_MONGO_URL || 'mongodb://localhost/amazing',
@@ -22,9 +22,9 @@ var hunt = require('hunt'),
       'apiKeyOutdates': 60 * 60 * 1000 //ttl of api key for buyer to authorize - 1 day //https://oselot.atlassian.net/browse/ACR-20
     },
     'getProveApiKey': 'sk_live_X2dbARkkapQoOIGJc36uCfBQ',//'sk_test_TvGbvfhSC8Rfv9UcUt80czar',
-    'calledIn': {
-      'some': 'keys'
-    },
+//    'calledIn': {
+//      'some': 'keys' //it do not work!
+//    },
     'areYouAHuman': {
       'publisherKey': 'b940b3d9b8c42968e398d6042617944d3f0005c5',
       'scoringKey': 'dd286f8cd506dc324e2c8558c4f005bc617adee9'
@@ -42,6 +42,10 @@ var hunt = require('hunt'),
         }
       }
     },
+    'evs': {
+      'username': 'nowak@oselot.com',
+      'password': 's6Rek34p'
+    },
     'emailConfig': process.env.AMAZING_AMAZON_USE_SES ? {
       host: 'email-smtp.us-east-1.amazonaws.com',
       port: 587,
@@ -55,13 +59,13 @@ var hunt = require('hunt'),
   });
 
 //loading models
-Hunt.extendModel('Product', require('./models/Product.model.js'));
-Hunt.extendModel('TradeLine', require('./models/TradeLine.model.js'));
-Hunt.extendModel('TradeLineChange', require('./models/TradeLineChange.model.js'));
-Hunt.extendModel('Transaction', require('./models/Transaction.model.js'));
-Hunt.extendModel('Facade', require('./models/Facade.model.js'));
+hunt.extendModel('Product', require('./models/Product.model.js'));
+hunt.extendModel('TradeLine', require('./models/TradeLine.model.js'));
+hunt.extendModel('TradeLineChange', require('./models/TradeLineChange.model.js'));
+hunt.extendModel('Transaction', require('./models/Transaction.model.js'));
+hunt.extendModel('Facade', require('./models/Facade.model.js'));
 
-Hunt.extendApp(function (core) {
+hunt.extendApp(function (core) {
 //*/
 //setting up the css and javascripts to insert into layout
   core.app.locals.css.push({'href': '//yandex.st/bootstrap/3.1.1/css/bootstrap.min.css', 'media': 'screen'});
@@ -73,7 +77,7 @@ Hunt.extendApp(function (core) {
 });
 
 //perform ban for users being banned
-Hunt.extendMiddleware(function (core) {
+hunt.extendMiddleware(function (core) {
   return function (request, response, next) {
     if (request.user && request.user.isBanned) {
       response.status(403);
@@ -93,53 +97,53 @@ Hunt.extendMiddleware(function (core) {
 });
 
 //loading different controllers for buyers
-Hunt.extendRoutes(require('./controllers/buyer/login.js'));
-Hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
-Hunt.extendRoutes(require('./controllers/buyer/verifications/echosign.js'));
-Hunt.extendRoutes(require('./controllers/buyer/verifications/getprove.js'));
-Hunt.extendRoutes(require('./controllers/buyer/verifications/called.in.js'));
-Hunt.extendRoutes(require('./controllers/buyer/verifications/areyouahuman.js'));
+hunt.extendRoutes(require('./controllers/buyer/login.js'));
+hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
+hunt.extendRoutes(require('./controllers/buyer/verifications/echosign.js'));
+hunt.extendRoutes(require('./controllers/buyer/verifications/getprove.js'));
+hunt.extendRoutes(require('./controllers/buyer/verifications/called.in.js'));
+hunt.extendRoutes(require('./controllers/buyer/verifications/areyouahuman.js'));
 
 //loading controller for inventory table
-Hunt.extendRoutes(require('./controllers/buyer/tradelines.js'));
+hunt.extendRoutes(require('./controllers/buyer/tradelines.js'));
 
 //loading controller for cart
-Hunt.extendRoutes(require('./controllers/buyer/cart.js'));
-Hunt.extendRoutes(require('./controllers/buyer/checkout.js'));
+hunt.extendRoutes(require('./controllers/buyer/cart.js'));
+hunt.extendRoutes(require('./controllers/buyer/checkout.js'));
 
 //loading different controllers for owners
-Hunt.extendRoutes(require('./controllers/owner/login.js'));
-Hunt.extendRoutes(require('./controllers/owner/editOwners.js'));
-Hunt.extendRoutes(require('./controllers/owner/editClients.js'));
-Hunt.extendRoutes(require('./controllers/owner/editProducts.js'));
-Hunt.extendRoutes(require('./controllers/owner/editAllTradelines.js'));
-Hunt.extendRoutes(require('./controllers/owner/bulkImport.js'));
+hunt.extendRoutes(require('./controllers/owner/login.js'));
+hunt.extendRoutes(require('./controllers/owner/editOwners.js'));
+hunt.extendRoutes(require('./controllers/owner/editClients.js'));
+hunt.extendRoutes(require('./controllers/owner/editProducts.js'));
+hunt.extendRoutes(require('./controllers/owner/editAllTradelines.js'));
+hunt.extendRoutes(require('./controllers/owner/bulkImport.js'));
 
 //loading different controllers for sellers
-Hunt.extendRoutes(require('./controllers/seller/listProducts.js'));
-Hunt.extendRoutes(require('./controllers/seller/editMyTradelines.js'));
+hunt.extendRoutes(require('./controllers/seller/listProducts.js'));
+hunt.extendRoutes(require('./controllers/seller/editMyTradelines.js'));
 
 //loading controller shared by all users
-Hunt.extendRoutes(require('./controllers/shared.js'));
+hunt.extendRoutes(require('./controllers/shared.js'));
 
 //processing payment notifications from stripe
-Hunt.extendRoutes(require('./controllers/stripe/webhooks.js'));
+hunt.extendRoutes(require('./controllers/stripe/webhooks.js'));
 
 //RESTfull api via HRW
 
-hrw(Hunt, { 'modelName': 'Product', 'mountPoint': '/api/v2/products'});
+hrw(hunt, { 'modelName': 'Product', 'mountPoint': '/api/v2/products'});
 
 
 //Development route to test error catcher middleware
-if (Hunt.config.env === 'development') {
-  Hunt.extendRoutes(function (core) {
+if (hunt.config.env === 'development') {
+  hunt.extendRoutes(function (core) {
     core.app.get('/testError', function (request, response) {
       throw new Error('Test error!');
     });
   });
 }
 
-Hunt.extendRoutes(function (core) {
+hunt.extendRoutes(function (core) {
   core.app.all('*', function (request, response) {
     response.status(404);
     response.json({
@@ -156,7 +160,7 @@ Hunt.extendRoutes(function (core) {
 
 //JSON error reporter middleware.
 //https://oselot.atlassian.net/browse/ACR-105
-Hunt.extendRoutes(function (core) {
+hunt.extendRoutes(function (core) {
   core.app.use(function (error, request, response, next) {
 //http://mongoosejs.com/docs/validation.html
 //    if (core.config.env === 'development') {
@@ -215,32 +219,32 @@ Hunt.extendRoutes(function (core) {
   });
 });
 
-Hunt.once('start', function (evnt) {
+hunt.once('start', function (evnt) {
 //populating database with test data in development environment!
-  if (Hunt.config.env === 'development') {
-    require('./lib/populateDatabase.js')(Hunt); //uncomment to repopulate database on every start
+  if (hunt.config.env === 'development') {
+    require('./lib/populateDatabase.js')(hunt); //uncomment to repopulate database on every start
   }
   /*/
    //testing amazon SES
-   Hunt.sendEmail('nowak@oselot.com','SES works','YO!', console.error);
+   hunt.sendEmail('nowak@oselot.com','SES works','YO!', console.error);
    //*/
 });
 
 
 //Some sort of logging. npm module of `forever` can output this all to files.
 
-//Hunt.on('httpSuccess', console.log);
-//Hunt.on('httpError', console.error);
+//hunt.on('httpSuccess', console.log);
+//hunt.on('httpError', console.error);
 
 //starting
 if (module.parent) {
 //https://oselot.atlassian.net/browse/ACR-255
-  module.exports = exports = Hunt;
+  module.exports = exports = hunt;
 } else {
-  if (Hunt.config.env === 'development') {
-    Hunt.startWebServer();
+  if (hunt.config.env === 'development') {
+    hunt.startWebServer();
   } else {
-    Hunt.startWebCluster();
+    hunt.startWebCluster();
   }
 }
 
