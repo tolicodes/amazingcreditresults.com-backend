@@ -5,7 +5,7 @@ var welcomeLinkGenerator = require('./../../lib/welcome.js'),
   ensureOwner = require('./../../lib/middleware.js').ensureOwner,
   curl = require('request'),
   xml2js = require('xml2js'),
-  utilities = require('./../../lib/utilities');
+  utilities = require('./../../lib/utilities.js');
 
 module.exports = exports = function (core) {
 
