@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<PlatformResponse>
+    <TransactionDetails>
+        <TransactionId>587</TransactionId>
+        <TransactionDate>2011-07-06T15:17:30.44</TransactionDate>
+        <Product name="SSN Lookup" version="2.0.0"/>
+        <CustomerReference/>
+        <DataProviderDuration>0.2939566</DataProviderDuration>
+        <TotalDuration>0.3992648</TotalDuration>
+        <Errors/>
+        <Warnings/>
+    </TransactionDetails>
+    <Response>
+        <WorkflowOutcome code="R">Needs Further Review</WorkflowOutcome>
+        <StandardizedAddress>
+            <LastName>SMITH</LastName>
+            <FirstName>JOHN</FirstName>
+            <MiddleInitial>C</MiddleInitial>
+            <Street>123 MAIN ST APT 2</Street>
+            <City>OKLAHOMA CITY</City>
+            <State>OK</State>
+            <ZipCode>73172</ZipCode>
+            <ZipPlusFour>1789</ZipPlusFour>
+        </StandardizedAddress>
+        <SsnDetails/>
+        <SsnValidation>
+            <DeceasedResult code="N"/>
+            <StateIssued>OK</StateIssued>
+            <IssueStartRange>1969</IssueStartRange>
+            <IssueEndRange>1971</IssueEndRange>
+        </SsnValidation>
+        <PreviousAddresses>
+            <PreviousAddress>
+                <Street>222 WATER ST</Street>
+                <City>OKLAHOMA CITY</City>
+                <State>OK</State>
+                <ZipCode>73132</ZipCode>
+                <ZipPlusFour>4101</ZipPlusFour>
+                <ReportDate>
+                    <Day/>
+                    <Month>04</Month>
+                    <Year>1994</Year>
+                </ReportDate>
+                <UpdateDate>
+                    <Day/>
+                    <Month>02</Month>
+                    <Year>2010</Year>
+                </UpdateDate>
+            </PreviousAddress>
+            <PreviousAddress>
+                <Street>4444 OAK ST</Street>
+                <City>OKLAHOMA CITY</City>
+                <State>OK</State>
+                <ZipCode>73132</ZipCode>
+                <ZipPlusFour>1154</ZipPlusFour>
+                <ReportDate>
+                    <Day/>
+                    <Month>10</Month>
+                    <Year>1993</Year>
+                </ReportDate>
+                <UpdateDate>
+                    <Day/>
+                    <Month>04</Month>
+                    <Year>1999</Year>
+                </UpdateDate>
+            </PreviousAddress>
+        </PreviousAddresses>
+        <Questions>
+            <Question type="1" text="Which one of the following addresses is associated with you?">
+                <Answer correct="false">7402 ST PATRICK DR</Answer>
+                <Answer correct="false">6115 SHEFFIELD</Answer>
+                <Answer correct="false">4548 WOODSMOKE LN</Answer>
+                <Answer correct="false">5653 KELLEY AV</Answer>
+                <Answer correct="true">4444 OAK ST</Answer>
+                <Answer correct="false">3408 PENNSAVANIA AV</Answer>
+                <Answer correct="false">6971 BARTLETT DR</Answer>
+                <Answer correct="false">6056 MCKINELY</Answer>
+                <Answer correct="false">4063 WILSON ST</Answer>
+                <Answer correct="false">None of the above</Answer>
+            </Question>
+            <Question type="2" text="Which one of the following area codes is associated with you?">
+                <Answer correct="false">208</Answer>
+                <Answer correct="false">630</Answer>
+                <Answer correct="true">405</Answer>
+                <Answer correct="false">910</Answer>
+                <Answer correct="false">606</Answer>
+                <Answer correct="false">513</Answer>
+                <Answer correct="false">503</Answer>
+                <Answer correct="false">860</Answer>
+                <Answer correct="false">803</Answer>
+                <Answer correct="false">None of the above</Answer>
+            </Question>
+            <Question type="3" text="Which one of the following counties is associated with you?">
+                <Answer correct="false">Talbot</Answer>
+                <Answer correct="false">Corozal</Answer>
+                <Answer correct="false">Johnson</Answer>
+                <Answer correct="false">Aleutians West</Answer>
+                <Answer correct="false">Trumbull</Answer>
+                <Answer correct="false">Cuyahoga</Answer>
+                <Answer correct="false">Arroyo</Answer>
+                <Answer correct="false">Suffolk City</Answer>
+                <Answer correct="true">Oklahoma</Answer>
+                <Answer correct="false">None of the above</Answer>
+            </Question>
+            <Question type="4" text="Which one of the following zip codes is associated with you?">
+                <Answer correct="false">73383</Answer>
+                <Answer correct="false">73352</Answer>
+                <Answer correct="false">73007</Answer>
+                <Answer correct="false">73534</Answer>
+                <Answer correct="false">73060</Answer>
+                <Answer correct="false">73348</Answer>
+                <Answer correct="false">73211</Answer>
+                <Answer correct="true">73132</Answer>
+                <Answer correct="false">73744</Answer>
+                <Answer correct="false">None of the above</Answer>
+            </Question>
+            <Question type="5" text="What state was your SSN issued in?">
+                <Answer correct="false">Maine</Answer>
+                <Answer correct="false">Kentucky</Answer>
+                <Answer correct="true">Oklahoma</Answer>
+                <Answer correct="false">Texas</Answer>
+                <Answer correct="false">Nebraska</Answer>
+                <Answer correct="false">Arkansas</Answer>
+                <Answer correct="false">Alabama</Answer>
+                <Answer correct="false">Georgia</Answer>
+                <Answer correct="false">Oregon</Answer>
+                <Answer correct="false">None of the above</Answer>
+            </Question>
+            <Question type="6" text="Which one of the following adult individuals is most closely associated with you?">
+                <Answer correct="false">Sandro</Answer>
+                <Answer correct="false">Bertha</Answer>
+                <Answer correct="false">Irma</Answer>
+                <Answer correct="false">Dora</Answer>
+                <Answer correct="false">Sara</Answer>
+                <Answer correct="false">Juanita</Answer>
+                <Answer correct="false">Jesus-Ernesto</Answer>
+                <Answer correct="false">Otilio</Answer>
+                <Answer correct="false">Pitina</Answer>
+                <Answer correct="true">None of the above</Answer>
+            </Question>
+        </Questions>
+    </Response>
+</PlatformResponse>
