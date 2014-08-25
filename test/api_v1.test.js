@@ -10,6 +10,7 @@ var request = require('request'),
   testId = Math.floor(Math.random() * 10000),
   welcomeLink,
   ownerHuntKey,
+  ownerHuntKey2,
   buyerHuntKey,
   productId,
   userId,
@@ -2072,10 +2073,30 @@ describe('init', function () {
               done(error);
             } else {
               response.statusCode.should.be.equal(201);
-              body.status.should.be.equal('ok');
+              body.status.should.be.equal('Ok');
               body.transactionId.should.be.a.String;
-              //todo - test that transaction is issued at /api/v1/account
-              done()
+              var newTransactionId = body.transactionId;
+              request({
+                'method': 'POST',
+                'url': 'http://localhost:' + port + '/api/v1/account',
+                'headers': {'huntKey': buyerHuntKey},
+                'json': true
+              }, function(error, response, body){
+                  if(error) {
+                    done(error);
+                  } else {
+                    response.statusCode.should.be.equal(200);
+                    var transactionFound1 = false;
+                    body.transactions.map(function(tr){
+                      if (tr.id == newTransactionId) {
+                        transactionFound1 = true
+                      }
+                    });
+                    transactionFound1.should.be.true;
+                    done();
+                  }
+              });
+
             }
           });
         });
