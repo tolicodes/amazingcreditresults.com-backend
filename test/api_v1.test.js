@@ -2077,7 +2077,7 @@ describe('init', function () {
               body.transactionId.should.be.a.String;
               var newTransactionId = body.transactionId;
               request({
-                'method': 'POST',
+                'method': 'GET',
                 'url': 'http://localhost:' + port + '/api/v1/account',
                 'headers': {'huntKey': buyerHuntKey},
                 'json': true
@@ -2087,7 +2087,7 @@ describe('init', function () {
                   } else {
                     response.statusCode.should.be.equal(200);
                     var transactionFound1 = false;
-                    body.transactions.map(function(tr){
+                    body.data.transactions.map(function(tr){
                       if (tr.id == newTransactionId) {
                         transactionFound1 = true
                       }
@@ -2135,7 +2135,7 @@ describe('init', function () {
         } else {
           response.statusCode.should.be.equal(200);
           body.transactions.should.be.an.Array;
-          body.transactions.length.should.be.equal(1);
+          body.transactions.length.should.be.above(0);
 
           var transactionFound = false;
           body.transactions.map(function (t) {
