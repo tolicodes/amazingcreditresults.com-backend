@@ -687,7 +687,7 @@ DELETE /api/v1/cart/tradelines/5396002cb5282e71211d4f74
 Checkout
 POST /api/v1/cart/checkout
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
-< 202
+< 201
 < Content-Type: application/json
 {
     "status": "ok",

@@ -2060,8 +2060,25 @@ describe('init', function () {
         });
       });
 
-      describe('buyer can checkout', function(){
-        it('will be done soon')
+      describe('buyer can checkout', function () {
+        it('should work', function(done){
+          request({
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/api/v1/cart/checkout',
+            'headers': {'huntKey': buyerHuntKey},
+            'json': true
+          }, function (error, response, body) {
+            if(error) {
+              done(error);
+            } else {
+              response.statusCode.should.be.equal(201);
+              body.status.should.be.equal('ok');
+              body.transactionId.should.be.a.String;
+              //todo - test that transaction is issued at /api/v1/account
+              done()
+            }
+          });
+        });
       });
   });
 
