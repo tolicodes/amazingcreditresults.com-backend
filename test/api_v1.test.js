@@ -1949,8 +1949,7 @@ describe('init', function () {
     });
   });
 
-  describe('Buyer', function () {
-    describe('cart', function () {
+  describe('Buyer can use cart to', function () {
       describe('adding tradelines', function () {
 
         it('should be able to add a tradeline to a cart', function (done) {
@@ -2061,7 +2060,9 @@ describe('init', function () {
         });
       });
 
-    });
+      describe('buyer can checkout', function(){
+        it('will be done soon')
+      });
   });
 
   describe('Owner uploads funds to Buyer account', function () {
