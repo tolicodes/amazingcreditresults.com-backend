@@ -2136,7 +2136,6 @@ describe('init', function () {
           response.statusCode.should.be.equal(200);
           body.transactions.should.be.an.Array;
           body.transactions.length.should.be.above(0);
-
           var transactionFound = false;
           body.transactions.map(function (t) {
             if (t.amount == 1 && t.type == 'ownerUpload' && t.date == 'Sat May 03 2014' && t.paidBy == 'Credit Card') {
@@ -2144,7 +2143,6 @@ describe('init', function () {
             }
           });
           transactionFound.should.be.true;
-
           done();
         }
       });
