@@ -77,3 +77,36 @@ Will authorize the request to be done by the user who has this huntKey
 
 Additional header - `huntkey=1fcfaecdc53ce05ac5aa0658a9770903cd70cef7107357395125c9a2888100f0634a9`
 
+
+Chechout procedures (CART WORKFLOW)
+=====================================
+
+1) Buyer can add tradeline he/she want to buy to cart,
+
+http://docs.amazingcreditresultsapi.apiary.io/#post-%2Fapi%2Fv1%2Fcart%2Ftradelines
+
+Also note, that on this api endpoint -
+http://docs.amazingcreditresultsapi.apiary.io/#get-%2Fapi%2Fv1%2Ftradelines
+the field of "inCart" is set to true if this particular tradeline is in cart.
+
+Also Buyer can see the tradelines currently in cart by using this endpoint
+http://docs.amazingcreditresultsapi.apiary.io/#get-%2Fapi%2Fv1%2Fcart%2Ftradelines
+
+2) To delete unneeded tradeline from cart, Buyer can use this endpoint
+http://docs.amazingcreditresultsapi.apiary.io/#delete-%2Fapi%2Fv1%2Fcart%2Ftradelines%2F5396002cb5282e71211d4f74
+
+
+3) To perform checkount Buyer have to use this api endpoint
+http://docs.amazingcreditresultsapi.apiary.io/#post-%2Fapi%2Fv1%2Fcart%2Ftradelines
+
+If Byuer does not have sufficient funds on his account, the transaction will not be issued.
+
+If Byuer has sufficient funds on his account (as can be seen here http://docs.amazingcreditresultsapi.apiary.io/#get-%2Fapi%2Fv1%2Faccount),
+the transaction is issued. Firstly, the transaction is created in database collection of `Transactions`,
+ with userId, tradelineId as parameters saved. Than, the transaction is saved into database.
+
+ALso Buyer can see his/her transactions on this api endpoint http://docs.amazingcreditresultsapi.apiary.io/#get-%2Fapi%2Fv1%2Faccount
+
+The tradeline entity in the database will have the buyers populated with current user profile.
+ And Owner can see the transaction Buyers when using this api endpoint - http://docs.amazingcreditresultsapi.apiary.io/#get-%2Fapi%2Fv1%2Fowner%2Ftradelines%2F%3Aid
+ For now it is planned behaviour, if this is correct approach, i can uncomment code to do this

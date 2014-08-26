@@ -592,7 +592,7 @@ GET /api/v1/tradelines
 }
 
 
--- Buyer cart (unstable) --
+-- Buyer cart --
 
 List tradelines in cart
 GET /api/v1/cart/tradelines
