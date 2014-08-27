@@ -472,12 +472,38 @@ module.exports = exports = function (core) {
         return utilities.error(400, 'Only buyers and sellers can be removed', response);
       }
 
-      userFound.update({isBanned: true}, function (error) {
+
+//we can actually delete user from database if he or she has no transactions or tradelines
+      core.async.parallel({
+        'countTransactions': function (cb) {
+          request.model.Transaction.count({'client': userFound._id}, cb);
+        },
+        'countTradelines': function (cb) { //for seller, for example
+          request.model.TradeLine.count({'seller': userFound._id}, cb);
+        }
+      }, function (error, p) {
         if (error) {
           throw error;
+        } else {
+          if (p.countTransactions === 0 && p.countTradelines === 0) {
+            userFound.remove(function (error) {
+              if (error) {
+                throw error
+              } else {
+                response.status(200);
+                response.json({'status': 'Deleted'});
+              }
+            });
+          } else {
+            utilities.error(400,
+              (
+                'Unable to delete client. He or she has ' +
+                p.countTransactions + ' transactions and ' +
+                p.countTradelines + ' tradelines owned'
+              ),
+              response);
+          }
         }
-
-        response.send(200, null);
       });
     });
   });
