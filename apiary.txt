@@ -925,6 +925,10 @@ DELETE /api/v1/admin/owners/5396002cb5282e71211d4f74
 -- Owner resource to edit clients --
 
 List all clients in JSON format
+We can list clients by role like this:
+http://dev.amazingcreditresults.com/api/v1/admin/clients?huntKey=iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv&owner=true
+http://dev.amazingcreditresults.com/api/v1/admin/clients?huntKey=iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv&seller=true
+http://dev.amazingcreditresults.com/api/v1/admin/clients?huntKey=iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv&buyer=true
 GET /api/v1/admin/clients
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
@@ -1318,7 +1322,7 @@ POST /api/v1/admin/clients/resetPassword/:id
 }
 
 
-Ban(delete) one of Buyers. Accessible by Owners.
+Delete one of Buyers or Sellers. Accessible by Owners. Owner or Seller can be only deleted, if they do not have transactions or tradelines owned by them
 DELETE /api/v1/admin/clients/5396002cb5282e71211d4f74
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json; charset=utf-8
