@@ -924,11 +924,181 @@ DELETE /api/v1/admin/owners/5396002cb5282e71211d4f74
 
 -- Owner resource to edit clients --
 
+
+List all buyers in JSON format
+GET /api/v1/admin/clients?buyer=true
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 200
+< Content-Type: application/json
+{
+    "metadata":{
+        "users":1,
+        "page":1,
+        "perPage":100,
+        "order":"+_id",
+        "filter":{
+          "roles":{"buyer":true}
+        }
+    },
+    "data": [
+        {
+            "id": "538b612c7f61bdb5eadffe22",
+            "huntKey": "d10899484b00263d062e5e1a1d79394fb7c893110ae2cc64d4bc8c508be3d7aff728058ea4ebb17afbf84be618a0708edab3f1f8e881d8a305b31ae48c1e99a4",
+            "email": "johndoe@example.org",
+            "name": {
+                "familyName": "Doe",
+                "givenName": "John",
+                "middleName": "Theodor"
+            },
+            "title": "Mr.",
+            "phone": "",
+            "altPhone": "",
+            "state": "",
+            "city": "",
+            "zip": "",
+            "street1": "",
+            "ssn":11111,
+            "birthday":"01-01-1982"
+            "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+            "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
+            "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
+            "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+            "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
+            "root": false,
+            "roles": {
+                "owner": false,
+                "buyer": true,
+                "seller": false
+            },
+            "accountVerified": false,
+            "isBanned": true,
+            "needQuestionnaire": true,
+            "profile": {
+                "answer1": "",
+                "answer2": "",
+                "answer3": ""
+            }
+        }
+     ]
+}
+
+List all sellers in JSON format
+GET /api/v1/admin/clients?seller=true
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 200
+< Content-Type: application/json
+{
+    "metadata":{
+        "users":1,
+        "page":1,
+        "perPage":100,
+        "order":"+_id",
+        "filter":{
+          "roles":{"seller":true}
+        }
+    },
+    "data": [
+        {
+            "id": "538b612c7f61bdb5eadffe22",
+            "huntKey": "d10899484b00263d062e5e1a1d79394fb7c893110ae2cc64d4bc8c508be3d7aff728058ea4ebb17afbf84be618a0708edab3f1f8e881d8a305b31ae48c1e99a4",
+            "email": "johndoe@example.org",
+            "name": {
+                "familyName": "Doe",
+                "givenName": "John",
+                "middleName": "Theodor"
+            },
+            "title": "Mr.",
+            "phone": "",
+            "altPhone": "",
+            "state": "",
+            "city": "",
+            "zip": "",
+            "street1": "",
+            "ssn":11111,
+            "birthday":"01-01-1982"
+            "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+            "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
+            "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
+            "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+            "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
+            "root": false,
+            "roles": {
+                "owner": false,
+                "buyer": true,
+                "seller": false
+            },
+            "accountVerified": false,
+            "isBanned": true,
+            "needQuestionnaire": true,
+            "profile": {
+                "answer1": "",
+                "answer2": "",
+                "answer3": ""
+            }
+        }
+     ]
+}
+
+
+List all owners in JSON format
+GET /api/v1/admin/clients?owner=true
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 200
+< Content-Type: application/json
+{
+    "metadata":{
+        "users":1,
+        "page":1,
+        "perPage":100,
+        "order":"+_id",
+        "filter":{
+          "roles":{"owner":true}
+        }
+    },
+    "data": [
+        {
+            "id": "538b612c7f61bdb5eadffe22",
+            "huntKey": "d10899484b00263d062e5e1a1d79394fb7c893110ae2cc64d4bc8c508be3d7aff728058ea4ebb17afbf84be618a0708edab3f1f8e881d8a305b31ae48c1e99a4",
+            "email": "johndoe@example.org",
+            "name": {
+                "familyName": "Doe",
+                "givenName": "John",
+                "middleName": "Theodor"
+            },
+            "title": "Mr.",
+            "phone": "",
+            "altPhone": "",
+            "state": "",
+            "city": "",
+            "zip": "",
+            "street1": "",
+            "ssn":11111,
+            "birthday":"01-01-1982"
+            "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+            "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
+            "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
+            "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+            "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
+            "root": false,
+            "roles": {
+                "owner": false,
+                "buyer": true,
+                "seller": false
+            },
+            "accountVerified": false,
+            "isBanned": true,
+            "needQuestionnaire": true,
+            "profile": {
+                "answer1": "",
+                "answer2": "",
+                "answer3": ""
+            }
+        }
+     ]
+}
+
+
 List all clients in JSON format
-We can list clients by role like this:
-http://dev.amazingcreditresults.com/api/v1/admin/clients?huntKey=iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv&owner=true
-http://dev.amazingcreditresults.com/api/v1/admin/clients?huntKey=iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv&seller=true
-http://dev.amazingcreditresults.com/api/v1/admin/clients?huntKey=iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv&buyer=true
 GET /api/v1/admin/clients
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
