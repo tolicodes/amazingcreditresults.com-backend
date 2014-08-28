@@ -29,9 +29,9 @@ module.exports = exports = function (core) {
       filter = {};
 
     ['owner', 'buyer', 'seller'].map(function (role) {
-      if (request.query[role]) {
+      if (request.query[role] == true) {
         filter.roles = filter.roles || {};
-        filter.roles[role] = request.query[role] ? true : false;
+        filter.roles[role] = true;
       }
     });
 
