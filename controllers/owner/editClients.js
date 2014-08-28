@@ -155,6 +155,12 @@ module.exports = exports = function (core) {
       }
     });
 
+    ['title', 'suffix'].map(function(b) {
+      if (request.body.name && request.body.name[a]) {
+        patch['profile.' + a] = request.body.name[a];
+      }
+    });
+
     [
       'title', 'street1', 'street2',
       'phone', 'altPhone', 'state',
