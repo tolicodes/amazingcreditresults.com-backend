@@ -26,11 +26,11 @@ module.exports = exports = function (core) {
       perPage = request.query.perPage || 100,
       order = request.query.order || '+_id',
       skip = (page - 1) * perPage,
-      filter = { 'roles': {} };
+      filter = { };
 
     ['owner', 'buyer', 'seller'].map(function (role) {
-      if (request.query[role] == true) {
-        filter.roles[role] = true;
+      if (request.query[role] == 'true') {
+        filter['roles.'+role] = true;
       }
     });
 
