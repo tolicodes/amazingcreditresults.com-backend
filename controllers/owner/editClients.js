@@ -147,7 +147,7 @@ module.exports = exports = function (core) {
       patch.isBanned = request.body.isBanned;
     }
 
-    ['familyName', 'givenName', 'middleName'].map(function (a) {
+    ['familyName', 'givenName', 'middleName', 'title', 'generation'].map(function (a) {
       if (request.body.name && request.body.name[a]) {
         patch['name.' + a] = request.body.name[a];
       }
