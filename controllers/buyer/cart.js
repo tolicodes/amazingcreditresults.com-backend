@@ -10,14 +10,18 @@ module.exports = exports = function (core) {
         request.model.TradeLine
           .findById(id)
           .populate('product')
+          .lean()
           .exec(cb);
       },
       function (error, tradeLinesFound) {
         if (error) {
           throw error;
         } else {
+         
           response.json({
-            'data': tradeLinesFound.map(formatter.formatTradelineForBuyer),
+            'data': tradeLinesFound.map(
+                formatter.formatTradelineForBuyer.bind(null, request.user)
+            ),
             'itemsInCart': tradeLinesFound.length
           });
         }

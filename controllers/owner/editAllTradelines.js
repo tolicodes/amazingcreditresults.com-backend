@@ -1,277 +1,91 @@
-//https://oselot.atlassian.net/browse/ACR-197
-//https://oselot.atlassian.net/browse/ACR-198
-var ensureUserIsOwnerMiddleware = require('./../../lib/middleware.js').ensureOwner;
+var ensureRole = require('./../../lib/middleware.js').ensureRole;
+var utilities = require('../../lib/utilities');
+var _ = require('underscore');
 
-module.exports = exports = function (core) {
+var fields = [
+  'product', 'seller', 'totalAus', 'currentAus', 
+  'statementDate', 'dateOpen', 'creditLimit',
+  'currentBalance', 'cost', 'price', 'balance', 'notes', 'tier', 'active'
+];
 
-  function formatProduct(product) {
-    return product;
-  }
+var editableFields = _(fields).chain().clone().without('product', 'seller').value();
 
-  function formatTradeline(product) {
-    return product;
-  }
+module.exports = exports = function(core) {
+  core.app.get('/api/v1/owner/tradelines', ensureRole('owner'), function(req, res) {
+    utilities.throwError = utilities.throwError.bind(utilities, res);
 
-  core.app.get('/api/v1/owner/tradelines', ensureUserIsOwnerMiddleware, function (request, response) {
-    var filter = {};
-    [ 'product', 'seller', 'totalAus', 'usedAus',
-      'creditLimit', 'cashLimit', 'currentBalance',
-      '_ncRating', '_bcRating', '_moRating',
-      'ncRating', 'bcRating', 'moRating',
-      'cost', 'price', 'active'].map(function (field) {
-        if (request.query[field]) {
-          filter[field] = request.query[field];
-        }
-      });
-    request.model.TradeLine
-      .find(filter)
-      .skip(request.query.skip || 0)
-      .limit(request.query.limit || 30)
+    req.model.TradeLine
+      .find(utilities.createModel(req.query, fields))
+      .skip(req.query.skip || 0)
+      .limit(req.query.limit || 10000)
       .sort('+_id')
-      .populate('seller')
       .populate('product')
-      .exec(function (error, tradeLines) {
-        if (error) {
-          throw error;
-        } else {
-          response.json({
-            'metaData': {},
-            'data': tradeLines.map(formatTradeline)
-          });
-        }
-      });
+      .exec().then(function(obj) {
+        utilities.returnList(res, obj);
+      }, utilities.throwError);
   });
 
-  core.app.get('/api/v1/owner/tradelines/:id', ensureUserIsOwnerMiddleware, function (request, response) {
-    request.model.TradeLine
-      .findById(request.params.id)
-      .populate('seller')
+  core.app.get('/api/v1/owner/tradelines/:id', ensureRole('role'), function(req, res) {
+    utilities.throwError = utilities.throwError.bind(utilities, res);
+
+    req.model.TradeLine
+      .findById(req.params.id)
       .populate('product')
-      .exec(function (error, tradeLineFound) {
-        if (error) {
-          throw error;
-        } else {
-          if (tradeLineFound) {
-            request.model.TradeLineChange
-              .find({'tradeLine': tradeLineFound.id})
-              .sort('-_id')
-              .populate('issuer')
-              .populate('reviewer')
-              .exec(function (error, tradeLineChanges) {
-                if (error) {
-                  throw error;
-                } else {
-//                  console.log(tradeLineChanges);
-                  tradeLineFound.changes = tradeLineChanges || [];
-//                  console.log(tradeLineFound);
-                  response.json({'data': tradeLineFound, 'changes': tradeLineChanges});
-                }
-              });
-          } else {
-            response.status(404);
-            response.json({
-              'status': 'Error',
-              'errors': [
-                {
-                  'code': 404,
-                  'message': 'Tradeline with this id do not exists!'
-                }
-              ]
-            });
-          }
+      .exec().then(function (obj) {
+        if(!obj) {
+          return utilities.error(404, 'Tradeline not found', res);
         }
-      });
+        
+        res.json(utilities.pickFields(fields, data));
+      }, utilities.throwError);
   });
 
-  //ACR-254
-  core.app.post(/^\/api\/v1\/owner\/tradelines\/([0-9a-f]+)\/changeset\/([0-9a-f]+)\/approve$/, ensureUserIsOwnerMiddleware, function (request, response) {
-    var tradeLineId = request.params[0],
-      changeId = request.params[1];
-    core.async.parallel({
-      'tradeLine': function (cb) {
-        request.model.TradeLine.findById(tradeLineId, cb);
-      },
-      'tradeLineChange': function (cb) {
-        request.model.TradeLineChange.findOne({'_id': changeId, 'tradeLine': tradeLineId}, cb);
-      }
-    }, function (error, obj) {
-      if (error) {
-        throw error;
-      } else {
-        if (obj.tradeLine && obj.tradeLineChange) {
-          obj.tradeLineChange.approve(request.user, function (err) {
-            if (err) {
-              throw err;
-            } else {
-              response.json({
-                'tradeLine': obj.tradeLine,
-                'tradeLineChange': obj.tradeLineChange,
-                'status': 'approve'
-              });
-            }
-          });
-        } else {
-          response.status(404);
-          response.json({
-            'status': 'Error',
-            'errors': [
-              {
-                'code': 404,
-                'message': 'Tradeline or TradelineChange with this IDs do not exists!'
-              }
-            ]
-          });
+  core.app.post('/api/v1/owner/tradelines', ensureRole('owner'), function(req, res) {
+    utilities.throwError = utilities.throwError.bind(utilities, res);
 
-        }
-      }
-    });
+    console.log(req.body)
+
+    req.model.TradeLine
+      .create(utilities.createModel(req.body, fields))
+      .then(function (obj) {
+        res.status(201).json(utilities.pickFields(fields, obj));
+      }, utilities.throwError);
   });
 
-  core.app.post(/^\/api\/v1\/owner\/tradelines\/([0-9a-f]+)\/changeset\/([0-9a-f]+)\/deny$/, ensureUserIsOwnerMiddleware, function (request, response) {
-    var tradeLineId = request.params[0],
-      changeId = request.params[1];
-    core.async.parallel({
-      'tradeLine': function (cb) {
-        request.model.TradeLine.findById(tradeLineId, cb);
-      },
-      'TradeLineChanges': function (cb) {
-        request.model.TradeLineChange.findOne({'_id': changeId, 'tradeLine': tradeLineId}, cb);
-      }
-    }, function (error, obj) {
-      if (error) {
-        throw error;
-      } else {
-        if (obj.tradeLine && obj.tradeLineChange) {
-          obj.tradeLineChange.deny(request.user, function (err) {
-            if (err) {
-              throw err;
-            } else {
-              response.json({
-                'tradeLine': obj.tradeLine,
-                'tradeLineChange': obj.tradeLineChange,
-                'status': 'deny'
-              });
-            }
-          });
-        } else {
-          response.status(404);
-          response.json({
-            'status': 'Error',
-            'errors': [
-              {
-                'code': 404,
-                'message': 'Tradeline or TradelineChange with this IDs do not exists!'
-              }
-            ]
-          });
-
+  core.app.put('/api/v1/owner/tradelines/:id', ensureRole('owner'), function(req, res) {
+    utilities.throwError = utilities.throwError.bind(utilities, res);
+    
+    req.model.TradeLine
+      .update(
+        {_id: req.params.id}, 
+        utilities.createModel(req.body, editableFields, {})
+      )
+      .exec().then(function (affected) {
+        if(!affected) {
+          return utilities.error(404, 'Tradeline not found', res);
         }
-      }
-    });
+        
+        res.status(202).json(utilities.pickFields(fields, req.body));
+      }, utilities.throwError);
   });
 
+  core.app.delete('/api/v1/owner/tradelines/:id', ensureRole('owner'), function(req, res) {
+    utilities.throwError = utilities.throwError.bind(utilities, res);
 
-  core.app.post('/api/v1/owner/tradelines', ensureUserIsOwnerMiddleware, function (request, response) {
-    var fields = {};
-    [
-      'product', 'seller', 'totalAus', 'usedAus', 'price',
-      'creditLimit', 'cashLimit', 'currentBalance', 'ncRating', 'statementDate',
-      'bcRating', 'moRating', 'cost', 'notes'
-    ].map(function (field) {
-        if (request.body[field]) {
-          fields[field] = request.body[field];
+    req.model.TradeLine
+     .findById(req.params.id)
+      .exec()
+      .then(function(obj){
+        if(!obj) {
+          return utilities.error(404, 'Tradeline not found', res);
         }
-      });
-    var newTradeLine = new request.model.TradeLine(fields);
-    newTradeLine.save(function (error, tradelineCreated) {
-      if (error) {
-        throw error;
-      } else {
-        response.status(201);
-        response.json({data: tradelineCreated});
-      }
-    });
-  });
 
-  core.app.put('/api/v1/owner/tradelines/:id', ensureUserIsOwnerMiddleware, function (request, response) {
-    request.model.TradeLine.findById(request.params.id, function (error, tradeLineFound) {
-      if (error) {
-        throw error;
-      } else {
-        if (tradeLineFound) {
-          var tradeLineChange = new request.model.TradeLineChange();
-          tradeLineChange.tradeLine = tradeLineFound.id;
-          tradeLineChange.issuer = request.user.id;
-          tradeLineChange._status = 1;
-
-          [
-            'product', 'seller', 'totalAus', 'usedAus', 'price',
-            'creditLimit', 'cashLimit', 'currentBalance', 'ncRating', 'statementDate',
-            'bcRating', 'moRating', 'cost', 'notes'
-          ].map(function (field) {
-              if (request.body[field]) {
-                tradeLineFound[field] = request.body[field];
-                tradeLineChange[field] = request.body[field];
-              }
-            });
-          core.async.parallel({
-            'tradeline': function (cb) {
-              tradeLineFound.save(cb);
-            },
-            'change': function (cb) {
-              tradeLineChange.save(cb);
-            }
-          }, function (err, obj) {
-            if (err) {
-              throw err;
-            } else {
-              response.status(202);
-              response.json({data: tradeLineFound });
-            }
-          });
-
-        } else {
-          response.status(404);
-          response.json({
-            'status': 'Error',
-            'errors': [
-              {
-                'code': 404,
-                'message': 'Tradeline with this id ' + request.params.id + ' do not exists!'
-              }
-            ]
-          });
-        }
-      }
-    });
-  });
-
-  core.app.delete('/api/v1/owner/tradelines/:id', ensureUserIsOwnerMiddleware, function (request, response) {
-    request.model.TradeLine.findOneAndUpdate(
-      {'_id': request.params.id},
-      { 'active': false },
-      {'upsert': false},
-      function (error, tradeLineArchived) {
-        if (error) {
-          throw error;
-        } else {
-          if (tradeLineArchived) {
-            response.status(202);
-            response.json({'status': 'Tradeline archived'});
-          } else {
-            response.status(404);
-            response.json({
-              'status': 'Error',
-              'errors': [
-                {
-                  'code': 404,
-                  'message': 'Tradeline with this ID do not exists!'
-                }
-              ]
-            });
-          }
-        }
-      }
-    );
+        req.model.TradeLine
+          .remove({'_id': req.params.id})
+          .exec()
+          .then(function(){
+            res.status(202).json({});
+          }, utilities.throwError);
+      }, utilities.throwError);
   });
 };

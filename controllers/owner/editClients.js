@@ -3,7 +3,8 @@ var welcomeLinkGenerator = require('./../../lib/welcome.js'),
   formatUser = require('./../../lib/formatter.js').formatUserForOwner,
   formatTradelineForBuyer = require('./../../lib/formatter.js').formatTradelineForBuyer,
   ensureOwner = require('./../../lib/middleware.js').ensureOwner,
-  utilities = require('./../../lib/utilities');
+  utilities = require('./../../lib/utilities'),
+  _ = require('underscore');
 
 module.exports = exports = function (core) {
 
@@ -23,23 +24,15 @@ module.exports = exports = function (core) {
     var page = request.query.page || 1,
       perPage = request.query.perPage || 100,
       order = request.query.order || '+_id',
-      skip = (page - 1) * perPage,
-      filter = {};
+      skip = (page - 1) * perPage;
 
-    ['owner', 'buyer', 'seller'].map(function (role) {
-      if (request.query[role]) {
-        filter.roles = filter.roles || {};
-        filter.roles[role] = request.query[role] ? true : false;
-      }
+    utilities.fixQueryFormatting(request.query);
+
+    var filter = utilities.createFilter(request.query, ['isBanned'], {
+      'owner': 'roles.owner',
+      'buyer': 'roles.buyer',
+      'seller': 'roles.seller'
     });
-
-    if (request.query.isBanned === 'true') {
-      filter.isBanned = true;
-    }
-
-    if (request.query.isBanned === 'false') {
-      filter.isBanned = false;
-    }
 
     core.async.parallel({
       'metadata': function (cb) {
@@ -119,7 +112,6 @@ module.exports = exports = function (core) {
             'status': 'Error',
             'errors': [
               {
-                'code': 404,
                 'message': 'User with this id do not exists!'
               }
             ]
@@ -130,56 +122,19 @@ module.exports = exports = function (core) {
   });
 
   core.app.put('/api/v1/admin/clients/:id', ensureOwner, function (request, response) {
-//https://oselot.atlassian.net/browse/ACR-108
-    var patch = {},
-      roles = {},
-      rolesToSet = false;
-
-    if (request.body.email) {
-      patch['keychain.email'] = request.body.email;
-    }
-
-    if (request.body.accountVerified === true || request.body.accountVerified === false) {
-      patch.accountVerified = request.body.accountVerified;
-    }
-
-    if (request.body.isBanned === true || request.body.isBanned === false) {
-      patch.isBanned = request.body.isBanned;
-    }
-
-    ['familyName', 'givenName', 'middleName', 'title', 'generation'].map(function (a) {
-      if (request.body.name && request.body.name[a]) {
-        patch['name.' + a] = request.body.name[a];
-      }
+    var patch = utilities.createModel(request.body, 
+      ['accountVerified', 'isBanned', 'name.familyName', 'name.givenName', 'name.middleName', 'name.title', 'name.generation', 'roles'], {
+      'email': 'keychain.email',
+      'title': 'profile.title',
+      'street1': 'profile.street1', 
+      'street2': 'profile.street2',
+      'phone': 'profile.phone',  
+      'state': 'profile.state',
+      'city': 'profile.city', 
+      'ssn': 'profile.ssn', 
+      'birthday': 'profile.birthday',
+      'zip': 'profile.zip'
     });
-
-    [
-      'title', 'street1', 'street2',
-      'phone', 'altPhone', 'state',
-      'city', 'ssn', 'birthday',
-      'zip', 'needQuestionnaire'
-    ].map(function (b) {
-      if (request.body[b]) {
-        patch['profile.' + b] = request.body[b];
-      }
-    });
-
-    if (request.body.roles) {
-      ['seller', 'buyer'].map(function (role) {
-        if (request.body.roles[role] === true || request.body.roles[role] === false) {
-          roles[role] = request.body.roles[role];
-          rolesToSet = true;
-        }
-      });
-
-      if (rolesToSet) {
-        patch.roles = roles;
-      }
-    }
-
-    if (request.body.preSelectTradeLines && Array.isArray(request.body.preSelectTradeLines)) {
-      patch.profile.preSelectTradeLines = request.body.preSelectTradeLines;
-    }
 
     request.model.User.findOneAndUpdate(
       {
@@ -190,25 +145,10 @@ module.exports = exports = function (core) {
         'upsert': false // important!
       },
       function (error, userFound) {
-        if (error) {
-          throw error;
-        } else {
-          if (userFound) {
-            response.status(202);
-            response.json(formatUser(userFound));
-          } else {
-            response.status(404);
-            response.json({
-              'status': 'Error',
-              'errors': [
-                {
-                  'code': 404,
-                  'message': 'User with this ID do not exists!'
-                }
-              ]
-            });
-          }
-        }
+        utilities.checkError(error, userFound, 'User with this ID do not exists!', response, function(data, response){
+          response.status(202);
+          response.json(formatUser(data));
+        });
       }
     );
   });

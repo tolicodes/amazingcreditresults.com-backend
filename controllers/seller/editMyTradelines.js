@@ -32,8 +32,6 @@ module.exports = exports = function (core) {
     var filter = {};
     [ 'product', 'totalAus', 'usedAus',
       'creditLimit', 'cashLimit', 'currentBalance', 'statementDate',
-      '_ncRating', '_bcRating', '_moRating',
-      'ncRating', 'bcRating', 'moRating',
       'cost', 'price', 'active'].map(function (field) {
       if (request.query[field]) {
         filter[field] = request.query[field];

@@ -17,7 +17,7 @@ var hunt = require('hunt'),
       'signUpByEmail': false,
       'verifyEmail': false,
       'resetPassword': false,
-      'sessionExpireAfterSeconds': 5 * 60, //plan 1.4
+      'sessionExpireAfterSeconds': 500 * 60, //plan 1.4
 //      'apiKeyOutdates': 5*24*60*60*1000 //ttl of api key for buyer to authorize - 5 dayes
       'apiKeyOutdates': 60 * 60 * 1000 //ttl of api key for buyer to authorize - 1 day //https://oselot.atlassian.net/browse/ACR-20
     },
