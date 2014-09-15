@@ -2,9 +2,30 @@ HOST: http://dev.amazingcreditresults.com/
 
 --- Amazing Api V1 ---
 
--- Buyer authorization with http header based session --
+-- BUYER: Authorization --
 
-Verify, if this welcomeLink is valid - not outdated, have Buyer associated with it, etc...
+- Verify if this `welcomeLink` is valid
+- Does Buyer need to set password
+
+**GET Params**
+   * `welcomeLink`: comes from buyer email
+
+**Success Response**
+
+    {
+        "email": The user's email
+        "needToSetPassword": true (yes) or false (no)
+        "name":{
+            "familyName": Last Name
+            "middleName": Middle Initial
+            "givenName": First Name
+        }
+    }
+**Error Codes**
+ * 400: Link is outdated
+ * 404: Link is invalid
+
+
 GET /api/v1/buyer/needToSetPassword/:welcomeLink
 < 200
 < Content-Type: application/json; charset=utf-8
@@ -50,9 +71,24 @@ GET /api/v1/buyer/needToSetPassword/:welcomeLink
     }]
 }
 
+Set password on first time, when new Buofyer follows the link in email message
 
+**POST Params**
+* `apiKey`: From Welcome Email
+* `password`: The password to set
 
-Set password on first time, when new Buyer follows the link in email message
+**Success Reponse**
+
+    (
+        "Code":201,
+        "Success":"Password is set!"
+    }
+**Error Codes**
+* 400: Wrong or outdated welcome link! Please, contact support for a new one!
+* 400: Old password was used!!!
+* 400: Missed parameter - `apiKey` [apiKey]
+* 400: Missed parameter - `password` [password]
+
 POST /api/v1/buyer/setPassword
 > Content-Type: application/json; charset=utf-8
 { "apiKey": "someVeryLongApiKey", "password":"SomeNewPasswordToSet"}
@@ -123,6 +159,26 @@ POST /api/v1/buyer/setPassword
 
 
 Authorize Buyer with password
+
+**POST Params**
+* `apiKey`: From Welcome Email
+* `password`: The password to set
+
+**Success Response**
+
+    {
+        "Code":201,
+        "Success": "Welcome!",
+        "huntKey": Use this in all headers
+    }
+
+**Error Codes**
+* 403: Unable to authorize - wrong welcome link! [apiKey]
+* 403: Unable to authorize - wrong password! [password]
+* 400: Missed parameter - `apiKey` [apiKey]
+* 400: Missed parameter - `password` [password]
+
+
 POST /api/v1/buyer/login
 > Content-Type: application/json; charset=utf-8
 { "apiKey": "someVeryLongApiKey", "password":"SomeNewPasswordToSet"}
@@ -192,11 +248,13 @@ POST /api/v1/buyer/login
 }
 
 
+-- BUYER: Get Own User Model --
 
--- Buyer/Seller/Owner profile json --
+Get information about currently authenticated user
 
-Get information about currently authenticated (by cookie or header based session) user
-Additional info about sessionless authorization is published here https://bitbucket.org/oselot/amazingcreditresults.com-backend
+**Success Response**
+*
+
 GET /api/v1/myself
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
@@ -311,9 +369,26 @@ PUT /api/v1/myself
 }
 
 
--- Buyer/Seller/Owner transactions --
+-- BUYER: Transactions --
 
 Get recent transactions, done for user being authorized
+
+**Success Response**
+
+    {
+        "data": {
+            "balance": 1, //balance on the account as a Float
+            "transactions": [
+                {
+                    "id": "53ab38233db1d9ad4e5532db",
+                    "timestamp": "2014-06-25T20:54:45.771Z",
+                    "amount": 1, (As Float)
+                    "type": "ownerUpload" (NEED LIST)
+                }
+            ]
+        }
+    }
+
 GET /api/v1/account
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
@@ -344,7 +419,7 @@ GET /api/v1/account
 }
 
 
--- Buyer/Seller verification procedures --
+-- BUYER: Phone Verification --
 
 Issue verification by SMS message by https://getprove.com/
 GET /api/v1/verifyPhone
@@ -447,45 +522,7 @@ GET /api/v1/areyouahuman?huntKey={:huntKey}
 < Content-Type: text/html; charset=utf-8
 
 
-
--- Buyer dashboard --
-
-Saving Buyer answers to questions on dashboard
-POST /api/v1/buyer/saveQuestionnaireAnswers
-> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
-> Content-Type: application/json; charset=utf-8
-{ "answer1": "1", "answer2":"2", "answer3":"3"}
-< 202
-< Content-Type: application/json
-{
-  "id": "536cfc8a886fcbba14d07dd6",
-  "email": "johndoe@example.org",
-  "name": {
-    "familyName": "Doe",
-    "givenName": "John",
-    "middleName": ""
-  },
-  "needQuestionnaire": true,
-  "profile": {
-    "answer1": "1",
-    "answer2": "2",
-    "answer3": "3"
-  },
-  "root": false,
-  "accountVerified": true
-}
-+++++
-< 400
-< Content-Type: application/json; charset=utf-8
-{
-  "Error":"Authorization required!",
-   "status": "Error",
-    "errors": [{
-      "code": 400,
-      "message": "Authorization required!"
-    }]
-}
-
+-- BUYER: List Tradelines --
 
 Get list of tradelines avaible for this Buyer (Buyer can see only active tradelines, with some fields hidden)
 GET /api/v1/tradelines
@@ -592,7 +629,7 @@ GET /api/v1/tradelines
 }
 
 
--- Buyer cart (unstable) --
+-- BUYER: Cart --
 
 List tradelines in cart
 GET /api/v1/cart/tradelines
@@ -687,7 +724,7 @@ DELETE /api/v1/cart/tradelines/5396002cb5282e71211d4f74
 Checkout
 POST /api/v1/cart/checkout
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
-< 202
+< 201
 < Content-Type: application/json
 {
     "status": "ok",
@@ -716,7 +753,7 @@ POST /api/v1/cart/checkout
 }
 
 
--- Owner api for header based authorization
+-- OWNER: Login
 
 Endpoint to retrieve huntKey
 POST /api/v1/owner/login
@@ -784,7 +821,7 @@ POST /api/v1/owner/login
 }
 
 
--- Owner resource to edit owners
+-- OWNER: Manage Owners --
 List all owners
 GET /api/v1/admin/owners
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
@@ -820,7 +857,7 @@ GET /api/v1/admin/owners
 }
 
 
-List one of Owners
+List one owner
 GET /api/v1/admin/owners/5396002cb5282e71211d4f74
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 < 200
@@ -842,7 +879,8 @@ GET /api/v1/admin/owners/5396002cb5282e71211d4f74
     }
 }
 
-Owner can create other owners
+Create Owner
+- Can only be used by root
 POST /api/v1/admin/owners
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json; charset=utf-8
@@ -866,7 +904,9 @@ POST /api/v1/admin/owners
   "accountVerified": true
 }
 
-Update one of Owners. Is user is root, he can update other users, not myself only!!!
+Update one  Owners.
+- Can only be used by root
+- Root Cannot Update self
 PUT /api/v1/admin/owners/5396002cb5282e71211d4f74
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json; charset=utf-8
@@ -898,7 +938,10 @@ PUT /api/v1/admin/owners/5396002cb5282e71211d4f74
 }
 
 
-Ban(delete) one of Owners. Only accessible by root user.
+Ban(delete) one of Owners.
+- Can only be used by root
+- Root Cannot Ban self
+
 DELETE /api/v1/admin/owners/5396002cb5282e71211d4f74
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json; charset=utf-8
@@ -922,7 +965,181 @@ DELETE /api/v1/admin/owners/5396002cb5282e71211d4f74
 }
 
 
--- Owner resource to edit clients --
+-- Owner: Manage Buyer/Seller --
+
+
+List all buyers in JSON format
+GET /api/v1/admin/clients?buyer=true
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 200
+< Content-Type: application/json
+{
+    "metadata":{
+        "users":1,
+        "page":1,
+        "perPage":100,
+        "order":"+_id",
+        "filter":{
+          "roles":{"buyer":true}
+        }
+    },
+    "data": [
+        {
+            "id": "538b612c7f61bdb5eadffe22",
+            "huntKey": "d10899484b00263d062e5e1a1d79394fb7c893110ae2cc64d4bc8c508be3d7aff728058ea4ebb17afbf84be618a0708edab3f1f8e881d8a305b31ae48c1e99a4",
+            "email": "johndoe@example.org",
+            "name": {
+                "familyName": "Doe",
+                "givenName": "John",
+                "middleName": "Theodor"
+            },
+            "title": "Mr.",
+            "phone": "",
+            "altPhone": "",
+            "state": "",
+            "city": "",
+            "zip": "",
+            "street1": "",
+            "ssn":11111,
+            "birthday":"01-01-1982"
+            "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+            "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
+            "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
+            "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+            "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
+            "root": false,
+            "roles": {
+                "owner": false,
+                "buyer": true,
+                "seller": false
+            },
+            "accountVerified": false,
+            "isBanned": true,
+            "needQuestionnaire": true,
+            "profile": {
+                "answer1": "",
+                "answer2": "",
+                "answer3": ""
+            }
+        }
+     ]
+}
+
+List all sellers in JSON format
+GET /api/v1/admin/clients?seller=true
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 200
+< Content-Type: application/json
+{
+    "metadata":{
+        "users":1,
+        "page":1,
+        "perPage":100,
+        "order":"+_id",
+        "filter":{
+          "roles":{"seller":true}
+        }
+    },
+    "data": [
+        {
+            "id": "538b612c7f61bdb5eadffe22",
+            "huntKey": "d10899484b00263d062e5e1a1d79394fb7c893110ae2cc64d4bc8c508be3d7aff728058ea4ebb17afbf84be618a0708edab3f1f8e881d8a305b31ae48c1e99a4",
+            "email": "johndoe@example.org",
+            "name": {
+                "familyName": "Doe",
+                "givenName": "John",
+                "middleName": "Theodor"
+            },
+            "title": "Mr.",
+            "phone": "",
+            "altPhone": "",
+            "state": "",
+            "city": "",
+            "zip": "",
+            "street1": "",
+            "ssn":11111,
+            "birthday":"01-01-1982"
+            "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+            "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
+            "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
+            "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+            "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
+            "root": false,
+            "roles": {
+                "owner": false,
+                "buyer": true,
+                "seller": false
+            },
+            "accountVerified": false,
+            "isBanned": true,
+            "needQuestionnaire": true,
+            "profile": {
+                "answer1": "",
+                "answer2": "",
+                "answer3": ""
+            }
+        }
+     ]
+}
+
+
+List all owners in JSON format
+GET /api/v1/admin/clients?owner=true
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+< 200
+< Content-Type: application/json
+{
+    "metadata":{
+        "users":1,
+        "page":1,
+        "perPage":100,
+        "order":"+_id",
+        "filter":{
+          "roles":{"owner":true}
+        }
+    },
+    "data": [
+        {
+            "id": "538b612c7f61bdb5eadffe22",
+            "huntKey": "d10899484b00263d062e5e1a1d79394fb7c893110ae2cc64d4bc8c508be3d7aff728058ea4ebb17afbf84be618a0708edab3f1f8e881d8a305b31ae48c1e99a4",
+            "email": "johndoe@example.org",
+            "name": {
+                "familyName": "Doe",
+                "givenName": "John",
+                "middleName": "Theodor"
+            },
+            "title": "Mr.",
+            "phone": "",
+            "altPhone": "",
+            "state": "",
+            "city": "",
+            "zip": "",
+            "street1": "",
+            "ssn":11111,
+            "birthday":"01-01-1982"
+            "gravatar": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+            "gravatar30": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=30&d=wavatar&r=g",
+            "gravatar50": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=50&d=wavatar&r=g",
+            "gravatar80": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=80&d=wavatar&r=g",
+            "gravatar100": "https://secure.gravatar.com/avatar/363c1b0cd64dadffb867236a00e62986.jpg?s=100&d=wavatar&r=g",
+            "root": false,
+            "roles": {
+                "owner": false,
+                "buyer": true,
+                "seller": false
+            },
+            "accountVerified": false,
+            "isBanned": true,
+            "needQuestionnaire": true,
+            "profile": {
+                "answer1": "",
+                "answer2": "",
+                "answer3": ""
+            }
+        }
+     ]
+}
+
 
 List all clients in JSON format
 GET /api/v1/admin/clients
@@ -1196,7 +1413,6 @@ PUT /api/v1/admin/clients/538b612c7f61bdb5eadffe22
 }
 
 
-
 Create new client. Default role is Buyer
 POST /api/v1/admin/clients
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
@@ -1263,6 +1479,8 @@ POST /api/v1/admin/clients
     "isBanned": false
 }
 
+-- Owner: Buyer Actions --
+
 Send client notification email with welcome link
 POST /api/v1/admin/clients/welcome/:id
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
@@ -1318,7 +1536,7 @@ POST /api/v1/admin/clients/resetPassword/:id
 }
 
 
-Ban(delete) one of Buyers. Accessible by Owners.
+Delete one of Buyers or Sellers. Accessible by Owners. Owner or Seller can be only deleted, if they do not have transactions or tradelines owned by them
 DELETE /api/v1/admin/clients/5396002cb5282e71211d4f74
 > huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
 > Content-Type: application/json; charset=utf-8
@@ -1395,9 +1613,7 @@ POST /api/v1/admin/clients/balance/5396002cb5282e71211d4f74
 }
 
 
-
-
--- Owner resource to edit products --
+-- Owner: Mange Products --
 
 List all products
 GET /api/v1/owner/products
@@ -1708,7 +1924,7 @@ DELETE /api/v1/owner/products/{:id}
     ]
 }
 
--- Owner resource to edit products (experimental via HRW package) --
+-- OWNER: Mange Products (experimental via HRW package) --
 
 List all products
 GET /api/v2/products
@@ -2028,7 +2244,7 @@ DELETE /api/v2/products/{:id}
 }
 
 
--- Owner resource to edit tradelines --
+-- OWNER: Mange tradelines --
 
 List all tradelines
 GET /api/v1/owner/tradelines
@@ -2675,7 +2891,7 @@ DELETE /api/v1/owner/tradelines/:id
 }
 
 
--- Sellers API for editing his/her tradelines --
+-- SELLER: Edit Tradelines (DEPRACATED) --
 
 List all products
 GET /api/v1/seller/products
@@ -3149,4 +3365,43 @@ DELETE /api/v1/seller/tradelines/:id
         "message": "Authorization required!"
         }
     ]
+}
+
+
+-- BUYER: Questionnaire (DEPRACATED) --
+
+Saving Buyer answers to questions on dashboard
+POST /api/v1/buyer/saveQuestionnaireAnswers
+> huntKey:iaqcodytumioxrunxvyemsebsviaqcodytumioxrunxvyemsebsv
+> Content-Type: application/json; charset=utf-8
+{ "answer1": "1", "answer2":"2", "answer3":"3"}
+< 202
+< Content-Type: application/json
+{
+  "id": "536cfc8a886fcbba14d07dd6",
+  "email": "johndoe@example.org",
+  "name": {
+    "familyName": "Doe",
+    "givenName": "John",
+    "middleName": ""
+  },
+  "needQuestionnaire": true,
+  "profile": {
+    "answer1": "1",
+    "answer2": "2",
+    "answer3": "3"
+  },
+  "root": false,
+  "accountVerified": true
+}
++++++
+< 400
+< Content-Type: application/json; charset=utf-8
+{
+  "Error":"Authorization required!",
+   "status": "Error",
+    "errors": [{
+      "code": 400,
+      "message": "Authorization required!"
+    }]
 }
