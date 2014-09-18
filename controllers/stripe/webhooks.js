@@ -1,5 +1,4 @@
-var stripe = require('stripe')(process.env.STRIPE_API_KEY || 'sk_test_Bq4myUHpyXqVaiZ47u7VrtCY');
-
+var stripe = require('stripe')();
 
 module.exports = exports = function (core) {
   core.app.post('/stripewebhooks', function (request, response) {

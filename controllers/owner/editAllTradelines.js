@@ -43,8 +43,6 @@ module.exports = exports = function(core) {
   core.app.post('/api/v1/owner/tradelines', ensureRole('owner'), function(req, res) {
     utilities.throwError = utilities.throwError.bind(utilities, res);
 
-    console.log(req.body)
-
     req.model.TradeLine
       .create(utilities.createModel(req.body, fields))
       .then(function (obj) {

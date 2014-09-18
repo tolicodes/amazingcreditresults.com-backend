@@ -16,6 +16,7 @@
   "license": "proprietary",
   "dependencies": {
     "async": ">=0.9.0",
+    "cheerio": "^0.17.0",
     "connect-multiparty": ">=1.0.5",
     "echosign": "git+ssh://git@github.com:oselot/echosign.git",
     "fast-csv": ">=0.4.0",
@@ -27,7 +28,8 @@
     "request": "2.34.0",
     "stripe": "latest",
     "underscore": "^1.7.0",
-    "wkhtmltopdf": "0.1.4"
+    "wkhtmltopdf": "0.1.4",
+    "xml2js": "^0.4.4"
   },
   "devDependencies": {
     "mocha": "1.18.2",
