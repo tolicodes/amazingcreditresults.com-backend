@@ -19,7 +19,11 @@ Some usefull info:
 [http://nginx.org/en/docs/windows.html](http://nginx.org/en/docs/windows.html)
 [http://wiki.nginx.org/Install](http://wiki.nginx.org/Install)
 
-* After installing nginx replace your configuration file with the one found in the repository,
+* Clone oselot/echosign, and oselot/hunt-mongoose-rest projects into seperate repos.
+
+* npm install those fromt their respective folders.
+
+* After installing nginx replace your configuration e.g. /etc/nginx/nginx.conf file with the one found in the repository,
 open it, and adjust the lines that follow exclamation marks.
 
 * `cd` into the backend directory and execute `node index.js` to start the server.
