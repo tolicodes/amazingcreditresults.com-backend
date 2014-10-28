@@ -23,7 +23,7 @@ module.exports = exports = function (core) {
           return utilities.error(404, 'Product not found', res);
         }
         
-        res.json(utilities.pickFields(fields, data));
+        res.json(utilities.pickFields(fields, obj));
       }, utilities.throwError);
   });
 

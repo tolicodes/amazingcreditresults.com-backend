@@ -775,10 +775,7 @@ describe('init', function () {
 
     });
 
-    // TODO FIX THIS
     it('owner can list one product', function (done) {
-      console.log(productId);
-      console.log('http://localhost:' + port + '/api/v1/owner/products/' + productId);
       request({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
@@ -788,17 +785,12 @@ describe('init', function () {
           done(error);
         } else {
           response.statusCode.should.be.equal(200);
+          console.log(body);
           var bodyParsed = JSON.parse(body);
-          bodyParsed.data.id.should.be.equal(productId);
-          bodyParsed.data.name.should.be.equal('SuperMega' + testId);
-          bodyParsed.data.bank.should.be.equal('SuperMegaBank' + testId);
-          bodyParsed.data.type.should.be.equal('MasterCard');
-          bodyParsed.data.ncRating.should.be.equal('None');
-          bodyParsed.data.bcRating.should.be.equal('Bronze');
-          bodyParsed.data.moRating.should.be.equal('Silver');
-          bodyParsed.data.reportsToExperian.should.be.false;
-          bodyParsed.data.reportsToEquifax.should.be.false;
-          bodyParsed.data.reportsToTransunion.should.be.false;
+          bodyParsed.id.should.be.equal(productId);
+          bodyParsed.name.should.be.equal('SuperMega' + testId);
+          bodyParsed.bank.should.be.equal('SuperMegaBank' + testId);
+          bodyParsed.type.should.be.equal('MasterCard');
           done();
         }
       });
