@@ -38,9 +38,7 @@ module.exports = exports = function(core) {
         if (error) {
           throw error;
         } else {
-          userCreated.roles = {
-            owner: true
-          };
+          userCreated.role = 'owner';
           userCreated.accountVerified = true;
 
           userCreated.name = {
@@ -54,7 +52,7 @@ module.exports = exports = function(core) {
               throw err;
             } else {
               response.status(201);
-              response.json( formatOwner(userCreated));
+              response.json(userCreated);
             }
           });
         }
