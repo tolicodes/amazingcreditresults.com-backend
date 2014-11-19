@@ -4,6 +4,7 @@ var request = require('request'),
   fs = require('fs'),
   path = require('path'),
   backend = require('./../index.js'),
+  helper = require('./test_helpers.js'),
   async = require('async'),
   _ = require('underscore'),
   port = 3001,
@@ -125,9 +126,12 @@ describe('init', function () {
         });
       });
 
-      it('can modify middle name', function (done) {
+      it('can modify user`s name', function (done) {
         // Modify user's info
-        userInfo.name.middleName = 'Jackson' + testId;
+        var modUser = helper.clone(userInfo);
+        modUser.name.givenName = 'Billy' + testId;
+        modUser.name.middleName = 'Jackson' + testId;
+        modUser.name.familyName = 'Koern' + testId;
 
         request({
           'method': 'PUT',
@@ -137,11 +141,13 @@ describe('init', function () {
         }, function (error, response, body) {
           response.statusCode.should.be.equal(202);
           var bodyParsed = JSON.parse(body);
-          bodyParsed.name.middleName = userInfo.name.middleName;
+          console.log(body);
+          bodyParsed.name.givenName.should.be.equal(modUser.name.givenName);
+          bodyParsed.name.middleName.should.be.equal(modUser.name.middleName);
+          bodyParsed.name.familyName.should.be.equal(modUser.name.familyName);
           done();
         });
       });
-
 
       it('makes this user to have correct response on /api/v1/api/v1/buyer/needToSetPassword/:welcomeLink', function (done) {
         request({
