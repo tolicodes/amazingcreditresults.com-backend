@@ -6,6 +6,7 @@ lib-cov
 *.out
 *.pid
 *.gz
+*.swp
 *~
 
 pids
@@ -25,3 +26,4 @@ coverage/
 out/
 
 public
+dump.rdb

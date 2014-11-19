@@ -395,7 +395,7 @@ describe('init', function () {
       });
     });
 
-    it('performs Owners login on behalf of newly created owner', function (done) {
+    xit('performs Owners login on behalf of newly created owner', function (done) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/owner/login',
@@ -417,7 +417,7 @@ describe('init', function () {
       });
     });
 
-    it('really created new Owner', function (done) {
+    xit('really created new Owner', function (done) {
       request({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/myself',
@@ -656,7 +656,7 @@ describe('init', function () {
     });
   });
 
-  describe('/api/v1/owner/products test', function () {
+  xdescribe('/api/v1/owner/products test', function () {
     before(function (done) {
       request({
         'method': 'POST',
@@ -979,7 +979,7 @@ describe('init', function () {
       });
     });
 //*/
-    it('owner can\'t create tradeline with non existant product', function (done) {
+    xit('owner can\'t create tradeline with non existant product', function (done) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
@@ -1019,7 +1019,7 @@ describe('init', function () {
     });
 //*/
 //*/
-    it('owner can\'t create tradeline with non existant seller', function (done) {
+    xit('owner can\'t create tradeline with non existant seller', function (done) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
@@ -1132,7 +1132,7 @@ describe('init', function () {
       });
 
     });
-    it('owner can list one tradeline', function (done) {
+    xit('owner can list one tradeline', function (done) {
       request({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradeLineId,
@@ -1254,7 +1254,7 @@ describe('init', function () {
       });
     });
 
-    it('owner can delete (set `active` to false) tradeline', function (done) {
+    xit('owner can delete (set `active` to false) tradeline', function (done) {
       request({
         'method': 'DELETE',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradeLineId,
@@ -1335,7 +1335,7 @@ describe('init', function () {
       });
     });
 
-    it('seller cannot create tradeline with nonexistant product id', function (done) {
+    xit('seller cannot create tradeline with nonexistant product id', function (done) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/seller/tradelines',
@@ -1438,7 +1438,7 @@ describe('init', function () {
           }
         });
       });
-      it('works for POST response', function (done) {
+      xit('works for POST response', function (done) {
         request({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/seller/tradelines',
@@ -1552,7 +1552,7 @@ describe('init', function () {
         });
       });
 
-      it('seller can update tradeline', function (done) {
+      xit('seller can update tradeline', function (done) {
         request({
           'method': 'PUT',
           'url': 'http://localhost:' + port + '/api/v1/seller/tradelines/' + tradeLineId,
@@ -1719,7 +1719,7 @@ describe('init', function () {
       });
     });
 
-    it('creates new seller', function (done) {
+    xit('creates new seller', function (done) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/admin/clients',
@@ -1778,7 +1778,7 @@ describe('init', function () {
     });
 
     describe('seller do things', function () {
-      it('seller logins', function (done) {
+      xit('seller logins', function (done) {
         request({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/myself',
@@ -1825,7 +1825,7 @@ describe('init', function () {
           });
         });
 
-        it("doesn't add the same item twice", function (done) {
+        xit("doesn't add the same item twice", function (done) {
           async.waterfall([
             function (cb) {
               helpers.getTradelines(function (error, response, body) {
@@ -1878,7 +1878,7 @@ describe('init', function () {
       });
 
       describe("deleting a tradeline", function () {
-        it("should be able to delete a tradeline", function (done) {
+        xit("should be able to delete a tradeline", function (done) {
           async.waterfall([
             function (cb) {
               helpers.getTradelines(function (error, response, body) {
@@ -1916,7 +1916,7 @@ describe('init', function () {
       });
 
       describe('buyer can checkout', function () {
-        it('should work', function(done){
+        xit('should work', function(done){
           request({
             'method': 'POST',
             'url': 'http://localhost:' + port + '/api/v1/cart/checkout',
@@ -1976,7 +1976,7 @@ describe('init', function () {
       });
     });
 
-    it('Owner can check that he uploaded the funds', function (done) {
+    xit('Owner can check that he uploaded the funds', function (done) {
       request({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
@@ -2185,7 +2185,7 @@ describe('init', function () {
 
       });
     });
-    describe('Owner rejects first tradeline', function () {
+    xdescribe('Owner rejects first tradeline', function () {
       var changesId;
       //'owner can see current tradeline revision amont this tradeline revisions',
       before(function (done) {
@@ -2253,7 +2253,7 @@ describe('init', function () {
       });
     });
 
-    describe('Owner accepts second tradeline', function () {
+    xdescribe('Owner accepts second tradeline', function () {
       var changesId;
       //'owner can see current tradeline revision amont this tradeline revisions',
       before(function (done) {
