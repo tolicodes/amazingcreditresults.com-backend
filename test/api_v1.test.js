@@ -64,29 +64,31 @@ describe('init', function () {
     });
 
     describe('owner is creating user without verified account, that we will use for tests', function () {
+      var userInfo = {
+        'email': 'unitTestUser' + testId + '@mail.ru',
+        'name': {
+          'givenName': 'John' + testId,
+          'middleName': 'Teodor' + testId,
+          'familyName': 'Doe' + testId
+        },
+        'needQuestionnaire': true,
+        'telefone': '555-339' + testId,
+        'street1': 'Some Address',
+        'title': 'Mr.'
+      };
+
       before(function (done) {
         request({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/admin/clients',
           'headers': {'huntKey': ownerHuntKey},
-          'form': {
-            'email': 'unitTestUser' + testId + '@mail.ru',
-            'name': {
-              'givenName': 'John' + testId,
-              'middleName': 'Teodor' + testId,
-              'familyName': 'Doe' + testId
-            },
-            'needQuestionnaire': true,
-            'telefone': '555-339' + testId,
-            'street1': 'Some Address',
-            'title': 'Mr.'
-          }
+          'form': userInfo
         }, function (error, response, body) {
           if (error) {
             done(error);
           } else {
             var bodyParsed = JSON.parse(body);
-            console.log(bodyParsed);
+            //console.log(bodyParsed);
             response.statusCode.should.be.equal(201);
             userId = bodyParsed.id;
             done();
@@ -122,6 +124,24 @@ describe('init', function () {
           }
         });
       });
+
+      it('can modify middle name', function (done) {
+        // Modify user's info
+        userInfo.name.middleName = 'Jackson' + testId;
+
+        request({
+          'method': 'PUT',
+          'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
+          'form': userInfo,
+          'headers': {'huntKey': ownerHuntKey}
+        }, function (error, response, body) {
+          response.statusCode.should.be.equal(202);
+          var bodyParsed = JSON.parse(body);
+          bodyParsed.name.middleName = userInfo.name.middleName;
+          done();
+        });
+      });
+
 
       it('makes this user to have correct response on /api/v1/api/v1/buyer/needToSetPassword/:welcomeLink', function (done) {
         request({
@@ -179,7 +199,6 @@ describe('init', function () {
           }
         });
       });
-
 
       it('makes this user to have the correct response for setting password via /api/v1/buyer/setPassword', function (done) {
         request({
@@ -242,7 +261,6 @@ describe('init', function () {
           }
         });
       });
-
 
       it('makes this user to have correct response for authorizing via /api/v1/buyer/login', function (done) {
         request({
@@ -785,7 +803,7 @@ describe('init', function () {
           done(error);
         } else {
           response.statusCode.should.be.equal(200);
-          console.log(body);
+          //console.log(body);
           var bodyParsed = JSON.parse(body);
           bodyParsed.id.should.be.equal(productId);
           bodyParsed.name.should.be.equal('SuperMega' + testId);
@@ -930,8 +948,8 @@ describe('init', function () {
             } else {
               response.statusCode.should.be.equal(201);
               var bodyParsed = JSON.parse(body);
-              console.log('-------------------------------------------------------------');
-              console.log(bodyParsed);
+              //console.log('-------------------------------------------------------------');
+              //console.log(bodyParsed);
               bodyParsed.name.should.be.equal('SuperMega' + testId);
               bodyParsed.bank.should.be.equal('SuperMegaBank' + testId);
               bodyParsed.type.should.be.equal('MasterCard');
@@ -968,7 +986,7 @@ describe('init', function () {
                 } else {
                   response.statusCode.should.be.equal(201);
                   var bodyParsed = JSON.parse(body);
-                  console.log(bodyParsed);
+                  //console.log(bodyParsed);
                   tradeLineId = bodyParsed.id;
                   done();
                 }
@@ -1084,7 +1102,7 @@ describe('init', function () {
         } else {
           response.statusCode.should.be.equal(201);
           var bodyParsed = JSON.parse(body);
-          console.log(bodyParsed);
+          //console.log(bodyParsed);
           tradeLineId = bodyParsed.id;
           done();
         }
@@ -1494,7 +1512,7 @@ describe('init', function () {
           } else {
             response.statusCode.should.be.equal(200);
             var bodyParsed = JSON.parse(body);
-            console.log(body);
+            //console.log(body);
             bodyParsed.data.product.id.should.be.equal(productId);
             //bodyParsed.data.seller.should.be.equal(sellerId);
             bodyParsed.data.totalAus.should.be.equal(10);
@@ -1646,7 +1664,7 @@ describe('init', function () {
           } else {
             response.statusCode.should.be.equal(202);
             var bodyParsed = JSON.parse(body);
-            console.log(bodyParsed);
+            //console.log(bodyParsed);
             bodyParsed.status.should.be.equal('Tradeline archived');
             request({
               'method': 'GET',
@@ -2221,7 +2239,7 @@ describe('init', function () {
             done(error);
           } else {
             //response.statusCode.should.be.equal(200);
-            console.log(body);
+            //console.log(body);
             body.status.should.be.equal('deny');
             done()
           }
