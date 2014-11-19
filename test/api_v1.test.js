@@ -72,6 +72,12 @@ describe('init', function () {
           'middleName': 'Teodor' + testId,
           'familyName': 'Doe' + testId
         },
+        'street1' : '123 Street',
+        'street2' : 'Apt 1',
+        'phone' : '5551234567',
+        'city': 'Brooklyn',
+        'state': 'NY',
+        'zip': '11201',
         'needQuestionnaire': true,
         'telefone': '555-339' + testId,
         'street1': 'Some Address',
@@ -89,6 +95,7 @@ describe('init', function () {
             done(error);
           } else {
             var bodyParsed = JSON.parse(body);
+            //console.log('Created User: ');
             //console.log(bodyParsed);
             response.statusCode.should.be.equal(201);
             userId = bodyParsed.id;
@@ -136,15 +143,43 @@ describe('init', function () {
         request({
           'method': 'PUT',
           'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
-          'form': userInfo,
+          'form': modUser,
           'headers': {'huntKey': ownerHuntKey}
         }, function (error, response, body) {
           response.statusCode.should.be.equal(202);
           var bodyParsed = JSON.parse(body);
-          console.log(body);
           bodyParsed.name.givenName.should.be.equal(modUser.name.givenName);
           bodyParsed.name.middleName.should.be.equal(modUser.name.middleName);
           bodyParsed.name.familyName.should.be.equal(modUser.name.familyName);
+          done();
+        });
+      });
+
+      // TODO reset userInfo after each test
+      it('can modify user`s location', function (done) {
+        // Modify user's info
+        var modUser = helper.clone(userInfo);
+        modUser.city = 'Orlando';
+        modUser.state = 'Fl';
+        modUser.zip = '13311';
+        modUser.street1 = '456 Ave';
+        modUser.street2 = 'Apt 4';
+        // TODO can move this out later
+        modUser.phone = '5550001111';
+
+        request({
+          'method': 'PUT',
+          'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
+          'form': modUser,
+          'headers': {'huntKey': ownerHuntKey}
+        }, function (error, response, body) {
+          response.statusCode.should.be.equal(202);
+          var bodyParsed = JSON.parse(body);
+          var modified = ['city', 'state', 'zip', 'street1', 'street2', 'phone'];
+          modified.forEach(function(mod) {
+            bodyParsed[mod].should.be.equal(modUser[mod]);
+          });
+
           done();
         });
       });

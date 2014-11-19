@@ -122,6 +122,8 @@ module.exports = exports = function (core) {
   });
 
   core.app.put('/api/v1/admin/clients/:id', ensureOwner, function (request, response) {
+    // ========= Anatoliy's Version ==========
+    /*
     var patch = utilities.createModel(request.body, 
       ['accountVerified', 'isBanned', 'name.familyName', 'name.givenName', 'name.middleName', 'name.title', 'name.generation', 'roles'], {
       'email': 'keychain.email',
@@ -135,6 +137,60 @@ module.exports = exports = function (core) {
       'birthday': 'profile.birthday',
       'zip': 'profile.zip'
     });
+    */
+
+    // ======= Original Version =======
+    var patch = {},
+      roles = {},
+      rolesToSet = false;
+
+    if (request.body.email) {
+      patch['keychain.email'] = request.body.email;
+    }
+
+    if (request.body.accountVerified === true || request.body.accountVerified === false) {
+      patch.accountVerified = request.body.accountVerified;
+    }
+
+    if (request.body.isBanned === true || request.body.isBanned === false) {
+      patch.isBanned = request.body.isBanned;
+    }
+
+    ['familyName', 'givenName', 'middleName'].map(function (a) {
+      if (request.body.name && request.body.name[a]) {
+        patch['name.' + a] = request.body.name[a];
+      }
+    });
+
+    [
+      'title', 'street1', 'street2',
+      'phone', 'altPhone', 'state',
+      'city', 'ssn', 'birthday',
+      'zip', 'needQuestionnaire'
+    ].map(function (b) {
+      if (request.body[b]) {
+        patch['profile.' + b] = request.body[b];
+      }
+    });
+
+    if (request.body.roles) {
+      ['seller', 'buyer'].map(function (role) {
+        if (request.body.roles[role] === true || request.body.roles[role] === false) {
+          roles[role] = request.body.roles[role];
+          rolesToSet = true;
+        }
+      });
+
+      if (rolesToSet) {
+        patch.roles = roles;
+      }
+    }
+
+    if (request.body.preSelectTradeLines && Array.isArray(request.body.preSelectTradeLines)) {
+      patch.profile.preSelectTradeLines = request.body.preSelectTradeLines;
+    }
+        
+    //console.log(patch);
 
     request.model.User.findOneAndUpdate(
       {
