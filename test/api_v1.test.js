@@ -70,8 +70,10 @@ describe('init', function () {
         'name': {
           'givenName': 'John' + testId,
           'middleName': 'Teodor' + testId,
-          'familyName': 'Doe' + testId
+          'familyName': 'Doe' + testId,
         },
+        'title': 'Mr.',
+        'suffix' : 'III',
         'street1' : '123 Street',
         'street2' : 'Apt 1',
         'phone' : '5551234567',
@@ -81,9 +83,9 @@ describe('init', function () {
         'needQuestionnaire': true,
         'telefone': '555-339' + testId,
         'street1': 'Some Address',
-        'title': 'Mr.'
       };
 
+      // TODO reset userInfo after each test
       before(function (done) {
         request({
           'method': 'POST',
@@ -136,9 +138,11 @@ describe('init', function () {
       it('can modify user`s name', function (done) {
         // Modify user's info
         var modUser = helper.clone(userInfo);
-        modUser.name.givenName = 'Billy' + testId;
+        modUser.name.givenName = 'Jemima' + testId;
         modUser.name.middleName = 'Jackson' + testId;
         modUser.name.familyName = 'Koern' + testId;
+        modUser.title = 'Ms.';
+        modUser.suffix = 'Jr.';
 
         request({
           'method': 'PUT',
@@ -148,14 +152,17 @@ describe('init', function () {
         }, function (error, response, body) {
           response.statusCode.should.be.equal(202);
           var bodyParsed = JSON.parse(body);
+          console.log('return from PUT:');
+          console.log(bodyParsed.name.title);
           bodyParsed.name.givenName.should.be.equal(modUser.name.givenName);
           bodyParsed.name.middleName.should.be.equal(modUser.name.middleName);
           bodyParsed.name.familyName.should.be.equal(modUser.name.familyName);
+          bodyParsed.name.title.should.be.equal(modUser.title);
+          bodyParsed.name.suffix.should.be.equal(modUser.suffix);
           done();
         });
       });
 
-      // TODO reset userInfo after each test
       it('can modify user`s location', function (done) {
         // Modify user's info
         var modUser = helper.clone(userInfo);

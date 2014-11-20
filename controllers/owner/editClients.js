@@ -156,17 +156,18 @@ module.exports = exports = function (core) {
       patch.isBanned = request.body.isBanned;
     }
 
-    ['familyName', 'givenName', 'middleName'].map(function (a) {
+    ['familyName', 'givenName', 'middleName', 'title'].map(function (a) {
       if (request.body.name && request.body.name[a]) {
         patch['name.' + a] = request.body.name[a];
       }
     });
 
     [
-      'title', 'street1', 'street2',
+      'street1', 'street2',
       'phone', 'altPhone', 'state',
       'city', 'ssn', 'birthday',
-      'zip', 'needQuestionnaire'
+      'zip', 'needQuestionnaire',
+      'title', 'suffix'
     ].map(function (b) {
       if (request.body[b]) {
         patch['profile.' + b] = request.body[b];
@@ -190,6 +191,7 @@ module.exports = exports = function (core) {
       patch.profile.preSelectTradeLines = request.body.preSelectTradeLines;
     }
         
+    //console.log('patch: ');
     //console.log(patch);
 
     request.model.User.findOneAndUpdate(
@@ -204,6 +206,9 @@ module.exports = exports = function (core) {
         utilities.checkError(error, userFound, 'User with this ID do not exists!', response, function(data, response){
           response.status(202);
           response.json(formatUser(data));
+
+          //console.log('saved user:');
+         // console.log(data);
         });
       }
     );
