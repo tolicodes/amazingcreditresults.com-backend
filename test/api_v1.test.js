@@ -952,6 +952,7 @@ describe('init', function () {
         } else {
           response.statusCode.should.be.equal(202);
           var bodyParsed = JSON.parse(body);
+          console.log(bodyParsed);
           bodyParsed.status.should.be.equal('deleted');
 
           request({

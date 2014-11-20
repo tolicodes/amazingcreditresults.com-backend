@@ -84,7 +84,7 @@ module.exports = exports = function (core) {
               .remove({'_id': req.params.id})
               .exec()
               .then(function(){
-                res.status(202).json({});
+                res.status(202).json({status: 'deleted'});
               }, utilities.throwError);
           }, utilities.throwError)
       }, utilities.throwError);
