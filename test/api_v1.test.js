@@ -71,9 +71,9 @@ describe('init', function () {
           'givenName': 'John' + testId,
           'middleName': 'Teodor' + testId,
           'familyName': 'Doe' + testId,
+          'title': 'Mr.',
+          'suffix': 'III'
         },
-        'title': 'Mr.',
-        'suffix' : 'III',
         'street1' : '123 Street',
         'street2' : 'Apt 1',
         'phone' : '5551234567',
@@ -101,6 +101,9 @@ describe('init', function () {
             //console.log(bodyParsed);
             response.statusCode.should.be.equal(201);
             userId = bodyParsed.id;
+            // Sanity check
+            bodyParsed.name.title.should.be.equal(userInfo.name.title);
+            bodyParsed.name.suffix.should.be.equal(userInfo.name.suffix);
             done();
           }
         });
@@ -141,8 +144,8 @@ describe('init', function () {
         modUser.name.givenName = 'Jemima' + testId;
         modUser.name.middleName = 'Jackson' + testId;
         modUser.name.familyName = 'Koern' + testId;
-        modUser.title = 'Ms.';
-        modUser.suffix = 'Jr.';
+        modUser.name.title = 'Ms.';
+        modUser.name.suffix = 'Jr.';
 
         request({
           'method': 'PUT',
@@ -157,8 +160,8 @@ describe('init', function () {
           bodyParsed.name.givenName.should.be.equal(modUser.name.givenName);
           bodyParsed.name.middleName.should.be.equal(modUser.name.middleName);
           bodyParsed.name.familyName.should.be.equal(modUser.name.familyName);
-          bodyParsed.name.title.should.be.equal(modUser.title);
-          bodyParsed.name.suffix.should.be.equal(modUser.suffix);
+          bodyParsed.name.title.should.be.equal(modUser.name.title);
+          bodyParsed.name.suffix.should.be.equal(modUser.name.suffix);
           done();
         });
       });

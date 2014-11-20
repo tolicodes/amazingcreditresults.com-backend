@@ -156,9 +156,17 @@ module.exports = exports = function (core) {
       patch.isBanned = request.body.isBanned;
     }
 
-    ['familyName', 'givenName', 'middleName', 'title'].map(function (a) {
+    ['familyName', 'givenName', 'middleName'].map(function (a) {
       if (request.body.name && request.body.name[a]) {
         patch['name.' + a] = request.body.name[a];
+      }
+    });
+
+    // This is a silly hack because we store title & suffix
+    // in the profile object but pretend to store in the name object
+    ['title', 'suffix'].map(function (a) {
+      if (request.body.name && request.body.name[a]) {
+        patch['profile.' + a] = request.body.name[a];
       }
     });
 
@@ -166,8 +174,7 @@ module.exports = exports = function (core) {
       'street1', 'street2',
       'phone', 'altPhone', 'state',
       'city', 'ssn', 'birthday',
-      'zip', 'needQuestionnaire',
-      'title', 'suffix'
+      'zip', 'needQuestionnaire'
     ].map(function (b) {
       if (request.body[b]) {
         patch['profile.' + b] = request.body[b];
@@ -191,8 +198,8 @@ module.exports = exports = function (core) {
       patch.profile.preSelectTradeLines = request.body.preSelectTradeLines;
     }
         
-    //console.log('patch: ');
-    //console.log(patch);
+    console.log('patch: ');
+    console.log(patch);
 
     request.model.User.findOneAndUpdate(
       {
@@ -255,7 +262,8 @@ module.exports = exports = function (core) {
           'zip': request.body.zip,
           'street1': request.body.street1,
           'street2': request.body.street2,
-          'title': request.body.title,
+          'title': request.body.name.title,
+          'suffix': request.body.name.suffix,
           'ssn': request.body.ssn,
           'birthday': request.body.birthday
         },
