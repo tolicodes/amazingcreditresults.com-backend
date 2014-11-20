@@ -833,6 +833,7 @@ describe('init', function () {
         } else {
           response.statusCode.should.be.equal(200);
           var bodyParsed = JSON.parse(body);
+          console.log(bodyParsed);
           Array.isArray(bodyParsed.data).should.be.true;
           bodyParsed.data.map(function (product) {
             product.id.should.be.a.String;
@@ -879,7 +880,7 @@ describe('init', function () {
       });
     });
 
-    xit('owner can update product', function (done) {
+    it('owner can update product', function (done) {
       request({
         'method': 'PUT',
         'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
