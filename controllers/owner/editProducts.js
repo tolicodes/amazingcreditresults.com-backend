@@ -1,7 +1,14 @@
 var ensureRole = require('./../../lib/middleware.js').ensureRole;
 var utilities = require('../../lib/utilities');
 
-var fields = ['name', 'bank', 'type', 'notes', 'reportsTo', 'totalAus'];
+var fields = ['name', 'bank', 'type', 'notes', 
+              'reportsToExperian', 'reportsToEquifax', 
+              'reportsToTransunion', 'moRating',
+              'ncRating', 'bcRating', 'totalAus',
+              'improvingShortCreditHistory',
+              'improvingBadCreditScore',
+              'improvingMaxedOutCredit'
+             ];
 
 module.exports = exports = function (core) {
   core.app.get('/api/v1/owner/products', ensureRole('owner'), function (req, res) {

@@ -726,7 +726,8 @@ describe('init', function () {
     });
   });
 
-  xdescribe('/api/v1/owner/products test', function () {
+  describe('Owner Product Management', function () {
+    // Log in as Owner 
     before(function (done) {
       request({
         'method': 'POST',
@@ -744,37 +745,13 @@ describe('init', function () {
           bodyParsed.Code.should.be.equal(200);
           bodyParsed.huntKey.should.be.a.String;
           ownerHuntKey = bodyParsed.huntKey;
-          request({
-            'method': 'POST',
-            'url': 'http://localhost:' + port + '/api/v1/owner/products',
-            'headers': { 'huntKey': ownerHuntKey },
-            'form': {
-              'name': 'SuperMega' + testId,
-              'bank': 'SuperMegaBank' + testId,
-              'type': 'MasterCard',
-              'ncRating': 'None',
-              'bcRating': 'Bronze',
-              'moRating': 'Silver',
-              'reportsToExperian': false,
-              'reportsToEquifax': false,
-              'reportsToTransunion': false
-            }
-          }, function (error, response, body) {
-            if (error) {
-              done(error);
-            } else {
-              response.statusCode.should.be.equal(201);
-              var bodyParsed = JSON.parse(body);
-              productId = bodyParsed.id;
-              done();
-            }
-          });
+          done();
         }
       });
     });
 
-    // xit this to stop the main crash
-    it('owner can create product', function (done) {
+    // Create a test product 
+    beforeEach(function (done) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/owner/products',
@@ -796,19 +773,55 @@ describe('init', function () {
         } else {
           response.statusCode.should.be.equal(201);
           var bodyParsed = JSON.parse(body);
-          bodyParsed.data.name.should.be.equal('SuperMega' + testId);
-          bodyParsed.data.bank.should.be.equal('SuperMegaBank' + testId);
-          bodyParsed.data.type.should.be.equal('MasterCard');
-          bodyParsed.data.ncRating.should.be.equal('None');
-          bodyParsed.data.bcRating.should.be.equal('Bronze');
-          bodyParsed.data.moRating.should.be.equal('Silver');
-          bodyParsed.data.reportsToExperian.should.be.false;
-          bodyParsed.data.reportsToEquifax.should.be.false;
-          bodyParsed.data.reportsToTransunion.should.be.false;
+          productId = bodyParsed.id;
           done();
         }
       });
     });
+
+    // Reset the products
+    afterEach(function(done) {
+      helper.dropCollection('products', function() {
+        done();
+      });
+    });
+
+    it('can create new product', function (done) {
+      request({
+        'method': 'POST',
+        'url': 'http://localhost:' + port + '/api/v1/owner/products',
+        'headers': { 'huntKey': ownerHuntKey },
+        'form': {
+          'name': 'SuperMega' + testId,
+          'bank': 'SuperMegaBank' + testId,
+          'type': 'MasterCard',
+          'ncRating': 'None',
+          'bcRating': 'Bronze',
+          'moRating': 'Silver',
+          'reportsToExperian': false,
+          'reportsToEquifax': true,
+          'reportsToTransunion': false
+        }
+      }, function (error, response, body) {
+        if (error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(201);
+          var bodyParsed = JSON.parse(body);
+          bodyParsed.name.should.be.equal('SuperMega' + testId);
+          bodyParsed.bank.should.be.equal('SuperMegaBank' + testId);
+          bodyParsed.type.should.be.equal('MasterCard');
+          bodyParsed.ncRating.should.be.equal('None');
+          bodyParsed.bcRating.should.be.equal('Bronze');
+          bodyParsed.moRating.should.be.equal('Silver');
+          bodyParsed.reportsToExperian.should.be.false;
+          bodyParsed.reportsToEquifax.should.be.true;
+          bodyParsed.reportsToTransunion.should.be.false;
+          done();
+        }
+      });
+    });
+
     it('owner can list products', function (done) {
       request({
         'method': 'GET',

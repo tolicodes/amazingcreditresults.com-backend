@@ -15,9 +15,17 @@ module.exports = exports = function(core) {
       require: true
     },
 
-    'reportsToExperian': Boolean,
-    'reportsToEquifax': Boolean,
-    'reportsToTransunion': Boolean,
+    'reportsToExperian': {type: Boolean, default: false},
+    'reportsToEquifax': {type: Boolean, default: false},
+    'reportsToTransunion': {type: Boolean, default: false},
+
+    'ncRating': String,
+    'bcRating': String,
+    'moRating': String,
+
+    'improvingShortCreditHistory': String,
+    'improvingBadCreditScore': String,
+    'improvingMaxedOutCredit': String,
 
     'notes': String,
     
