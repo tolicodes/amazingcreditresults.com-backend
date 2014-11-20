@@ -64,7 +64,7 @@ describe('init', function () {
       });
     });
 
-    describe('owner is creating user without verified account, that we will use for tests', function () {
+    describe('Owner Client Management', function() {
       var userInfo = {
         'email': 'unitTestUser' + testId + '@mail.ru',
         'name': {
@@ -85,8 +85,7 @@ describe('init', function () {
         'street1': 'Some Address',
       };
 
-      // TODO reset userInfo after each test
-      before(function (done) {
+      beforeEach(function (done) {
         request({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/admin/clients',
@@ -109,30 +108,17 @@ describe('init', function () {
         });
       });
 
-      it('creates user without verified account', function () {
-        userId.should.be.a.String;
-        userId.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
-      });
-
-      it('notifies this user by email message', function (done) {
+      afterEach(function(done) {
         request({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/admin/clients/welcome/' + userId,
-          'form': { },
-          'headers': {'huntKey': ownerHuntKey}
+          'method': 'DELETE',
+          'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
+          'headers': {'huntKey': ownerHuntKey},
+          'form': {}
         }, function (error, response, body) {
           if (error) {
             done(error);
           } else {
             response.statusCode.should.be.equal(202);
-            var bodyParsed = JSON.parse(body);
-            bodyParsed.message.should.be.equal('sent');
-            var params = url.parse(bodyParsed.welcomeLink);
-            ['http:', 'https:'].should.include(params.protocol);
-            params.pathname.should.be.equal('/');
-            params.hash.should.match(/^\#login\/[a-z]+$/);
-            welcomeLink = (/^\#login\/([a-z]+)$/.exec(params.hash))[1];
-            bodyParsed.user.id.should.be.equal(userId);
             done();
           }
         });
@@ -193,6 +179,80 @@ describe('init', function () {
           done();
         });
       });
+
+    });
+
+    describe('owner is creating user without verified account, that we will use for tests', function () {
+
+      var userInfo = {
+        'email': 'unitTestUser' + testId + '@mail.ru',
+        'name': {
+          'givenName': 'John' + testId,
+          'middleName': 'Teodor' + testId,
+          'familyName': 'Doe' + testId,
+          'title': 'Mr.',
+          'suffix': 'III'
+        },
+        'street1' : '123 Street',
+        'street2' : 'Apt 1',
+        'phone' : '5551234567',
+        'city': 'Brooklyn',
+        'state': 'NY',
+        'zip': '11201',
+        'needQuestionnaire': true,
+        'telefone': '555-339' + testId,
+        'street1': 'Some Address',
+      };
+
+      // Can't cleanup because other tests dependent on this
+      before(function (done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/admin/clients',
+          'headers': {'huntKey': ownerHuntKey},
+          'form': userInfo
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            var bodyParsed = JSON.parse(body);
+            response.statusCode.should.be.equal(201);
+            userId = bodyParsed.id;
+            done();
+          }
+        });
+      });
+
+      it('creates user without verified account', function () {
+        userId.should.be.a.String;
+        userId.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
+      });
+
+      it('notifies this user by email message', function (done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/admin/clients/welcome/' + userId,
+          'form': { },
+          'headers': {'huntKey': ownerHuntKey}
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(202);
+            var bodyParsed = JSON.parse(body);
+            bodyParsed.message.should.be.equal('sent');
+            var params = url.parse(bodyParsed.welcomeLink);
+            ['http:', 'https:'].should.include(params.protocol);
+            params.pathname.should.be.equal('/');
+            params.hash.should.match(/^\#login\/[a-z]+$/);
+            welcomeLink = (/^\#login\/([a-z]+)$/.exec(params.hash))[1];
+            bodyParsed.user.id.should.be.equal(userId);
+            done();
+          }
+        });
+      });
+
+
 
       it('makes this user to have correct response on /api/v1/api/v1/buyer/needToSetPassword/:welcomeLink', function (done) {
         request({
@@ -879,7 +939,7 @@ describe('init', function () {
       });
     });
 
-    it('owner can update product', function (done) {
+    it('can update product', function (done) {
       request({
         'method': 'PUT',
         'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
@@ -941,7 +1001,7 @@ describe('init', function () {
 
     });
 
-    it('owner can delete product with no tradelines associated', function (done) {
+    it('can delete product with no tradelines associated', function (done) {
       request({
         'method': 'DELETE',
         'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
@@ -971,6 +1031,52 @@ describe('init', function () {
         }
       });
     });
+
+    // TODO once I'm sure that tradelines work
+    xit('cannot delete product with tradelines associated', function (done) {
+      request({
+        'method': 'POST',
+        'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
+        'headers': { 'huntKey': ownerHuntKey },
+        'form': {
+          'product': productId,
+          'seller': ownerId,
+          'totalAus': 10,
+          'usedAus': 5,
+          'price': 1100,
+          'creditLimit': 10000,
+          'cashLimit': 10000,
+          'currentBalance': 1000,
+          'ncRating': 'Silver',
+          'bcRating': 'Silver',
+          'moRating': 'Silver',
+          'cost': 1000,
+          'notes': 'Some notes'
+        }
+      }, function (error, response, body) {
+        if (error) {
+          done(error);
+        } else {
+         request({
+            'method': 'DELETE',
+            'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
+            'headers': { 'huntKey': ownerHuntKey }
+         }, function (error, response, body) {
+            if (error) {
+              done(error);
+            } else {
+              response.statusCode.should.be.equal(400);
+              var bodyParsed = JSON.parse(body);
+              console.log(bodyParsed);
+              bodyParsed.status.should.be.equal('Error');
+              bodyParsed.errors[0].message.should.be.equal('Product with this ID is used by Tradelines!');
+              done();
+            }
+         });
+       }
+      });
+    });
+
   });
 
   describe('/api/v1/owner/tradelines test', function () {
@@ -2417,7 +2523,7 @@ describe('init', function () {
         },
         function (buyer, cb) {
           helpers.clients.del(buyer.id, function (error, response) {
-            response.statusCode.should.be.equal(200);
+            response.statusCode.should.be.equal(202);
             cb(error, buyer);
           });
         },

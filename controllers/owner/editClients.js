@@ -484,7 +484,7 @@ module.exports = exports = function (core) {
           throw error;
         }
 
-        response.send(200, null);
+        response.send(202);
       });
     });
   });
