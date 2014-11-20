@@ -38,7 +38,9 @@ module.exports = exports = function(core) {
         if (error) {
           throw error;
         } else {
-          userCreated.role = 'owner';
+          userCreated.roles = {
+            'owner': true
+          };
           userCreated.accountVerified = true;
 
           userCreated.name = {

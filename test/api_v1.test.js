@@ -416,8 +416,9 @@ describe('init', function () {
     });
   });
 
+  // I really hate this sequential test bullshit, so much for UNIT tests
   describe('Owners can create other owner', function () {
-    it('performs Owners login', function (done) {
+    before(function (done) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/owner/login',
@@ -439,7 +440,7 @@ describe('init', function () {
       });
     });
 
-    it('returns correct response for POST /api/v1/admin/owners', function (done) {
+    it('creates new owner on POST /api/v1/admin/owners', function (done) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/admin/owners',
@@ -449,8 +450,8 @@ describe('init', function () {
           'password': 'test123',
           name: {
               givenName: 'John',
-                familyName: 'Doe',
-                middleName: ''
+              familyName: 'Doe',
+              middleName: ''
           }
         }
       }, function (error, response, body) {
@@ -458,35 +459,33 @@ describe('init', function () {
           done(error);
         } else {
           response.statusCode.should.be.equal(201);
-          var bodyParsed = JSON.parse(body);
           done();
         }
       });
     });
 
-    xit('performs Owners login on behalf of newly created owner', function (done) {
-      request({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/owner/login',
-        'form': {
-          'username': 'owner' + testId + '@example.org',
-          'password': 'test123'
-        }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(200);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.Code.should.be.equal(200);
-          bodyParsed.huntKey.should.be.a.String;
-          ownerHuntKey2 = bodyParsed.huntKey;
-          done();
-        }
-      });
+    it('can login as newly created owner', function (done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/owner/login',
+          'form': {
+            'username': 'owner' + testId + '@example.org',
+            'password': 'test123'
+          }
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(200);
+            var bodyParsed = JSON.parse(body);
+            bodyParsed.huntKey.should.be.a.String;
+            ownerHuntKey2 = bodyParsed.huntKey;
+            done();
+          }
+        });
     });
 
-    xit('really created new Owner', function (done) {
+    it('has valid info for new owner', function (done) {
       request({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/myself',
@@ -497,9 +496,11 @@ describe('init', function () {
         bodyParsed.id.should.be.a.String;
         bodyParsed.id.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
         bodyParsed.huntKey.should.be.equal(ownerHuntKey2);
-        bodyParsed.email.should.be.a.equal('owner' + testId + '@example.org');
+        bodyParsed.email.should.be.equal('owner' + testId + '@example.org');
         bodyParsed.roles.owner.should.be.true;
         bodyParsed.profile.should.be.an.Object;
+        bodyParsed.name.givenName.should.be.equal('John');
+        bodyParsed.name.familyName.should.be.equal('Doe');
         done();
       });
     });
