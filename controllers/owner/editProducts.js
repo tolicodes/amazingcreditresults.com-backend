@@ -45,17 +45,20 @@ module.exports = exports = function (core) {
 
   core.app.put('/api/v1/owner/products/:id', ensureRole('owner'), function (req, res) {
     utilities.throwError = utilities.throwError.bind(utilities, res);
+    var productModel = 
+        utilities.createModel(req.body, fields, {});
     req.model.Product
       .update(
         {_id: req.params.id}, 
-        utilities.createModel(req.body, fields, {})
+        productModel
       )
       .exec().then(function (affected) {
         if(!affected) {
           return utilities.error(404, 'Product not found', res);
         }
         
-        res.status(202).json(utilities.pickFields(fields, req.body));
+        productModel['id'] = req.params.id;
+        res.status(202).json(productModel);
       }, utilities.throwError);
   });
 

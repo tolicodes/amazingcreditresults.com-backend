@@ -833,7 +833,6 @@ describe('init', function () {
         } else {
           response.statusCode.should.be.equal(200);
           var bodyParsed = JSON.parse(body);
-          console.log(bodyParsed);
           Array.isArray(bodyParsed.data).should.be.true;
           bodyParsed.data.map(function (product) {
             product.id.should.be.a.String;
@@ -902,16 +901,16 @@ describe('init', function () {
         } else {
           response.statusCode.should.be.equal(202);
           var bodyParsed = JSON.parse(body);
-          bodyParsed.data.name.should.be.equal('1SuperMega' + testId);
-          bodyParsed.data.bank.should.be.equal('1SuperMegaBank' + testId);
-          bodyParsed.data.type.should.be.equal('Visa');
-          bodyParsed.data.ncRating.should.be.equal('Gold');
-          bodyParsed.data.bcRating.should.be.equal('Gold');
-          bodyParsed.data.moRating.should.be.equal('Gold');
-          bodyParsed.data.reportsToExperian.should.be.true;
-          bodyParsed.data.reportsToEquifax.should.be.true;
-          bodyParsed.data.reportsToTransunion.should.be.true;
-          bodyParsed.data.id.should.be.equal(productId);
+          bodyParsed.name.should.be.equal('1SuperMega' + testId);
+          bodyParsed.bank.should.be.equal('1SuperMegaBank' + testId);
+          bodyParsed.type.should.be.equal('Visa');
+          bodyParsed.ncRating.should.be.equal('Gold');
+          bodyParsed.bcRating.should.be.equal('Gold');
+          bodyParsed.moRating.should.be.equal('Gold');
+          bodyParsed.reportsToExperian.should.be.true;
+          bodyParsed.reportsToEquifax.should.be.true;
+          bodyParsed.reportsToTransunion.should.be.true;
+          bodyParsed.id.should.be.equal(productId);
 
           request({
               'method': 'GET',
@@ -923,16 +922,16 @@ describe('init', function () {
               } else {
                 response1.statusCode.should.be.equal(200);
                 var bodyParsed = JSON.parse(body);
-                bodyParsed.data.name.should.be.equal('1SuperMega' + testId);
-                bodyParsed.data.bank.should.be.equal('1SuperMegaBank' + testId);
-                bodyParsed.data.type.should.be.equal('Visa');
-                bodyParsed.data.ncRating.should.be.equal('Gold');
-                bodyParsed.data.bcRating.should.be.equal('Gold');
-                bodyParsed.data.moRating.should.be.equal('Gold');
-                bodyParsed.data.reportsToExperian.should.be.true;
-                bodyParsed.data.reportsToEquifax.should.be.true;
-                bodyParsed.data.reportsToTransunion.should.be.true;
-                bodyParsed.data.id.should.be.equal(productId);
+                bodyParsed.name.should.be.equal('1SuperMega' + testId);
+                bodyParsed.bank.should.be.equal('1SuperMegaBank' + testId);
+                bodyParsed.type.should.be.equal('Visa');
+                bodyParsed.ncRating.should.be.equal('Gold');
+                bodyParsed.bcRating.should.be.equal('Gold');
+                bodyParsed.moRating.should.be.equal('Gold');
+                bodyParsed.reportsToExperian.should.be.true;
+                bodyParsed.reportsToEquifax.should.be.true;
+                bodyParsed.reportsToTransunion.should.be.true;
+                bodyParsed.id.should.be.equal(productId);
                 done();
               }
             }
