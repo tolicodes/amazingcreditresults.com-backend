@@ -68,16 +68,16 @@ module.exports = exports = function(core) {
     utilities.throwError = utilities.throwError.bind(utilities, res);
     
     req.model.TradeLine
-      .update(
+      .findOneAndUpdate(
         {_id: req.params.id}, 
         utilities.createModel(req.body, editableFields, {})
       )
-      .exec().then(function (affected) {
-        if(!affected) {
+      .exec().then(function (updatedTradeline) {
+        if(!updatedTradeline) {
           return utilities.error(404, 'Tradeline not found', res);
         }
         
-        res.status(202).json(utilities.pickFields(fields, req.body));
+        res.status(202).json(utilities.pickFields(fields, updatedTradeline));
       }, utilities.throwError);
   });
 

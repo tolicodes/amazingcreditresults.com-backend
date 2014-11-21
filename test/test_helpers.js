@@ -33,3 +33,21 @@ exports.dropCollection = function(collName, callback) {
     }
   });
 }
+
+exports.dropDB = function(callback) {
+  // Connection URL - may need to change depending on your local config
+  var url = 'mongodb://localhost:27017/amazing';
+  // Use connect method to connect to the Server
+  MongoClient.connect(url, function(err, db) {
+    db.dropDatabase(function(err) {
+      if (err) {
+        db.close();
+        throw Error(err);
+      }
+      db.close();
+      // You made it!
+      console.log('Dropped database');
+      callback();
+    });
+  });
+}
