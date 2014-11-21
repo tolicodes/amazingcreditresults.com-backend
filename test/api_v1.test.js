@@ -1079,26 +1079,35 @@ describe('init', function () {
 
   });
 
-  describe('/api/v1/owner/tradelines test', function () {
+  describe('Owner Tradeline Management', function () {
+    // Login, create product, create tradeline
     before(function (done) {
-      request({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/owner/login',
-        'form': {
-          'username': 'owner@example.org',
-          'password': 'test123'
-        }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(200);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.Code.should.be.equal(200);
-          bodyParsed.huntKey.should.be.a.String;
-          ownerHuntKey = bodyParsed.huntKey;
-          ownerId = bodyParsed.id;
-
+      async.series([
+        // Login to get huntkey & ownerId
+        function(callback) {
+          request({
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/api/v1/owner/login',
+            'form': {
+              'username': 'owner@example.org',
+              'password': 'test123'
+            }
+          }, function (error, response, body) {
+            if (error) {
+              done(error);
+            } else {
+              response.statusCode.should.be.equal(200);
+              var bodyParsed = JSON.parse(body);
+              bodyParsed.Code.should.be.equal(200);
+              bodyParsed.huntKey.should.be.a.String;
+              ownerHuntKey = bodyParsed.huntKey;
+              ownerId = bodyParsed.id;
+              callback();
+            }
+          });
+        },
+        // Create a product & get productId
+        function(callback) {
           request({
             'method': 'POST',
             'url': 'http://localhost:' + port + '/api/v1/owner/products',
@@ -1120,56 +1129,50 @@ describe('init', function () {
             } else {
               response.statusCode.should.be.equal(201);
               var bodyParsed = JSON.parse(body);
-              //console.log('-------------------------------------------------------------');
-              //console.log(bodyParsed);
               bodyParsed.name.should.be.equal('SuperMega' + testId);
               bodyParsed.bank.should.be.equal('SuperMegaBank' + testId);
               bodyParsed.type.should.be.equal('MasterCard');
-              // TODO FIX
-              //bodyParsed.data.ncRating.should.be.equal('None');
-              //bodyParsed.data.bcRating.should.be.equal('Bronze');
-              //bodyParsed.data.moRating.should.be.equal('Silver');
-              //bodyParsed.data.reportsToExperian.should.be.false;
-              //bodyParsed.data.reportsToEquifax.should.be.false;
-              //bodyParsed.data.reportsToTransunion.should.be.false;
               productId = bodyParsed.id;
-              request({
-                'method': 'POST',
-                'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
-                'headers': { 'huntKey': ownerHuntKey },
-                'form': {
-                  'product': productId,
-                  'seller': ownerId,
-                  'totalAus': 10,
-                  'usedAus': 5,
-                  'price': 1100,
-                  'creditLimit': 10000,
-                  'cashLimit': 10000,
-                  'currentBalance': 1000,
-                  'ncRating': 'Silver',
-                  'bcRating': 'Silver',
-                  'moRating': 'Silver',
-                  'cost': 1000,
-                  'notes': 'Some notes'
-                  }
-                }, function (error, response, body) {
-                  if (error) {
-                    done(error);
-                } else {
-                  response.statusCode.should.be.equal(201);
-                  var bodyParsed = JSON.parse(body);
-                  //console.log(bodyParsed);
-                  tradeLineId = bodyParsed.id;
-                  done();
-                }
-              });              
+              callback();
             }
           });
-        }
-      });
+        },
+        // Create a tradeline, get tradelineId
+        function() {
+          request({
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
+            'headers': { 'huntKey': ownerHuntKey },
+            'form': {
+              'product': productId,
+              'seller': ownerId,
+              'totalAus': 10,
+              'usedAus': 5,
+              'price': 1100,
+              'creditLimit': 10000,
+              'cashLimit': 10000,
+              'currentBalance': 1000,
+              'ncRating': 'Silver',
+              'bcRating': 'Silver',
+              'moRating': 'Silver',
+              'cost': 1000,
+              'notes': 'Some notes'
+              }
+            }, function (error, response, body) {
+              if (error) {
+                done(error);
+            } else {
+              response.statusCode.should.be.equal(201);
+              var bodyParsed = JSON.parse(body);
+              //console.log(bodyParsed);
+              tradeLineId = bodyParsed.id;
+              done();
+            }
+          });              
+        }]);
     });
-//*/
-    xit('owner can\'t create tradeline with non existant product', function (done) {
+
+    it('owner can\'t create tradeline with non existant product', function (done) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
@@ -1191,15 +1194,17 @@ describe('init', function () {
           'notes': 'Some notes'
         }
       }, function (error, response, body) {
+        console.log(response);
         if (error) {
           done(error);
         } else {
           response.statusCode.should.be.equal(400);
+          console.log(body);
           var bodyParsed = JSON.parse(body);
+          console.log(bodyParsed);
           bodyParsed.status.should.be.equal('Error');
           bodyParsed.errors.should.be.an.Array;
           bodyParsed.errors.length.should.be.equal(1);
-          bodyParsed.errors[0].code.should.be.equal(400);
           bodyParsed.errors[0].message.should.be.equal('Unable to find corresponding Product!');
           bodyParsed.errors[0].field.should.be.equal('product');
           bodyParsed.errors[0].value.should.be.equal('5366506291e1e82b0f4be503');
@@ -1207,9 +1212,8 @@ describe('init', function () {
         }
       });
     });
-//*/
-//*/
-    xit('owner can\'t create tradeline with non existant seller', function (done) {
+    
+    it('owner can\'t create tradeline with non existant seller', function (done) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
@@ -1239,7 +1243,6 @@ describe('init', function () {
           bodyParsed.status.should.be.equal('Error');
           bodyParsed.errors.should.be.an.Array;
           bodyParsed.errors.length.should.be.equal(1);
-          bodyParsed.errors[0].code.should.be.equal(400);
           bodyParsed.errors[0].message.should.be.equal('Unable to find corresponding Seller among the Users!');
           bodyParsed.errors[0].field.should.be.equal('seller');
           bodyParsed.errors[0].value.should.be.equal('5366506291e1e82b0f4be503');
@@ -1247,7 +1250,7 @@ describe('init', function () {
         }
       });
     });
-//*/
+
     it('owner can create tradeline with existent product and seller', function (done) {
       request({
         'method': 'POST',

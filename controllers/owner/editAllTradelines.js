@@ -43,11 +43,24 @@ module.exports = exports = function(core) {
   core.app.post('/api/v1/owner/tradelines', ensureRole('owner'), function(req, res) {
     utilities.throwError = utilities.throwError.bind(utilities, res);
 
-    req.model.TradeLine
-      .create(utilities.createModel(req.body, fields))
-      .then(function (obj) {
-        res.status(201).json(utilities.pickFields(fields, obj));
-      }, utilities.throwError);
+    req.model.TradeLine.create(
+      utilities.createModel(req.body, fields),
+      function(err, tradelineCreated) {
+        if (err) {
+          var parsedErrors = utilities.parseError(err);
+          // TODO see more automated way to do this
+          var resMsg = {
+            status: 'Error',
+            errors: parsedErrors
+          };
+       
+          res.status(400).json(resMsg);
+        } else {
+          res.status(201).json(utilities.pickFields(fields, tradelineCreated));
+        }
+      }
+    );
+
   });
 
   core.app.put('/api/v1/owner/tradelines/:id', ensureRole('owner'), function(req, res) {

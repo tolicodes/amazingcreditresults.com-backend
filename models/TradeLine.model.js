@@ -31,5 +31,26 @@ module.exports = exports = function (core) {
     seller: 1
   });
 
+
+  TradeLineSchema.path('product').validate(function (value, respond) {
+    return core.model.Product.findById(value, function (error, productFound) {
+      if (error) {
+        throw error;
+      } else {
+        respond(productFound ? true : false);
+      }
+    });
+  }, 'Unable to find corresponding Product!');
+
+  TradeLineSchema.path('seller').validate(function (value, respond) {
+    return core.model.User.findById(value, function (error, userFound) {
+      if (error) {
+        throw error;
+      } else {
+        respond(userFound ? true : false);
+      }
+    });
+  }, 'Unable to find corresponding Seller among the Users!');
+
   return core.mongoConnection.model('TradeLine', TradeLineSchema);
 };
