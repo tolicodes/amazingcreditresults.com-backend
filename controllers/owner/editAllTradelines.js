@@ -4,8 +4,9 @@ var _ = require('underscore');
 
 var fields = [
   'product', 'seller', 'totalAus', 'currentAus', 
-  'statementDate', 'dateOpen', 'creditLimit',
-  'currentBalance', 'cost', 'price', 'balance', 'notes', 'tier', 'active'
+  'statementDate', 'dateOpen', 'creditLimit', 'usedAus', 'cashLimit',
+  'ncRating', 'bcRating', 'moRating',  'currentBalance', 'cost',
+  'price', 'balance', 'notes', 'tier', 'active'
 ];
 
 var editableFields = _(fields).chain().clone().without('product', 'seller').value();
@@ -25,7 +26,7 @@ module.exports = exports = function(core) {
       }, utilities.throwError);
   });
 
-  core.app.get('/api/v1/owner/tradelines/:id', ensureRole('role'), function(req, res) {
+  core.app.get('/api/v1/owner/tradelines/:id', ensureRole('owner'), function(req, res) {
     utilities.throwError = utilities.throwError.bind(utilities, res);
 
     req.model.TradeLine
@@ -36,7 +37,7 @@ module.exports = exports = function(core) {
           return utilities.error(404, 'Tradeline not found', res);
         }
         
-        res.json(utilities.pickFields(fields, data));
+        res.status(200).json(utilities.pickFields(fields, obj));
       }, utilities.throwError);
   });
 

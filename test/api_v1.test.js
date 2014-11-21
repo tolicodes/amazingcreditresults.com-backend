@@ -1325,7 +1325,7 @@ describe('init', function () {
       });
 
     });
-    xit('owner can list one tradeline', function (done) {
+    it('owner can list one tradeline', function (done) {
       request({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradeLineId,
@@ -1336,29 +1336,20 @@ describe('init', function () {
         } else {
           response.statusCode.should.be.equal(200);
           var bodyParsed = JSON.parse(body);
-          bodyParsed.data.id.should.be.equal(tradeLineId);
-          /*/
-           //Mongoose ORM acts strange
-           + expected - actual
-
-           +"5387a3837e6951ff1c28ed4e"
-           -"S£~iQÿ\u001c(íN"
-
-
-           bodyParsed.data.product.id.should.be.equal(productId);
-           //*/
-          bodyParsed.data.seller.id.should.be.equal(ownerId);
-          bodyParsed.data.totalAus.should.be.equal(10);
-          bodyParsed.data.usedAus.should.be.equal(5);
-          bodyParsed.data.price.should.be.equal(1100);
-          bodyParsed.data.creditLimit.should.be.equal(10000);
-          bodyParsed.data.cashLimit.should.be.equal(10000);
-          bodyParsed.data.currentBalance.should.be.equal(1000);
-          bodyParsed.data.ncRating.should.be.equal('Silver');
-          bodyParsed.data.bcRating.should.be.equal('Silver');
-          bodyParsed.data.moRating.should.be.equal('Silver');
-          bodyParsed.data.cost.should.be.equal(1000);
-          bodyParsed.data.notes.should.be.equal('Some notes');
+          bodyParsed.id.should.be.equal(tradeLineId);
+          bodyParsed.product.id.should.be.equal(productId);
+          bodyParsed.seller.should.be.equal(ownerId);
+          bodyParsed.totalAus.should.be.equal(10);
+          bodyParsed.usedAus.should.be.equal(5);
+          bodyParsed.price.should.be.equal(1100);
+          bodyParsed.creditLimit.should.be.equal(10000);
+          bodyParsed.cashLimit.should.be.equal(10000);
+          bodyParsed.currentBalance.should.be.equal(1000);
+          bodyParsed.ncRating.should.be.equal('Silver');
+          bodyParsed.bcRating.should.be.equal('Silver');
+          bodyParsed.moRating.should.be.equal('Silver');
+          bodyParsed.cost.should.be.equal(1000);
+          bodyParsed.notes.should.be.equal('Some notes');
           done();
         }
       });
