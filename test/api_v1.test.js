@@ -1,5 +1,8 @@
 // ================ NOTE DONT RUN THIS TEST IF YOU CARE ABOUT YOUR DB STATE! =============
 // ============== WILL WIPE YOUR DATABASE TO RUN TEST!!! ============
+
+process.env.NODE_ENV = 'test';
+
 var request = require('request'),
   url = require('url'),
   should = require('should'),
@@ -26,14 +29,12 @@ var request = require('request'),
   secondTradelineId;
 
 describe('init', function () {
-  process.env.ACR_MONGO_URL = 'mongodb://localhost/amazing-test';
   before(function (done) {
     backend.once('start', function (evnt) {
       if (evnt.type === 'webserver' || evnt.port === port) {
-        // TODO change this, for now give DB time to populate
-        setTimeout(function() {
-          done(null);
-        }, 500);
+        backend.once('populated', function (evnt) {
+          done();
+        });
       } else {
         done(new Error('We are unable to start backend, sorry!'));
       }
@@ -149,8 +150,6 @@ describe('init', function () {
         }, function (error, response, body) {
           response.statusCode.should.be.equal(202);
           var bodyParsed = JSON.parse(body);
-          console.log('return from PUT:');
-          console.log(bodyParsed.name.title);
           bodyParsed.name.givenName.should.be.equal(modUser.name.givenName);
           bodyParsed.name.middleName.should.be.equal(modUser.name.middleName);
           bodyParsed.name.familyName.should.be.equal(modUser.name.familyName);

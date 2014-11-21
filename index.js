@@ -4,7 +4,7 @@ var Hunt = require('hunt'),
   hunt = Hunt({
     'hostUrl': e.ACR_HOST, //for example
     'redisUrl': e.ACR_REDIS_URL || 'redis://localhost:6379',
-    'mongoUrl': e.ACR_MONGO_URL || 'mongodb://localhost/amazing',
+    'mongoUrl': process.env.NODE_ENV === 'test' ? 'mongodb://localhost/amazing-test' : (e.ACR_MONGO_URL || 'mongodb://localhost/amazing'),
     'io': false,
     'huntKey': true,
     'disableCsrf': true, //strongly not recommended for production!!!
@@ -55,6 +55,8 @@ var Hunt = require('hunt'),
       }
     } : false
   });
+
+console.log('Env:' + hunt.config.env);
 
 //loading models
 hunt.extendModel('Product', require('./models/Product.model.js'));
@@ -144,7 +146,7 @@ hrw(hunt, {
 
 
 //Development route to test error catcher middleware
-if (hunt.config.env === 'development') {
+if (hunt.config.env === 'development' || hunt.config.env === 'test') {
   hunt.extendRoutes(function(core) {
     core.app.get('/testError', function(request, response) {
       throw new Error('Test error!');
@@ -224,7 +226,7 @@ hunt.extendRoutes(function(core) {
 
 hunt.once('start', function(evnt) {
   //populating database with test data in development environment!
-  if (hunt.config.env === 'development') {
+  if (hunt.config.env === 'development' || hunt.config.env === 'test') {
     require('./lib/populateDatabase.js')(hunt); //uncomment to repopulate database on every start
   }
 
@@ -244,7 +246,7 @@ if (module.parent) {
   //https://oselot.atlassian.net/browse/ACR-255
   module.exports = exports = hunt;
 } else {
-  if (hunt.config.env === 'development') {
+  if (hunt.config.env === 'development' || hunt.config.env === 'test') {
     hunt.startWebServer();
   } else {
     hunt.startWebCluster();

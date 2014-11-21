@@ -198,9 +198,6 @@ module.exports = exports = function (core) {
       patch.profile.preSelectTradeLines = request.body.preSelectTradeLines;
     }
         
-    console.log('patch: ');
-    console.log(patch);
-
     request.model.User.findOneAndUpdate(
       {
         '_id': request.params.id

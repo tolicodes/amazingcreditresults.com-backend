@@ -1,4 +1,6 @@
 var MongoClient = require('mongodb').MongoClient;
+// Connection URL - may need to change depending on your local config
+var url = 'mongodb://localhost:27017/amazing-test';
 
 exports.clone = function(obj) {
  var target = {};
@@ -11,8 +13,6 @@ exports.clone = function(obj) {
 };
 
 exports.dropCollection = function(collName, callback) {
-  // Connection URL - may need to change depending on your local config
-  var url = 'mongodb://localhost:27017/amazing';
   // Use connect method to connect to the Server
   MongoClient.connect(url, function(err, db) {
     var collection = db.collection(collName);
@@ -35,8 +35,6 @@ exports.dropCollection = function(collName, callback) {
 }
 
 exports.dropDB = function(callback) {
-  // Connection URL - may need to change depending on your local config
-  var url = 'mongodb://localhost:27017/amazing';
   // Use connect method to connect to the Server
   MongoClient.connect(url, function(err, db) {
     db.dropDatabase(function(err) {
