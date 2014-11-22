@@ -15,6 +15,7 @@ var request = require('request'),
   welcomeLink,
   ownerHuntKey,
   ownerHuntKey2,
+  ownReq,
   buyerHuntKey,
   productId,
   userId,
@@ -64,6 +65,10 @@ describe('init', function () {
         bodyParsed.huntKey.should.be.a.String;
         ownerHuntKey = bodyParsed.huntKey;
         ownerId = bodyParsed.id;
+        ownReq = request.defaults({
+          'headers': {'huntKey': ownerHuntKey},
+          'json': true
+        });
         done();
       }
     });
@@ -95,33 +100,28 @@ describe('init', function () {
 
 
       beforeEach(function (done) {
-        request({
+        ownReq({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/admin/clients',
-          'headers': {'huntKey': ownerHuntKey},
           'form': userInfo
         }, function (error, response, body) {
           if (error) {
             done(error);
           } else {
-            var bodyParsed = JSON.parse(body);
-            //console.log('Created User: ');
-            //console.log(bodyParsed);
             response.statusCode.should.be.equal(201);
-            userId = bodyParsed.id;
+            userId = body.id;
             // Sanity check
-            bodyParsed.name.title.should.be.equal(userInfo.name.title);
-            bodyParsed.name.suffix.should.be.equal(userInfo.name.suffix);
+            body.name.title.should.be.equal(userInfo.name.title);
+            body.name.suffix.should.be.equal(userInfo.name.suffix);
             done();
           }
         });
       });
 
       afterEach(function(done) {
-        request({
+        ownReq({
           'method': 'DELETE',
           'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
-          'headers': {'huntKey': ownerHuntKey},
           'form': {}
         }, function (error, response, body) {
           if (error) {
@@ -142,19 +142,17 @@ describe('init', function () {
         modUser.name.title = 'Ms.';
         modUser.name.suffix = 'Jr.';
 
-        request({
+        ownReq({
           'method': 'PUT',
           'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
           'form': modUser,
-          'headers': {'huntKey': ownerHuntKey}
         }, function (error, response, body) {
           response.statusCode.should.be.equal(202);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.name.givenName.should.be.equal(modUser.name.givenName);
-          bodyParsed.name.middleName.should.be.equal(modUser.name.middleName);
-          bodyParsed.name.familyName.should.be.equal(modUser.name.familyName);
-          bodyParsed.name.title.should.be.equal(modUser.name.title);
-          bodyParsed.name.suffix.should.be.equal(modUser.name.suffix);
+          body.name.givenName.should.be.equal(modUser.name.givenName);
+          body.name.middleName.should.be.equal(modUser.name.middleName);
+          body.name.familyName.should.be.equal(modUser.name.familyName);
+          body.name.title.should.be.equal(modUser.name.title);
+          body.name.suffix.should.be.equal(modUser.name.suffix);
           done();
         });
       });
@@ -170,19 +168,16 @@ describe('init', function () {
         // TODO can move this out later
         modUser.phone = '5550001111';
 
-        request({
+        ownReq({
           'method': 'PUT',
           'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
           'form': modUser,
-          'headers': {'huntKey': ownerHuntKey}
         }, function (error, response, body) {
           response.statusCode.should.be.equal(202);
-          var bodyParsed = JSON.parse(body);
           var modified = ['city', 'state', 'zip', 'street1', 'street2', 'phone'];
           modified.forEach(function(mod) {
-            bodyParsed[mod].should.be.equal(modUser[mod]);
+            body[mod].should.be.equal(modUser[mod]);
           });
-
           done();
         });
       });
@@ -214,18 +209,16 @@ describe('init', function () {
 
       // Can't cleanup because other tests dependent on this
       before(function (done) {
-        request({
+        ownReq({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/admin/clients',
-          'headers': {'huntKey': ownerHuntKey},
           'form': userInfo
         }, function (error, response, body) {
           if (error) {
             done(error);
           } else {
-            var bodyParsed = JSON.parse(body);
             response.statusCode.should.be.equal(201);
-            userId = bodyParsed.id;
+            userId = body.id;
             done();
           }
         });
@@ -237,24 +230,22 @@ describe('init', function () {
       });
 
       it('notifies this user by email message', function (done) {
-        request({
+        ownReq({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/admin/clients/welcome/' + userId,
           'form': { },
-          'headers': {'huntKey': ownerHuntKey}
         }, function (error, response, body) {
           if (error) {
             done(error);
           } else {
             response.statusCode.should.be.equal(202);
-            var bodyParsed = JSON.parse(body);
-            bodyParsed.message.should.be.equal('sent');
-            var params = url.parse(bodyParsed.welcomeLink);
+            body.message.should.be.equal('sent');
+            var params = url.parse(body.welcomeLink);
             ['http:', 'https:'].should.include(params.protocol);
             params.pathname.should.be.equal('/');
             params.hash.should.match(/^\#login\/[a-z]+$/);
             welcomeLink = (/^\#login\/([a-z]+)$/.exec(params.hash))[1];
-            bodyParsed.user.id.should.be.equal(userId);
+            body.user.id.should.be.equal(userId);
             done();
           }
         });
@@ -377,7 +368,7 @@ describe('init', function () {
           } else {
             response.statusCode.should.be.equal(400);
             var bodyParsed = JSON.parse(body);
-            console.log(bodyParsed);
+            bodyParsed.errors[0].message.should.be.equal('Wrong or outdated welcome link! Please, contact support for a new one!');
             done();
           }
         });
@@ -411,11 +402,11 @@ describe('init', function () {
         request({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/myself',
-          'headers': {'huntKey': buyerHuntKey}
+          'headers': {'huntKey': buyerHuntKey},
+          'json': true
         }, function (error, response, body) {
           response.statusCode.should.be.equal(200);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.id.should.be.equal(userId);
+          body.id.should.be.equal(userId);
           done();
         });
       });
@@ -424,14 +415,14 @@ describe('init', function () {
         request({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/buyer/needToSetPassword/' + welcomeLink,
-          'headers': { }
+          'headers': { },
+          'json': true
         }, function (error, response, body) {
           if (error) {
             done(error);
           } else {
             response.statusCode.should.be.equal(200);
-            var bodyParsed = JSON.parse(body);
-            bodyParsed.needToSetPassword.should.be.false;
+            body.needToSetPassword.should.be.false;
             done();
           }
         });
@@ -490,10 +481,9 @@ describe('init', function () {
   // Beware these tests are interdependent
   describe('Other Owners Managment', function () {
     it('can create new owner', function (done) {
-      request({
+      ownReq({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/admin/owners',
-        'headers': {'huntKey': ownerHuntKey},
         'form': {
           'username': 'owner' + testId + '@example.org',
           'password': 'test123',
@@ -538,18 +528,18 @@ describe('init', function () {
       request({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/myself',
-        'headers': {'huntKey': ownerHuntKey2}
+        'headers': {'huntKey': ownerHuntKey2},
+        'json': true
       }, function (error, response, body) {
         response.statusCode.should.be.equal(200);
-        var bodyParsed = JSON.parse(body);
-        bodyParsed.id.should.be.a.String;
-        bodyParsed.id.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
-        bodyParsed.huntKey.should.be.equal(ownerHuntKey2);
-        bodyParsed.email.should.be.equal('owner' + testId + '@example.org');
-        bodyParsed.roles.owner.should.be.true;
-        bodyParsed.profile.should.be.an.Object;
-        bodyParsed.name.givenName.should.be.equal('John');
-        bodyParsed.name.familyName.should.be.equal('Doe');
+        body.id.should.be.a.String;
+        body.id.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
+        body.huntKey.should.be.equal(ownerHuntKey2);
+        body.email.should.be.equal('owner' + testId + '@example.org');
+        body.roles.owner.should.be.true;
+        body.profile.should.be.an.Object;
+        body.name.givenName.should.be.equal('John');
+        body.name.familyName.should.be.equal('Doe');
         done();
       });
     });
@@ -778,10 +768,9 @@ describe('init', function () {
   describe('Owner Product Management', function () {
     // Create a test product 
     beforeEach(function (done) {
-      request({
+      ownReq({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/owner/products',
-        'headers': { 'huntKey': ownerHuntKey },
         'form': {
           'name': 'SuperMega' + testId,
           'bank': 'SuperMegaBank' + testId,
@@ -798,8 +787,7 @@ describe('init', function () {
           done(error);
         } else {
           response.statusCode.should.be.equal(201);
-          var bodyParsed = JSON.parse(body);
-          productId = bodyParsed.id;
+          productId = body.id;
           done();
         }
       });
@@ -813,10 +801,9 @@ describe('init', function () {
     });
 
     it('can create new product', function (done) {
-      request({
+      ownReq({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/owner/products',
-        'headers': { 'huntKey': ownerHuntKey },
         'form': {
           'name': 'SuperMega' + testId,
           'bank': 'SuperMegaBank' + testId,
@@ -833,34 +820,31 @@ describe('init', function () {
           done(error);
         } else {
           response.statusCode.should.be.equal(201);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.name.should.be.equal('SuperMega' + testId);
-          bodyParsed.bank.should.be.equal('SuperMegaBank' + testId);
-          bodyParsed.type.should.be.equal('MasterCard');
-          bodyParsed.ncRating.should.be.equal('None');
-          bodyParsed.bcRating.should.be.equal('Bronze');
-          bodyParsed.moRating.should.be.equal('Silver');
-          bodyParsed.reportsToExperian.should.be.false;
-          bodyParsed.reportsToEquifax.should.be.true;
-          bodyParsed.reportsToTransunion.should.be.false;
+          body.name.should.be.equal('SuperMega' + testId);
+          body.bank.should.be.equal('SuperMegaBank' + testId);
+          body.type.should.be.equal('MasterCard');
+          body.ncRating.should.be.equal('None');
+          body.bcRating.should.be.equal('Bronze');
+          body.moRating.should.be.equal('Silver');
+          body.reportsToExperian.should.be.false;
+          body.reportsToEquifax.should.be.true;
+          body.reportsToTransunion.should.be.false;
           done();
         }
       });
     });
 
     it('can list products', function (done) {
-      request({
+      ownReq({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/owner/products',
-        'headers': { 'huntKey': ownerHuntKey }
       }, function (error, response, body) {
         if (error) {
           done(error);
         } else {
           response.statusCode.should.be.equal(200);
-          var bodyParsed = JSON.parse(body);
-          Array.isArray(bodyParsed.data).should.be.true;
-          bodyParsed.data.map(function (product) {
+          Array.isArray(body.data).should.be.true;
+          body.data.map(function (product) {
             product.id.should.be.a.String;
             product.name.should.be.a.String;
             product.bank.should.be.a.String;
@@ -885,31 +869,28 @@ describe('init', function () {
     });
 
     it('can list one product', function (done) {
-      request({
+      ownReq({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
-        'headers': { 'huntKey': ownerHuntKey }
       }, function (error, response, body) {
         if (error) {
           done(error);
         } else {
           response.statusCode.should.be.equal(200);
           //console.log(body);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.id.should.be.equal(productId);
-          bodyParsed.name.should.be.equal('SuperMega' + testId);
-          bodyParsed.bank.should.be.equal('SuperMegaBank' + testId);
-          bodyParsed.type.should.be.equal('MasterCard');
+          body.id.should.be.equal(productId);
+          body.name.should.be.equal('SuperMega' + testId);
+          body.bank.should.be.equal('SuperMegaBank' + testId);
+          body.type.should.be.equal('MasterCard');
           done();
         }
       });
     });
 
     it('can update product', function (done) {
-      request({
+      ownReq({
         'method': 'PUT',
         'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
-        'headers': { 'huntKey': ownerHuntKey },
         'form': {
           'name': '1SuperMega' + testId,
           'bank': '1SuperMegaBank' + testId,
@@ -926,38 +907,35 @@ describe('init', function () {
           done(error);
         } else {
           response.statusCode.should.be.equal(202);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.name.should.be.equal('1SuperMega' + testId);
-          bodyParsed.bank.should.be.equal('1SuperMegaBank' + testId);
-          bodyParsed.type.should.be.equal('Visa');
-          bodyParsed.ncRating.should.be.equal('Gold');
-          bodyParsed.bcRating.should.be.equal('Gold');
-          bodyParsed.moRating.should.be.equal('Gold');
-          bodyParsed.reportsToExperian.should.be.true;
-          bodyParsed.reportsToEquifax.should.be.true;
-          bodyParsed.reportsToTransunion.should.be.true;
-          bodyParsed.id.should.be.equal(productId);
+          body.name.should.be.equal('1SuperMega' + testId);
+          body.bank.should.be.equal('1SuperMegaBank' + testId);
+          body.type.should.be.equal('Visa');
+          body.ncRating.should.be.equal('Gold');
+          body.bcRating.should.be.equal('Gold');
+          body.moRating.should.be.equal('Gold');
+          body.reportsToExperian.should.be.true;
+          body.reportsToEquifax.should.be.true;
+          body.reportsToTransunion.should.be.true;
+          body.id.should.be.equal(productId);
 
-          request({
+          ownReq({
               'method': 'GET',
               'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
-              'headers': { 'huntKey': ownerHuntKey }
             }, function (error1, response1, body) {
               if (error1) {
                 done(error1);
               } else {
                 response1.statusCode.should.be.equal(200);
-                var bodyParsed = JSON.parse(body);
-                bodyParsed.name.should.be.equal('1SuperMega' + testId);
-                bodyParsed.bank.should.be.equal('1SuperMegaBank' + testId);
-                bodyParsed.type.should.be.equal('Visa');
-                bodyParsed.ncRating.should.be.equal('Gold');
-                bodyParsed.bcRating.should.be.equal('Gold');
-                bodyParsed.moRating.should.be.equal('Gold');
-                bodyParsed.reportsToExperian.should.be.true;
-                bodyParsed.reportsToEquifax.should.be.true;
-                bodyParsed.reportsToTransunion.should.be.true;
-                bodyParsed.id.should.be.equal(productId);
+                body.name.should.be.equal('1SuperMega' + testId);
+                body.bank.should.be.equal('1SuperMegaBank' + testId);
+                body.type.should.be.equal('Visa');
+                body.ncRating.should.be.equal('Gold');
+                body.bcRating.should.be.equal('Gold');
+                body.moRating.should.be.equal('Gold');
+                body.reportsToExperian.should.be.true;
+                body.reportsToEquifax.should.be.true;
+                body.reportsToTransunion.should.be.true;
+                body.id.should.be.equal(productId);
                 done();
               }
             }
@@ -973,10 +951,9 @@ describe('init', function () {
         async.series([
           // Create a product & get productId
           function(callback) {
-            request({
+            ownReq({
               'method': 'POST',
               'url': 'http://localhost:' + port + '/api/v1/owner/products',
-              'headers': { 'huntKey': ownerHuntKey },
               'form': {
                 'name': 'SuperMega' + testId,
                 'bank': 'SuperMegaBank' + testId,
@@ -993,21 +970,19 @@ describe('init', function () {
                 done(error);
               } else {
                 response.statusCode.should.be.equal(201);
-                var bodyParsed = JSON.parse(body);
-                bodyParsed.name.should.be.equal('SuperMega' + testId);
-                bodyParsed.bank.should.be.equal('SuperMegaBank' + testId);
-                bodyParsed.type.should.be.equal('MasterCard');
-                productId = bodyParsed.id;
+                body.name.should.be.equal('SuperMega' + testId);
+                body.bank.should.be.equal('SuperMegaBank' + testId);
+                body.type.should.be.equal('MasterCard');
+                productId = body.id;
                 callback();
               }
             });
           },
           // Create a tradeline, get tradelineId
           function() {
-            request({
+            ownReq({
               'method': 'POST',
               'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
-              'headers': { 'huntKey': ownerHuntKey },
               'form': {
                 'product': productId,
                 'seller': ownerId,
@@ -1028,9 +1003,7 @@ describe('init', function () {
                   done(error);
               } else {
                 response.statusCode.should.be.equal(201);
-                var bodyParsed = JSON.parse(body);
-                //console.log(bodyParsed);
-                tradeLineId = bodyParsed.id;
+                tradeLineId = body.id;
                 done();
               }
             });              
@@ -1038,22 +1011,19 @@ describe('init', function () {
       });
 
       it('can delete product with no tradelines associated', function (done) {
-        request({
+        ownReq({
           'method': 'DELETE',
           'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
-          'headers': { 'huntKey': ownerHuntKey }
         }, function (error, response, body) {
           if (error) {
             done(error);
           } else {
             response.statusCode.should.be.equal(202);
-            var bodyParsed = JSON.parse(body);
-            bodyParsed.status.should.be.equal('deleted');
+            body.status.should.be.equal('deleted');
 
-            request({
+            ownReq({
                 'method': 'GET',
                 'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
-                'headers': { 'huntKey': ownerHuntKey }
               }, function (error1, response1, body) {
                 if (error1) {
                   done(error1);
@@ -1068,10 +1038,9 @@ describe('init', function () {
       });
 
       it('cannot delete product with tradelines associated', function (done) {
-        request({
+        ownReq({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
-          'headers': { 'huntKey': ownerHuntKey },
           'form': {
             'product': productId,
             'seller': ownerId,
@@ -1091,19 +1060,16 @@ describe('init', function () {
           if (error) {
             done(error);
           } else {
-           request({
+           ownReq({
               'method': 'DELETE',
               'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
-              'headers': { 'huntKey': ownerHuntKey }
            }, function (error, response, body) {
               if (error) {
                 done(error);
               } else {
                 response.statusCode.should.be.equal(400);
-                var bodyParsed = JSON.parse(body);
-                //console.log(bodyParsed);
-                bodyParsed.status.should.be.equal('Error');
-                bodyParsed.errors[0].message.should.be.equal('Product with this ID is used by Tradelines!');
+                body.status.should.be.equal('Error');
+                body.errors[0].message.should.be.equal('Product with this ID is used by Tradelines!');
                 done();
               }
            });
@@ -1120,10 +1086,9 @@ describe('init', function () {
       async.series([
         // Create a product & get productId
         function(callback) {
-          request({
+          ownReq({
             'method': 'POST',
             'url': 'http://localhost:' + port + '/api/v1/owner/products',
-            'headers': { 'huntKey': ownerHuntKey },
             'form': {
               'name': 'SuperMega' + testId,
               'bank': 'SuperMegaBank' + testId,
@@ -1140,21 +1105,19 @@ describe('init', function () {
               done(error);
             } else {
               response.statusCode.should.be.equal(201);
-              var bodyParsed = JSON.parse(body);
-              bodyParsed.name.should.be.equal('SuperMega' + testId);
-              bodyParsed.bank.should.be.equal('SuperMegaBank' + testId);
-              bodyParsed.type.should.be.equal('MasterCard');
-              productId = bodyParsed.id;
+              body.name.should.be.equal('SuperMega' + testId);
+              body.bank.should.be.equal('SuperMegaBank' + testId);
+              body.type.should.be.equal('MasterCard');
+              productId = body.id;
               callback();
             }
           });
         },
         // Create a tradeline, get tradelineId
         function() {
-          request({
+          ownReq({
             'method': 'POST',
             'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
-            'headers': { 'huntKey': ownerHuntKey },
             'form': {
               'product': productId,
               'seller': ownerId,
@@ -1175,9 +1138,7 @@ describe('init', function () {
                 done(error);
             } else {
               response.statusCode.should.be.equal(201);
-              var bodyParsed = JSON.parse(body);
-              //console.log(bodyParsed);
-              tradeLineId = bodyParsed.id;
+              tradeLineId = body.id;
               done();
             }
           });              
@@ -1185,10 +1146,9 @@ describe('init', function () {
     });
 
     it('cannot create tradeline with invalid product', function (done) {
-      request({
+      ownReq({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
-        'headers': { 'huntKey': ownerHuntKey },
         'form': {
           'name': 'TestTradeline' + testId,
           'product': '5366506291e1e82b0f4be503', //non existant, but valid id
@@ -1211,25 +1171,21 @@ describe('init', function () {
           done(error);
         } else {
           response.statusCode.should.be.equal(400);
-          console.log(body);
-          var bodyParsed = JSON.parse(body);
-          console.log(bodyParsed);
-          bodyParsed.status.should.be.equal('Error');
-          bodyParsed.errors.should.be.an.Array;
-          bodyParsed.errors.length.should.be.equal(1);
-          bodyParsed.errors[0].message.should.be.equal('Unable to find corresponding Product!');
-          bodyParsed.errors[0].field.should.be.equal('product');
-          bodyParsed.errors[0].value.should.be.equal('5366506291e1e82b0f4be503');
+          body.status.should.be.equal('Error');
+          body.errors.should.be.an.Array;
+          body.errors.length.should.be.equal(1);
+          body.errors[0].message.should.be.equal('Unable to find corresponding Product!');
+          body.errors[0].field.should.be.equal('product');
+          body.errors[0].value.should.be.equal('5366506291e1e82b0f4be503');
           done();
         }
       });
     });
     
     it('owner cannot create tradeline with invalid seller', function (done) {
-      request({
+      ownReq({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
-        'headers': { 'huntKey': ownerHuntKey },
         'form': {
           'name': 'TestTradeline' + testId,
           'product': productId,
@@ -1251,23 +1207,21 @@ describe('init', function () {
           done(error);
         } else {
           response.statusCode.should.be.equal(400);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.status.should.be.equal('Error');
-          bodyParsed.errors.should.be.an.Array;
-          bodyParsed.errors.length.should.be.equal(1);
-          bodyParsed.errors[0].message.should.be.equal('Unable to find corresponding Seller among the Users!');
-          bodyParsed.errors[0].field.should.be.equal('seller');
-          bodyParsed.errors[0].value.should.be.equal('5366506291e1e82b0f4be503');
+          body.status.should.be.equal('Error');
+          body.errors.should.be.an.Array;
+          body.errors.length.should.be.equal(1);
+          body.errors[0].message.should.be.equal('Unable to find corresponding Seller among the Users!');
+          body.errors[0].field.should.be.equal('seller');
+          body.errors[0].value.should.be.equal('5366506291e1e82b0f4be503');
           done();
         }
       });
     });
 
     it('can create tradeline with valid product and seller', function (done) {
-      request({
+      ownReq({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
-        'headers': { 'huntKey': ownerHuntKey },
         'form': {
           'product': productId,
           'seller': ownerId,
@@ -1288,28 +1242,24 @@ describe('init', function () {
           done(error);
         } else {
           response.statusCode.should.be.equal(201);
-          var bodyParsed = JSON.parse(body);
-          //console.log(bodyParsed);
-          tradeLineId = bodyParsed.id;
+          tradeLineId = body.id;
           done();
         }
       });
     });
 
     it('can list tradelines', function (done) {
-      request({
+      ownReq({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
-        'headers': { 'huntKey': ownerHuntKey }
       }, function (error, response, body) {
         if (error) {
           done(error);
         } else {
           response.statusCode.should.be.equal(200);
-          var bodyParsed = JSON.parse(body);
-          Array.isArray(bodyParsed.data).should.be.true;
-          bodyParsed.data.length.should.be.above(1);
-          bodyParsed.data.map(function (tradeline) {
+          Array.isArray(body.data).should.be.true;
+          body.data.length.should.be.above(1);
+          body.data.map(function (tradeline) {
             tradeline.id.should.be.a.String;
             tradeline.id.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
             tradeline.totalAus.should.be.below(16);
@@ -1342,40 +1292,37 @@ describe('init', function () {
 
     });
     it('owner can list one tradeline', function (done) {
-      request({
+      ownReq({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradeLineId,
-        'headers': { 'huntKey': ownerHuntKey }
       }, function (error, response, body) {
         if (error) {
           done(error);
         } else {
           response.statusCode.should.be.equal(200);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.id.should.be.equal(tradeLineId);
-          bodyParsed.product.id.should.be.equal(productId);
-          bodyParsed.seller.should.be.equal(ownerId);
-          bodyParsed.totalAus.should.be.equal(10);
-          bodyParsed.usedAus.should.be.equal(5);
-          bodyParsed.price.should.be.equal(1100);
-          bodyParsed.creditLimit.should.be.equal(10000);
-          bodyParsed.cashLimit.should.be.equal(10000);
-          bodyParsed.currentBalance.should.be.equal(1000);
-          bodyParsed.ncRating.should.be.equal('Silver');
-          bodyParsed.bcRating.should.be.equal('Silver');
-          bodyParsed.moRating.should.be.equal('Silver');
-          bodyParsed.cost.should.be.equal(1000);
-          bodyParsed.notes.should.be.equal('Some notes');
+          body.id.should.be.equal(tradeLineId);
+          body.product.id.should.be.equal(productId);
+          body.seller.should.be.equal(ownerId);
+          body.totalAus.should.be.equal(10);
+          body.usedAus.should.be.equal(5);
+          body.price.should.be.equal(1100);
+          body.creditLimit.should.be.equal(10000);
+          body.cashLimit.should.be.equal(10000);
+          body.currentBalance.should.be.equal(1000);
+          body.ncRating.should.be.equal('Silver');
+          body.bcRating.should.be.equal('Silver');
+          body.moRating.should.be.equal('Silver');
+          body.cost.should.be.equal(1000);
+          body.notes.should.be.equal('Some notes');
           done();
         }
       });
     });
 
     it('owner can update tradeline', function (done) {
-      request({
+      ownReq({
         'method': 'PUT',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradeLineId,
-        'headers': { 'huntKey': ownerHuntKey },
         'form': {
           'product': productId,
           'seller': ownerId,
@@ -1396,43 +1343,39 @@ describe('init', function () {
           done(error);
         } else {
           response.statusCode.should.be.equal(202);
-//        console.log(body);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.product.should.be.equal(productId);
-          bodyParsed.seller.should.be.equal(ownerId);
-          bodyParsed.totalAus.should.be.equal(11);
-          bodyParsed.usedAus.should.be.equal(6);
-          bodyParsed.price.should.be.equal(1099);
-          bodyParsed.creditLimit.should.be.equal(9999);
-          bodyParsed.cashLimit.should.be.equal(9999);
-          bodyParsed.currentBalance.should.be.equal(9999);
-          bodyParsed.ncRating.should.be.equal('None');
-          bodyParsed.bcRating.should.be.equal('Bronze');
-          bodyParsed.moRating.should.be.equal('Gold');
-          bodyParsed.cost.should.be.equal(999);
-          bodyParsed.notes.should.be.equal('Some notes111');
+          body.product.should.be.equal(productId);
+          body.seller.should.be.equal(ownerId);
+          body.totalAus.should.be.equal(11);
+          body.usedAus.should.be.equal(6);
+          body.price.should.be.equal(1099);
+          body.creditLimit.should.be.equal(9999);
+          body.cashLimit.should.be.equal(9999);
+          body.currentBalance.should.be.equal(9999);
+          body.ncRating.should.be.equal('None');
+          body.bcRating.should.be.equal('Bronze');
+          body.moRating.should.be.equal('Gold');
+          body.cost.should.be.equal(999);
+          body.notes.should.be.equal('Some notes111');
 
-          request({
+          ownReq({
             'method': 'GET',
             'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradeLineId,
-            'headers': { 'huntKey': ownerHuntKey }
           }, function (error, response, body) {
             if (error) {
               done(error);
             } else {
               response.statusCode.should.be.equal(200);
-              var bodyParsed = JSON.parse(body);
-              bodyParsed.totalAus.should.be.equal(11);
-              bodyParsed.usedAus.should.be.equal(6);
-              bodyParsed.price.should.be.equal(1099);
-              bodyParsed.creditLimit.should.be.equal(9999);
-              bodyParsed.cashLimit.should.be.equal(9999);
-              bodyParsed.currentBalance.should.be.equal(9999);
-              bodyParsed.ncRating.should.be.equal('None');
-              bodyParsed.bcRating.should.be.equal('Bronze');
-              bodyParsed.moRating.should.be.equal('Gold');
-              bodyParsed.cost.should.be.equal(999);
-              bodyParsed.notes.should.be.equal('Some notes111');
+              body.totalAus.should.be.equal(11);
+              body.usedAus.should.be.equal(6);
+              body.price.should.be.equal(1099);
+              body.creditLimit.should.be.equal(9999);
+              body.cashLimit.should.be.equal(9999);
+              body.currentBalance.should.be.equal(9999);
+              body.ncRating.should.be.equal('None');
+              body.bcRating.should.be.equal('Bronze');
+              body.moRating.should.be.equal('Gold');
+              body.cost.should.be.equal(999);
+              body.notes.should.be.equal('Some notes111');
               done();
             }
           });
@@ -1456,8 +1399,7 @@ describe('init', function () {
             done(error);
           } else {
             response.statusCode.should.be.equal(202);
-            var bodyParsed = JSON.parse(body);
-            bodyParsed.status.should.be.equal('Tradeline archived');
+            body.status.should.be.equal('Tradeline archived');
 
             helpers.tradelines.get(ownerHuntKey, tradeLineId,
             function (err, response1, body1) {
@@ -1465,9 +1407,8 @@ describe('init', function () {
                 done(err);
               } else {
                 response1.statusCode.should.be.equal(200);
-                var bodyParsed = JSON.parse(body1);
-                bodyParsed.id.should.be.equal(tradeLineId);
-                bodyParsed.active.should.be.false;
+                body1.id.should.be.equal(tradeLineId);
+                body1.active.should.be.false;
                 done();
               }
             });
@@ -1483,9 +1424,8 @@ describe('init', function () {
             done(error);
           } else {
             response.statusCode.should.be.equal(404);
-            var bodyParsed = JSON.parse(body);
-            bodyParsed.status.should.be.equal('Error');
-            bodyParsed.errors[0].message.should.be.equal('Tradeline not found');
+            body.status.should.be.equal('Error');
+            body.errors[0].message.should.be.equal('Tradeline not found');
             done();
           }
         });
@@ -2004,18 +1944,17 @@ describe('init', function () {
             // The api key field in the DB is actually the huntKey
             'apiKey': 'a84e44544afb66dedba5a',
             'password': 'test123'
-          }
+          },
+          'json': true
         }, function (error, response, body) {
           if (error) {
             done(error);
           } else {
-            var bodyParsed = JSON.parse(body);
-            console.log(bodyParsed);
             response.statusCode.should.be.equal(202);
-            bodyParsed.Code.should.be.equal(202);
-            bodyParsed.Success.should.be.equal('Welcome!');
-            bodyParsed.huntKey.should.be.a.String;
-            cartBuyerHuntKey = bodyParsed.huntKey;
+            body.Code.should.be.equal(202);
+            body.Success.should.be.equal('Welcome!');
+            body.huntKey.should.be.a.String;
+            cartBuyerHuntKey = body.huntKey;
             done();
           }
         });
@@ -2207,12 +2146,10 @@ describe('init', function () {
   describe('Issue balance adjustment for buyer', function () {
     // Can't cleanup because other tests dependent on this
     before(function (done) {
-      request({
+      ownReq({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/admin/clients',
-        'headers': {'huntKey': ownerHuntKey},
         'form': userInfo,
-        'json': true
       }, function (error, response, body) {
         if (error) {
           done(error);
@@ -2225,17 +2162,14 @@ describe('init', function () {
     });
 
     it('Owner can increase buyer funds', function (done) {
-      request({
+      ownReq({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/admin/clients/balance/' + userId,
-        'headers': {'huntKey': ownerHuntKey},
         'form': {'amount': 1, 'notes': 'Merry Christmas, fuck you!', date: '2014-05-03', paidBy: 'Credit Card'},
-        'json': true
       }, function (error, response, body) {
         if (error) {
           done(error);
         } else {
-          console.log(body);
           response.statusCode.should.be.equal(202);
           body.status.should.be.equal('Ok');
           done();
@@ -2244,12 +2178,10 @@ describe('init', function () {
     });
 
     it('Owner can check that he uploaded the funds', function (done) {
-      request({
+      ownReq({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
-        'headers': {'huntKey': ownerHuntKey},
         'form': {'amount': 1, 'notes': 'Merry Christmas, fuck you!'},
-        'json': true
       }, function (error, response, body) {
         if (error) {
           done(error);
@@ -2456,11 +2388,9 @@ describe('init', function () {
       var changesId;
       //'owner can see current tradeline revision amont this tradeline revisions',
       before(function (done) {
-        request({
+        ownReq({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId1,
-          'json': true,
-          'headers': {'huntKey': ownerHuntKey}
         }, function (error, response, body) {
           if (error) {
             done(error);
@@ -2478,11 +2408,9 @@ describe('init', function () {
         });
       });
       it('owner can reject first tradeline changes', function (done) {
-        request({
+        ownReq({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId1 + '/changeset/' + changesId + '/deny',
-          'json': true,
-          'headers': {'huntKey': ownerHuntKey}
         }, function (error, response, body) {
           if (error) {
             done(error);
@@ -2496,11 +2424,9 @@ describe('init', function () {
       });
       //'owner actually rejects first tradeline changes'
       after(function (done) {
-        request({
+        ownReq({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId1,
-          'json': true,
-          'headers': {'huntKey': ownerHuntKey}
         }, function (error, response, body) {
           if (error) {
             done(error);
@@ -2524,11 +2450,9 @@ describe('init', function () {
       var changesId;
       //'owner can see current tradeline revision amont this tradeline revisions',
       before(function (done) {
-        request({
+        ownReq({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId2,
-          'json': true,
-          'headers': {'huntKey': ownerHuntKey}
         }, function (error, response, body) {
           if (error) {
             done(error);
@@ -2547,11 +2471,9 @@ describe('init', function () {
       });
 
       it('Owner can accept second tradeline changes', function (done) {
-        request({
+        ownReq({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId2 + '/changeset/' + changesId + '/approve',
-          'json': true,
-          'headers': {'huntKey': ownerHuntKey}
         }, function (error, response, body) {
           if (error) {
             done(error);
@@ -2564,11 +2486,9 @@ describe('init', function () {
       });
 //'owner actually accepts second tradeline changes',
       after(function (done) {
-        request({
+        ownReq({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId2,
-          'json': true,
-          'headers': {'huntKey': ownerHuntKey}
         }, function (error, response, body) {
           if (error) {
             done(error);
@@ -2687,7 +2607,8 @@ var helpers = {
       request({
           'method': 'DELETE',
           'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + id,
-          'headers': { 'huntKey': huntKey }
+          'headers': { 'huntKey': huntKey },
+          'json': true
         }, cb);
     },
 
@@ -2695,7 +2616,8 @@ var helpers = {
       request({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + id,
-          'headers': { 'huntKey': huntKey }
+          'headers': { 'huntKey': huntKey },
+          'json': true
         }, cb);
     }
   },
