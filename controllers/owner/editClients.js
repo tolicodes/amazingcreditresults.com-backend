@@ -4,20 +4,14 @@ var welcomeLinkGenerator = require('./../../lib/welcome.js'),
   formatTradelineForBuyer = require('./../../lib/formatter.js').formatTradelineForBuyer,
   ensureOwner = require('./../../lib/middleware.js').ensureOwner,
   utilities = require('./../../lib/utilities'),
+  moment = require('moment'),
   _ = require('underscore');
 
 module.exports = exports = function (core) {
 
+  // Ex: 'Saturday, November 22, 2014 2:17 AM GMT'
   var frmDt = function (today) {
-    var h = today.getHours(),
-      m = today.getMinutes();
-
-    h = h % 12;
-    h = h ? h : 12; // the hour '0' should be '12'
-
-    var ampm = h >= 12 ? 'PM' : 'AM';
-    m = m < 10 ? '0' + m : m;
-    return (today.toLocaleDateString() + ' ' + h + ':' + m + ' ' + ampm + ' GMT');
+    return moment.utc(today).format('dddd, MMMM D, YYYY h:mm A') + ' GMT';
   };
 
   core.app.get('/api/v1/admin/clients', ensureOwner, function (request, response) {
@@ -265,8 +259,8 @@ module.exports = exports = function (core) {
           'birthday': request.body.birthday
         },
         'roles': {
-          'buyer': request.body.roles ? request.body.roles.buyer : true,
-          'seller': request.body.roles ? request.body.roles.seller : false
+          'buyer': request.body.roles ? utilities.stringToBoolean(request.body.roles.buyer) : true,
+          'seller': request.body.roles ? utilities.stringToBoolean(request.body.roles.seller) : false
         },
         'root': false
       }, function (error, userCreated) {
@@ -481,7 +475,7 @@ module.exports = exports = function (core) {
           throw error;
         }
 
-        response.send(202);
+        response.status(202).end();
       });
     });
   });
@@ -496,8 +490,8 @@ module.exports = exports = function (core) {
             'client': userFound._id,
             'type': 'ownerUpload',
             'amount': request.body.amount,
-            'notes': request.body.notes.toString() + 'Transaction issued by Owner ' + request.user.email,
-            'date': request.body.date,
+            'notes': request.body.notes.toString() + ' | Transaction issued by Owner ' + request.user.email,
+            'date': moment(request.body.date).toDate(),
             'paidBy': request.body.paidBy
           }, function (error) {
             if (error) {

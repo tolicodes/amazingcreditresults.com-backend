@@ -85,19 +85,16 @@ module.exports = exports = function(core) {
     utilities.throwError = utilities.throwError.bind(utilities, res);
 
     req.model.TradeLine
-     .findById(req.params.id)
+      .findOneAndUpdate(
+        {_id: req.params.id}, 
+        {'$set' : {'active': false} }
+      )
       .exec()
       .then(function(obj){
         if(!obj) {
           return utilities.error(404, 'Tradeline not found', res);
         }
-
-        req.model.TradeLine
-          .remove({'_id': req.params.id})
-          .exec()
-          .then(function(){
-            res.status(202).json({});
-          }, utilities.throwError);
+        res.status(202).json({'status': 'Tradeline archived'});
       }, utilities.throwError);
   });
 };

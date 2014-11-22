@@ -22,7 +22,7 @@
     "forever": ">=0.11.1",
     "getprove": "0.0.5",
     "hunt": "0.1.5",
-    "moment": ">=2.7.0",
+    "moment": "^2.8.4",
     "request": "2.34.0",
     "stripe": "latest",
     "underscore": "^1.7.0",

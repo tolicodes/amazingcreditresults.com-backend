@@ -1,6 +1,4 @@
-// ================ NOTE DONT RUN THIS TEST IF YOU CARE ABOUT YOUR DB STATE! =============
-// ============== WILL WIPE YOUR DATABASE TO RUN TEST!!! ============
-
+// Used to set MongoDB to amazing-test database
 process.env.NODE_ENV = 'test';
 
 var request = require('request'),
@@ -26,14 +24,55 @@ var request = require('request'),
   huntKeys = [],
   bannedOwnerHuntKey = 'iaqtumioxrunxvyemsebsvcodytumioxrunxvyemsebsviaqcody',
   firstTradelineId,
-  secondTradelineId;
-
+  secondTradelineId,
+  userInfo = {
+    'email': 'unitTestUser' + testId + '@mail.ru',
+    'name': {
+      'givenName': 'John' + testId,
+      'middleName': 'Teodor' + testId,
+      'familyName': 'Doe' + testId,
+      'title': 'Mr.',
+      'suffix': 'III'
+    },
+    'street1' : '123 Street',
+    'street2' : 'Apt 1',
+    'phone' : '5551234567',
+    'city': 'Brooklyn',
+    'state': 'NY',
+    'zip': '11201',
+    'needQuestionnaire': true,
+    'telefone': '555-339' + testId,
+    'street1': 'Some Address',
+  };
 describe('init', function () {
+  // ownerHuntKey used by many other tests
+  function loginOwner(done) {
+    request({
+      'method': 'POST',
+      'url': 'http://localhost:' + port + '/api/v1/owner/login',
+      'form': {
+        'username': 'owner@example.org',
+        'password': 'test123'
+      }
+    }, function (error, response, body) {
+      if (error) {
+        done(error);
+      } else {
+        response.statusCode.should.be.equal(200);
+        var bodyParsed = JSON.parse(body);
+        bodyParsed.Code.should.be.equal(200);
+        bodyParsed.huntKey.should.be.a.String;
+        ownerHuntKey = bodyParsed.huntKey;
+        ownerId = bodyParsed.id;
+        done();
+      }
+    });
+  }
   before(function (done) {
     backend.once('start', function (evnt) {
       if (evnt.type === 'webserver' || evnt.port === port) {
         backend.once('populated', function (evnt) {
-          done();
+          loginOwner(done);
         });
       } else {
         done(new Error('We are unable to start backend, sorry!'));
@@ -50,49 +89,10 @@ describe('init', function () {
     });
   });
 
-  describe('Unit test for user authorization by welcome link', function () {
-    before(function (done) {
-      request({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/owner/login',
-        'form': {
-          'username': 'owner@example.org',
-          'password': 'test123'
-        }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(200);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.Code.should.be.equal(200);
-          bodyParsed.huntKey.should.be.a.String;
-          ownerHuntKey = bodyParsed.huntKey;
-          done();
-        }
-      });
-    });
+  describe('Owner Client Management', function () {
 
-    describe('Owner Client Management', function() {
-      var userInfo = {
-        'email': 'unitTestUser' + testId + '@mail.ru',
-        'name': {
-          'givenName': 'John' + testId,
-          'middleName': 'Teodor' + testId,
-          'familyName': 'Doe' + testId,
-          'title': 'Mr.',
-          'suffix': 'III'
-        },
-        'street1' : '123 Street',
-        'street2' : 'Apt 1',
-        'phone' : '5551234567',
-        'city': 'Brooklyn',
-        'state': 'NY',
-        'zip': '11201',
-        'needQuestionnaire': true,
-        'telefone': '555-339' + testId,
-        'street1': 'Some Address',
-      };
+    describe('Editing Clients', function() {
+
 
       beforeEach(function (done) {
         request({
@@ -133,7 +133,7 @@ describe('init', function () {
         });
       });
 
-      it('can modify user`s name', function (done) {
+      it('owner can modify user`s name', function (done) {
         // Modify user's info
         var modUser = helper.clone(userInfo);
         modUser.name.givenName = 'Jemima' + testId;
@@ -159,7 +159,7 @@ describe('init', function () {
         });
       });
 
-      it('can modify user`s location', function (done) {
+      it('owner can modify user`s location', function (done) {
         // Modify user's info
         var modUser = helper.clone(userInfo);
         modUser.city = 'Orlando';
@@ -189,7 +189,8 @@ describe('init', function () {
 
     });
 
-    describe('owner is creating user without verified account, that we will use for tests', function () {
+    // Beware these tests are interdependent
+    describe('Managing Buyer Account', function () {
 
       var userInfo = {
         'email': 'unitTestUser' + testId + '@mail.ru',
@@ -259,9 +260,7 @@ describe('init', function () {
         });
       });
 
-
-
-      it('makes this user to have correct response on /api/v1/api/v1/buyer/needToSetPassword/:welcomeLink', function (done) {
+      it('can check if user needs to set password based on welcome link', function (done) {
         request({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/buyer/needToSetPassword/' + welcomeLink,
@@ -278,7 +277,7 @@ describe('init', function () {
         });
       });
 //https://oselot.atlassian.net/browse/ACR-174
-      it('makes this user to have the correct response for failing to login via /api/v1/buyer/login', function (done) {
+      it('alerts unverified user if they try to log in with invalid password', function (done) {
         request({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/buyer/login',
@@ -293,12 +292,13 @@ describe('init', function () {
           } else {
             response.statusCode.should.be.equal(403);
             var bodyParsed = JSON.parse(body);
+            bodyParsed.errors[0].message.should.be.equal('Unable to authorize - wrong password!');
             done();
           }
         });
       });
 
-      it('makes this user to have the correct response for failing to login via /api/v1/buyer/login', function (done) {
+      it('errors if trying to login with invalid welcome link', function (done) {
         request({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/buyer/login',
@@ -313,12 +313,13 @@ describe('init', function () {
           } else {
             response.statusCode.should.be.equal(403);
             var bodyParsed = JSON.parse(body);
+            bodyParsed.errors[0].message.should.be.equal('Unable to authorize - wrong welcome link!');
             done();
           }
         });
       });
 
-      it('makes this user to have the correct response for setting password via /api/v1/buyer/setPassword', function (done) {
+      it('new user can set their password', function (done) {
         request({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
@@ -340,7 +341,7 @@ describe('init', function () {
         });
       });
 
-      it('makes this user to have the correct response for failing to set password via /api/v1/buyer/setPassword', function (done) {
+      it('errors if try to set password without apiKey (welcome link)', function (done) {
         request({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
@@ -355,12 +356,13 @@ describe('init', function () {
           } else {
             response.statusCode.should.be.equal(400);
             var bodyParsed = JSON.parse(body);
+            bodyParsed.errors[0].message.should.be.equal('Missed parameter - `apiKey`!');
             done();
           }
         });
       });
 
-      it('makes this user to have the correct response for failing to set password via /api/v1/buyer/setPassword', function (done) {
+      it('errors if trying to set password with invalid welcome link', function (done) {
         request({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
@@ -375,12 +377,13 @@ describe('init', function () {
           } else {
             response.statusCode.should.be.equal(400);
             var bodyParsed = JSON.parse(body);
+            console.log(bodyParsed);
             done();
           }
         });
       });
 
-      it('makes this user to have correct response for authorizing via /api/v1/buyer/login', function (done) {
+      it('authorizes user if they log in with valid welcome link and password', function (done) {
         request({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/buyer/login',
@@ -404,7 +407,7 @@ describe('init', function () {
         });
       });
 
-      it('actually authorizes user via header based sessions', function (done) {
+      it('can authorize new user via huntKey', function (done) {
         request({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/myself',
@@ -417,7 +420,7 @@ describe('init', function () {
         });
       });
 
-      it('makes this user to have correct response on /api/v1/api/v1/buyer/needToSetPassword/:welcomeLink', function (done) {
+      it('no longer needs user to set password after they have done so', function (done) {
         request({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/buyer/needToSetPassword/' + welcomeLink,
@@ -437,7 +440,8 @@ describe('init', function () {
     });
   });
 
-  describe('Owner can upload CSV file with clients', function () {
+  // TODO Is this in scope? 
+  xdescribe('Owner can upload CSV file with clients', function () {
     //todo - with clustering this test behaves strange
     var ownerHuntKey1;
     before(function (done) {
@@ -483,35 +487,13 @@ describe('init', function () {
     });
   });
 
-  // I really hate this sequential test bullshit, so much for UNIT tests
-  describe('Owners can create other owner', function () {
-    before(function (done) {
-      request({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/owner/login',
-        'form': {
-          'username': 'owner@example.org',
-          'password': 'test123'
-        }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(200);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.Code.should.be.equal(200);
-          bodyParsed.huntKey.should.be.a.String;
-          ownerHuntKey1 = bodyParsed.huntKey;
-          done();
-        }
-      });
-    });
-
-    it('creates new owner on POST /api/v1/admin/owners', function (done) {
+  // Beware these tests are interdependent
+  describe('Other Owners Managment', function () {
+    it('can create new owner', function (done) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/admin/owners',
-        'headers': {'huntKey': ownerHuntKey1},
+        'headers': {'huntKey': ownerHuntKey},
         'form': {
           'username': 'owner' + testId + '@example.org',
           'password': 'test123',
@@ -573,7 +555,7 @@ describe('init', function () {
     });
   });
 
-  describe('/api/v1/owner/login API endpoint test', function () {
+  describe('Owner Login', function () {
     it('returns 200 && `huntKey` for correct password via application/x-www-form-urlencoded', function (done) {
       request({
         'method': 'POST',
@@ -618,7 +600,7 @@ describe('init', function () {
       });
     });
 
-    it('returned the good huntKeys', function () {
+    it('returned valid huntKeys', function () {
       Array.isArray(huntKeys).should.be.true;
       huntKeys.length.should.be.equal(2);
       huntKeys[0].should.be.equal(huntKeys[1]);
@@ -794,29 +776,6 @@ describe('init', function () {
   });
 
   describe('Owner Product Management', function () {
-    // Log in as Owner 
-    before(function (done) {
-      request({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/owner/login',
-        'form': {
-          'username': 'owner@example.org',
-          'password': 'test123'
-        }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(200);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.Code.should.be.equal(200);
-          bodyParsed.huntKey.should.be.a.String;
-          ownerHuntKey = bodyParsed.huntKey;
-          done();
-        }
-      });
-    });
-
     // Create a test product 
     beforeEach(function (done) {
       request({
@@ -889,7 +848,7 @@ describe('init', function () {
       });
     });
 
-    it('owner can list products', function (done) {
+    it('can list products', function (done) {
       request({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/owner/products',
@@ -925,7 +884,7 @@ describe('init', function () {
 
     });
 
-    it('owner can list one product', function (done) {
+    it('can list one product', function (done) {
       request({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
@@ -1008,78 +967,148 @@ describe('init', function () {
 
     });
 
-    it('can delete product with no tradelines associated', function (done) {
-      request({
-        'method': 'DELETE',
-        'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
-        'headers': { 'huntKey': ownerHuntKey }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(202);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.status.should.be.equal('deleted');
-
-          request({
-              'method': 'GET',
-              'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
-              'headers': { 'huntKey': ownerHuntKey }
-            }, function (error1, response1, body) {
-              if (error1) {
-                done(error1);
+    describe('Deletion', function() {
+      // Login, create product, create tradeline
+      before(function (done) {
+        async.series([
+          // Create a product & get productId
+          function(callback) {
+            request({
+              'method': 'POST',
+              'url': 'http://localhost:' + port + '/api/v1/owner/products',
+              'headers': { 'huntKey': ownerHuntKey },
+              'form': {
+                'name': 'SuperMega' + testId,
+                'bank': 'SuperMegaBank' + testId,
+                'type': 'MasterCard',
+                'ncRating': 'None',
+                'bcRating': 'Bronze',
+                'moRating': 'Silver',
+                'reportsToExperian': false,
+                'reportsToEquifax': false,
+                'reportsToTransunion': false
+              }
+            }, function (error, response, body) {
+              if (error) {
+                done(error);
               } else {
-                response1.statusCode.should.be.equal(404);
+                response.statusCode.should.be.equal(201);
+                var bodyParsed = JSON.parse(body);
+                bodyParsed.name.should.be.equal('SuperMega' + testId);
+                bodyParsed.bank.should.be.equal('SuperMegaBank' + testId);
+                bodyParsed.type.should.be.equal('MasterCard');
+                productId = bodyParsed.id;
+                callback();
+              }
+            });
+          },
+          // Create a tradeline, get tradelineId
+          function() {
+            request({
+              'method': 'POST',
+              'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
+              'headers': { 'huntKey': ownerHuntKey },
+              'form': {
+                'product': productId,
+                'seller': ownerId,
+                'totalAus': 10,
+                'usedAus': 5,
+                'price': 1100,
+                'creditLimit': 10000,
+                'cashLimit': 10000,
+                'currentBalance': 1000,
+                'ncRating': 'Silver',
+                'bcRating': 'Silver',
+                'moRating': 'Silver',
+                'cost': 1000,
+                'notes': 'Some notes'
+                }
+              }, function (error, response, body) {
+                if (error) {
+                  done(error);
+              } else {
+                response.statusCode.should.be.equal(201);
+                var bodyParsed = JSON.parse(body);
+                //console.log(bodyParsed);
+                tradeLineId = bodyParsed.id;
                 done();
               }
-            }
-          );
-        }
+            });              
+          }]);
       });
-    });
 
-    // TODO once I'm sure that tradelines work
-    xit('cannot delete product with tradelines associated', function (done) {
-      request({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
-        'headers': { 'huntKey': ownerHuntKey },
-        'form': {
-          'product': productId,
-          'seller': ownerId,
-          'totalAus': 10,
-          'usedAus': 5,
-          'price': 1100,
-          'creditLimit': 10000,
-          'cashLimit': 10000,
-          'currentBalance': 1000,
-          'ncRating': 'Silver',
-          'bcRating': 'Silver',
-          'moRating': 'Silver',
-          'cost': 1000,
-          'notes': 'Some notes'
-        }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-         request({
-            'method': 'DELETE',
-            'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
-            'headers': { 'huntKey': ownerHuntKey }
-         }, function (error, response, body) {
-            if (error) {
-              done(error);
-            } else {
-              response.statusCode.should.be.equal(400);
-              var bodyParsed = JSON.parse(body);
-              //console.log(bodyParsed);
-              bodyParsed.status.should.be.equal('Error');
-              bodyParsed.errors[0].message.should.be.equal('Product with this ID is used by Tradelines!');
-              done();
-            }
-         });
-       }
+      it('can delete product with no tradelines associated', function (done) {
+        request({
+          'method': 'DELETE',
+          'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
+          'headers': { 'huntKey': ownerHuntKey }
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(202);
+            var bodyParsed = JSON.parse(body);
+            bodyParsed.status.should.be.equal('deleted');
+
+            request({
+                'method': 'GET',
+                'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
+                'headers': { 'huntKey': ownerHuntKey }
+              }, function (error1, response1, body) {
+                if (error1) {
+                  done(error1);
+                } else {
+                  response1.statusCode.should.be.equal(404);
+                  done();
+                }
+              }
+            );
+          }
+        });
+      });
+
+      it('cannot delete product with tradelines associated', function (done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
+          'headers': { 'huntKey': ownerHuntKey },
+          'form': {
+            'product': productId,
+            'seller': ownerId,
+            'totalAus': 10,
+            'usedAus': 5,
+            'price': 1100,
+            'creditLimit': 10000,
+            'cashLimit': 10000,
+            'currentBalance': 1000,
+            'ncRating': 'Silver',
+            'bcRating': 'Silver',
+            'moRating': 'Silver',
+            'cost': 1000,
+            'notes': 'Some notes'
+          }
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+           request({
+              'method': 'DELETE',
+              'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
+              'headers': { 'huntKey': ownerHuntKey }
+           }, function (error, response, body) {
+              if (error) {
+                done(error);
+              } else {
+                response.statusCode.should.be.equal(400);
+                var bodyParsed = JSON.parse(body);
+                //console.log(bodyParsed);
+                bodyParsed.status.should.be.equal('Error');
+                bodyParsed.errors[0].message.should.be.equal('Product with this ID is used by Tradelines!');
+                done();
+              }
+           });
+         }
+        });
       });
     });
 
@@ -1089,29 +1118,6 @@ describe('init', function () {
     // Login, create product, create tradeline
     before(function (done) {
       async.series([
-        // Login to get huntkey & ownerId
-        function(callback) {
-          request({
-            'method': 'POST',
-            'url': 'http://localhost:' + port + '/api/v1/owner/login',
-            'form': {
-              'username': 'owner@example.org',
-              'password': 'test123'
-            }
-          }, function (error, response, body) {
-            if (error) {
-              done(error);
-            } else {
-              response.statusCode.should.be.equal(200);
-              var bodyParsed = JSON.parse(body);
-              bodyParsed.Code.should.be.equal(200);
-              bodyParsed.huntKey.should.be.a.String;
-              ownerHuntKey = bodyParsed.huntKey;
-              ownerId = bodyParsed.id;
-              callback();
-            }
-          });
-        },
         // Create a product & get productId
         function(callback) {
           request({
@@ -1178,7 +1184,7 @@ describe('init', function () {
         }]);
     });
 
-    it('owner can\'t create tradeline with non existant product', function (done) {
+    it('cannot create tradeline with invalid product', function (done) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
@@ -1219,7 +1225,7 @@ describe('init', function () {
       });
     });
     
-    it('owner can\'t create tradeline with non existant seller', function (done) {
+    it('owner cannot create tradeline with invalid seller', function (done) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
@@ -1257,7 +1263,7 @@ describe('init', function () {
       });
     });
 
-    it('owner can create tradeline with existent product and seller', function (done) {
+    it('can create tradeline with valid product and seller', function (done) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
@@ -1290,7 +1296,7 @@ describe('init', function () {
       });
     });
 
-    it('owner can list tradelines', function (done) {
+    it('can list tradelines', function (done) {
       request({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
@@ -1313,18 +1319,22 @@ describe('init', function () {
             if (tradeline.creditLimit) {
               tradeline.creditLimit.should.be.below(1000000);
             }
-//          tradeline.currentBalance.should.be.below(1000000);
+            if (tradeline.currentBalance) {
+              tradeline.currentBalance.should.be.below(1000000);
+            }
             tradeline.cost.should.be.a.Number;
             tradeline.price.should.be.a.Number;
-//          tradeline.notes.should.be.a.String;
-            //tradeline.seller.id.should.be.a.String;
-            //tradeline.seller.id.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
+            tradeline.notes.should.be.a.String;
+            tradeline.seller.should.be.a.String;
+            tradeline.seller.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
             tradeline.dateOpen.should.be.a.Date;
+            // TODO investigate why this works when test run in isolation but 
+            // not when all tests are run - turns productId to null for some tradelines
             //tradeline.product.id.should.be.a.String;
             //tradeline.product.id.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
-            //['ncRating', 'bcRating', 'moRating'].map(function (r) {
-            //  ['None', 'Bronze', 'Silver', 'Gold'].should.containEql(tradeline[r])
-            //});
+            ['ncRating', 'bcRating', 'moRating'].map(function (r) {
+              ['None', 'Bronze', 'Silver', 'Gold'].should.containEql(tradeline[r])
+            });
           });
           done()
         }
@@ -1388,8 +1398,8 @@ describe('init', function () {
           response.statusCode.should.be.equal(202);
 //        console.log(body);
           var bodyParsed = JSON.parse(body);
-//        bodyParsed.data.product.should.be.equal(productId);
-//        bodyParsed.data.seller.should.be.equal(ownerId);
+          bodyParsed.product.should.be.equal(productId);
+          bodyParsed.seller.should.be.equal(ownerId);
           bodyParsed.totalAus.should.be.equal(11);
           bodyParsed.usedAus.should.be.equal(6);
           bodyParsed.price.should.be.equal(1099);
@@ -1423,22 +1433,6 @@ describe('init', function () {
               bodyParsed.moRating.should.be.equal('Gold');
               bodyParsed.cost.should.be.equal(999);
               bodyParsed.notes.should.be.equal('Some notes111');
-              /* TODO add this back in
-              bodyParsed.changes.should.be.an.Array;
-              bodyParsed.changes.length.should.be.above(0);
-              var changes = bodyParsed.changes[0];
-              changes.totalAus.should.be.equal(11);
-              changes.usedAus.should.be.equal(6);
-              changes.price.should.be.equal(1099);
-              changes.creditLimit.should.be.equal(9999);
-              changes.cashLimit.should.be.equal(9999);
-              changes.currentBalance.should.be.equal(9999);
-              changes.ncRating.should.be.equal('None');
-              changes.bcRating.should.be.equal('Bronze');
-              changes.moRating.should.be.equal('Gold');
-              changes.cost.should.be.equal(999);
-              changes.notes.should.be.equal('Some notes111');
-              */
               done();
             }
           });
@@ -1446,35 +1440,56 @@ describe('init', function () {
       });
     });
 
-    xit('owner can delete (set `active` to false) tradeline', function (done) {
-      request({
-        'method': 'DELETE',
-        'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradeLineId,
-        'headers': { 'huntKey': ownerHuntKey }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(202);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.status.should.be.equal('Tradeline archived');
+    /*
+     * TODO? Toly says no longer needed
+    describe('Tradeline Change Approval', function(done) {
+      it('can approve tradeline');
+      it('can deny tradeline');
+    });
+    */
 
-          request({
-            'method': 'GET',
-            'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradeLineId,
-            'headers': { 'huntKey': ownerHuntKey }
-          }, function (err, response1, body1) {
-            if (err) {
-              done(error);
-            } else {
-              response1.statusCode.should.be.equal(200);
-              var bodyParsed = JSON.parse(body1);
-              bodyParsed.data.id.should.be.equal(tradeLineId);
-              bodyParsed.data.active.should.be.false;
-              done();
-            }
-          });
-        }
+    describe('Archiving', function(done) {
+      it('owner can archive active tradeline', function (done) {
+        helpers.tradelines.archive(ownerHuntKey, tradeLineId,
+        function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(202);
+            var bodyParsed = JSON.parse(body);
+            bodyParsed.status.should.be.equal('Tradeline archived');
+
+            helpers.tradelines.get(ownerHuntKey, tradeLineId,
+            function (err, response1, body1) {
+              if (err) {
+                done(err);
+              } else {
+                response1.statusCode.should.be.equal(200);
+                var bodyParsed = JSON.parse(body1);
+                bodyParsed.id.should.be.equal(tradeLineId);
+                bodyParsed.active.should.be.false;
+                done();
+              }
+            });
+          }
+        });
+      });
+
+      it('owner cannot archive invalid tradeline', function(done) {
+        var invalidId = '547006878128698dbc0e2151'; // valid MongoId, but not in the DB
+        helpers.tradelines.archive(ownerHuntKey, invalidId,
+        function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(404);
+            var bodyParsed = JSON.parse(body);
+            bodyParsed.status.should.be.equal('Error');
+            bodyParsed.errors[0].message.should.be.equal('Tradeline not found');
+            done();
+          }
+        });
+
       });
     });
   });
@@ -1888,30 +1903,8 @@ describe('init', function () {
     });
   });
 
-  describe('Owner creates new seller', function () {
-    it('returns 200 && `huntKey` for correct password via application/x-www-form-urlencoded', function (done) {
-      request({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/owner/login',
-        'form': {
-          'username': 'owner@example.org',
-          'password': 'test123'
-        }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(200);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.Code.should.be.equal(200);
-          bodyParsed.huntKey.should.be.a.String;
-          ownerHuntKey = bodyParsed.huntKey;
-          done();
-        }
-      });
-    });
-
-    xit('creates new seller', function (done) {
+  describe('Owner Seller Management', function () {
+    it('can create new seller', function (done) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/admin/clients',
@@ -1921,13 +1914,16 @@ describe('init', function () {
           'name': {
             'givenName': 'John' + testId,
             'middleName': 'Teodor' + testId,
-            'familyName': 'Doe' + testId
+            'familyName': 'Doe' + testId,
+            'title': 'Mr.'
           },
           'needQuestionnaire': true,
           'phone': '555-339' + testId,
           'street1': 'Some Address',
-          'title': 'Mr.',
-          'role': 'seller'
+          'roles': {
+            'seller': true,
+            'buyer': false
+          }
         }
       }, function (error, response, body) {
         if (error) {
@@ -1944,11 +1940,13 @@ describe('init', function () {
           bodyParsed.name.givenName.should.be.equal('John' + testId);
           bodyParsed.name.middleName.should.be.equal('Teodor' + testId);
           bodyParsed.name.familyName.should.be.equal('Doe' + testId);
-          bodyParsed.title.should.be.equal('Mr.');
+          bodyParsed.name.title.should.be.equal('Mr.');
           bodyParsed.phone.should.be.equal('555-339' + testId);
           bodyParsed.street1.should.be.equal('Some Address');
           bodyParsed.email.should.be.equal('unitTestSeller' + testId + '@mail.ru');
           bodyParsed.root.should.be.a.false;
+          bodyParsed.roles.seller.should.be.true;
+          bodyParsed.roles.buyer.should.be.false;
           sellerHuntKey = bodyParsed.huntKey;
 //and we can get this client
           request({
@@ -1969,6 +1967,7 @@ describe('init', function () {
       });
     });
 
+    /*
     describe('seller do things', function () {
       xit('seller logins', function (done) {
         request({
@@ -1987,13 +1986,8 @@ describe('init', function () {
       it('seller creates tradeline2');
       it('seller updates tradeline2');
 
-      describe('owner do things', function () {
-        it('approves tradeline1');
-        it('and tradeline1 is correct');
-        it('denies tradeline2');
-        it('and tradeline2 is correct');
-      });
     });
+    */
   });
 
   describe('Buyer Cart Management', function () {
@@ -2034,10 +2028,10 @@ describe('init', function () {
       });
 
       describe('adding tradelines', function () {
-        it('should be able to add a tradeline to a cart', function (done) {
+        it('can add a tradeline to a cart', function (done) {
           async.waterfall([
             function (cb) {
-              helpers.getTradelines(cartBuyerHuntKey, function (error, response, body) {
+              helpers.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
                 body.data.should.be.instanceof(Array);
                 body.data.length.should.be.above(0);
                 cb(error, body.data[0]);
@@ -2059,10 +2053,10 @@ describe('init', function () {
           });
         });
 
-        it("cannot add the same item twice", function (done) {
+        it("cannot add the same tradeline twice", function (done) {
           async.waterfall([
             function (cb) {
-              helpers.getTradelines(cartBuyerHuntKey, function (error, response, body) {
+              helpers.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
                 cb(error, body.data[0]);
               });
             },
@@ -2104,7 +2098,7 @@ describe('init', function () {
         it('should be able to list tradelines', function (done) {
           async.waterfall([
             function (cb) {
-              helpers.getTradelines(cartBuyerHuntKey, function (error, response, body) {
+              helpers.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
                 cb(error, body.data[0]);
               });
             },
@@ -2128,11 +2122,11 @@ describe('init', function () {
         });
       });
 
-      describe("deleting a tradeline", function () {
-        it("should be able to delete a tradeline", function (done) {
+      describe("removing a tradeline from the cart", function () {
+        it("can remove a tradeline", function (done) {
           async.waterfall([
             function (cb) {
-              helpers.getTradelines(cartBuyerHuntKey, function (error, response, body) {
+              helpers.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
                 var tradeline = body.data[0];
                 cb(error, tradeline);
               });
@@ -2166,7 +2160,8 @@ describe('init', function () {
         });
       });
 
-      describe('buyer can checkout', function () {
+      // TODO write more tests for this
+      describe('checkout', function () {
         it('should work', function(done){
           request({
             'method': 'POST',
@@ -2209,8 +2204,27 @@ describe('init', function () {
       });
   });
 
-  describe('Owner uploads funds to Buyer account', function () {
-    it('Owner uploads the funds', function (done) {
+  describe('Issue balance adjustment for buyer', function () {
+    // Can't cleanup because other tests dependent on this
+    before(function (done) {
+      request({
+        'method': 'POST',
+        'url': 'http://localhost:' + port + '/api/v1/admin/clients',
+        'headers': {'huntKey': ownerHuntKey},
+        'form': userInfo,
+        'json': true
+      }, function (error, response, body) {
+        if (error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(201);
+          userId = body.id;
+          done();
+        }
+      });
+    });
+
+    it('Owner can increase buyer funds', function (done) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/admin/clients/balance/' + userId,
@@ -2221,6 +2235,7 @@ describe('init', function () {
         if (error) {
           done(error);
         } else {
+          console.log(body);
           response.statusCode.should.be.equal(202);
           body.status.should.be.equal('Ok');
           done();
@@ -2228,7 +2243,7 @@ describe('init', function () {
       });
     });
 
-    xit('Owner can check that he uploaded the funds', function (done) {
+    it('Owner can check that he uploaded the funds', function (done) {
       request({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
@@ -2576,27 +2591,6 @@ describe('init', function () {
 
 
   describe('Owner editing clients', function () {
-    before(function(done) {
-      request({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/owner/login',
-        'form': {
-          'username': 'owner@example.org',
-          'password': 'test123'
-        }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(200);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.Code.should.be.equal(200);
-          bodyParsed.huntKey.should.be.a.String;
-          ownerHuntKey = bodyParsed.huntKey;
-          done();
-        }
-      });
-    });
     it('can delete a client', function (done) {
       async.waterfall([
         function (cb) {
@@ -2651,15 +2645,6 @@ describe('init', function () {
 
 
 var helpers = {
-  getTradelines: function (huntKey, cb) {
-    request({
-      'method': 'GET',
-      'url': 'http://localhost:' + port + '/api/v1/tradelines',
-      'headers': {'huntKey': huntKey},
-      json: true
-    }, cb);
-  },
-
   clients: {
     list: function (huntKey, cb) {
       request({
@@ -2686,6 +2671,32 @@ var helpers = {
         'headers': {'huntKey': huntKey},
         json: true
       }, cb);
+    }
+  },
+  tradelines: {
+    list: function (huntKey, cb) {
+      request({
+        'method': 'GET',
+        'url': 'http://localhost:' + port + '/api/v1/tradelines',
+        'headers': {'huntKey': huntKey},
+        json: true
+      }, cb);
+    },
+
+    archive: function (huntKey, id, cb) {
+      request({
+          'method': 'DELETE',
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + id,
+          'headers': { 'huntKey': huntKey }
+        }, cb);
+    },
+
+    get: function (huntKey, id, cb) {
+      request({
+          'method': 'GET',
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + id,
+          'headers': { 'huntKey': huntKey }
+        }, cb);
     }
   },
   cart: {

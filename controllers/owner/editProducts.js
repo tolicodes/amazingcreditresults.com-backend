@@ -77,7 +77,7 @@ module.exports = exports = function (core) {
           .exec()
           .then(function(count){
             if(count) {
-              return utilities.error(400, 'Tradeline associated with tradelines', res)
+              return utilities.error(400, 'Product with this ID is used by Tradelines!', res)
             }
 
             req.model.Product
