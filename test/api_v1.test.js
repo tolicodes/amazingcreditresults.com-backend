@@ -1019,7 +1019,6 @@ describe('init', function () {
         } else {
           response.statusCode.should.be.equal(202);
           var bodyParsed = JSON.parse(body);
-          console.log(bodyParsed);
           bodyParsed.status.should.be.equal('deleted');
 
           request({
@@ -1998,37 +1997,43 @@ describe('init', function () {
   });
 
   describe('Buyer Cart Management', function () {
-      describe('adding tradelines', function () {
-        var cartBuyerHuntKey;
-        // Login the buyer
-        before(function(done) {
-          request({
-            'method': 'POST',
-            'url': 'http://localhost:' + port + '/api/v1/buyer/login',
-            'headers': { },
-            'form': {
-              // Strangely, the api key isn't actually the api key field, it's the 
-              // welcome link field
-              // The api key field in the DB is actually the huntKey
-              'apiKey': 'a84e44544afb66dedba5a',
-              'password': 'test123'
-            }
-          }, function (error, response, body) {
-            if (error) {
-              done(error);
-            } else {
-              var bodyParsed = JSON.parse(body);
-              console.log(bodyParsed);
-              response.statusCode.should.be.equal(202);
-              bodyParsed.Code.should.be.equal(202);
-              bodyParsed.Success.should.be.equal('Welcome!');
-              bodyParsed.huntKey.should.be.a.String;
-              cartBuyerHuntKey = bodyParsed.huntKey;
-              done();
-            }
-          });
+      var cartBuyerHuntKey;
+      // Login the buyer
+      before(function(done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+          'headers': { },
+          'form': {
+            // Strangely, the api key isn't actually the api key field, it's the 
+            // welcome link field
+            // The api key field in the DB is actually the huntKey
+            'apiKey': 'a84e44544afb66dedba5a',
+            'password': 'test123'
+          }
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            var bodyParsed = JSON.parse(body);
+            console.log(bodyParsed);
+            response.statusCode.should.be.equal(202);
+            bodyParsed.Code.should.be.equal(202);
+            bodyParsed.Success.should.be.equal('Welcome!');
+            bodyParsed.huntKey.should.be.a.String;
+            cartBuyerHuntKey = bodyParsed.huntKey;
+            done();
+          }
         });
+      });
 
+      afterEach(function(done) {
+        helper.resetBuyer(function() {
+          done();
+        });
+      });
+
+      describe('adding tradelines', function () {
         it('should be able to add a tradeline to a cart', function (done) {
           async.waterfall([
             function (cb) {
@@ -2054,30 +2059,30 @@ describe('init', function () {
           });
         });
 
-        xit("doesn't add the same item twice", function (done) {
+        it("cannot add the same item twice", function (done) {
           async.waterfall([
             function (cb) {
-              helpers.getTradelines(function (error, response, body) {
+              helpers.getTradelines(cartBuyerHuntKey, function (error, response, body) {
                 cb(error, body.data[0]);
               });
             },
             function (tradeline, cb) {
-              helpers.cart.addTradeline(tradeline.id, function (error) {
+              helpers.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error) {
                 cb(error, tradeline);
               });
             },
             function (tradeline, cb) {
-              helpers.cart.addTradeline(tradeline.id, function (error) {
+              helpers.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error) {
                 cb(error, tradeline);
               });
             },
             function (tradeline, cb) {
-              helpers.cart.addTradeline(tradeline.id, function (error) {
+              helpers.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error) {
                 cb(error);
               });
             },
             function (cb) {
-              helpers.cart.getTradelines(function (error, response, body) {
+              helpers.cart.getTradelines(cartBuyerHuntKey, function (error, response, body) {
                 cb(error, body);
               });
             }
@@ -2087,53 +2092,70 @@ describe('init', function () {
           });
         });
 
-        xit("returns 400 if there is no id", function (done) {
-          helpers.cart.addTradeline(null, function (error, response) {
+        it("fails if tradeline id not provided", function (done) {
+          helpers.cart.addTradeline(cartBuyerHuntKey, null, function (error, response) {
             response.statusCode.should.be.equal(400);
             done(error);
           });
         });
       });
 
-      describe("list of tradelines", function () {
-        xit('should return list of tradelines', function (done) {
-          helpers.cart.getTradelines(function (error, response, body) {
-            response.statusCode.should.be.equal(200);
+      describe("list tradelines", function () {
+        it('should be able to list tradelines', function (done) {
+          async.waterfall([
+            function (cb) {
+              helpers.getTradelines(cartBuyerHuntKey, function (error, response, body) {
+                cb(error, body.data[0]);
+              });
+            },
+            function (tradeline, cb) {
+              helpers.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error) {
+                cb(error);
+              });
+            },
+            function (cb) {
+              helpers.cart.getTradelines(cartBuyerHuntKey, function (error, response, body) {
+                response.statusCode.should.be.equal(200);
+                cb(error, body);
+              });
+            }
+          ], function (error, body) {
             body.data.should.be.an.Array;
             body.itemsInCart.should.be.an.Integer;
-            done(error);
+            body.data.length.should.be.equal(1);
+            done(error)
           });
         });
       });
 
       describe("deleting a tradeline", function () {
-        xit("should be able to delete a tradeline", function (done) {
+        it("should be able to delete a tradeline", function (done) {
           async.waterfall([
             function (cb) {
-              helpers.getTradelines(function (error, response, body) {
+              helpers.getTradelines(cartBuyerHuntKey, function (error, response, body) {
                 var tradeline = body.data[0];
                 cb(error, tradeline);
               });
             },
             function (tradeline, cb) {
-              helpers.cart.addTradeline(tradeline.id, function (error) {
+              helpers.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error) {
                 cb(error, tradeline);
               });
             },
             function (tradeline, cb) {
-              helpers.cart.getTradelines(function (error, respoonse, body) {
+              helpers.cart.getTradelines(cartBuyerHuntKey, function (error, respoonse, body) {
                 body.data.length.should.be.equal(1);
                 cb(error, tradeline);
               });
             },
             function (tradeline, cb) {
-              helpers.cart.deleteTradeline(tradeline.id, function (error, response) {
+              helpers.cart.deleteTradeline(cartBuyerHuntKey, tradeline.id, function (error, response) {
                 response.statusCode.should.be.equal(202);
                 cb(error);
               });
             },
             function (cb) {
-              helpers.cart.getTradelines(function (error, response, body) {
+              helpers.cart.getTradelines(cartBuyerHuntKey, function (error, response, body) {
                 cb(error, body);
               });
             }
@@ -2145,11 +2167,11 @@ describe('init', function () {
       });
 
       describe('buyer can checkout', function () {
-        xit('should work', function(done){
+        it('should work', function(done){
           request({
             'method': 'POST',
             'url': 'http://localhost:' + port + '/api/v1/cart/checkout',
-            'headers': {'huntKey': buyerHuntKey},
+            'headers': {'huntKey': cartBuyerHuntKey},
             'json': true
           }, function (error, response, body) {
             if(error) {
@@ -2162,9 +2184,10 @@ describe('init', function () {
               request({
                 'method': 'GET',
                 'url': 'http://localhost:' + port + '/api/v1/account',
-                'headers': {'huntKey': buyerHuntKey},
+                'headers': {'huntKey': cartBuyerHuntKey},
                 'json': true
               }, function(error, response, body){
+                //console.log(body);
                   if(error) {
                     done(error);
                   } else {
@@ -2553,21 +2576,42 @@ describe('init', function () {
 
 
   describe('Owner editing clients', function () {
+    before(function(done) {
+      request({
+        'method': 'POST',
+        'url': 'http://localhost:' + port + '/api/v1/owner/login',
+        'form': {
+          'username': 'owner@example.org',
+          'password': 'test123'
+        }
+      }, function (error, response, body) {
+        if (error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(200);
+          var bodyParsed = JSON.parse(body);
+          bodyParsed.Code.should.be.equal(200);
+          bodyParsed.huntKey.should.be.a.String;
+          ownerHuntKey = bodyParsed.huntKey;
+          done();
+        }
+      });
+    });
     it('can delete a client', function (done) {
       async.waterfall([
         function (cb) {
-          helpers.clients.list(function (error, response, body) {
+          helpers.clients.list(ownerHuntKey, function (error, response, body) {
             cb(error, findWithRole('buyer', body))
           });
         },
         function (buyer, cb) {
-          helpers.clients.del(buyer.id, function (error, response) {
+          helpers.clients.del(ownerHuntKey, buyer.id, function (error, response) {
             response.statusCode.should.be.equal(202);
             cb(error, buyer);
           });
         },
         function (buyer, cb) {
-          helpers.clients.get(buyer.id, function (error, response, body) {
+          helpers.clients.get(ownerHuntKey, buyer.id, function (error, response, body) {
             var buyer = body.data;
             cb(error, buyer);
           });
@@ -2581,12 +2625,12 @@ describe('init', function () {
     it("can't delete an owner", function (done) {
       async.waterfall([
         function (cb) {
-          helpers.clients.list(function (error, response, body) {
+          helpers.clients.list(ownerHuntKey, function (error, response, body) {
             cb(error, findWithRole('owner', body))
           });
         },
         function (buyer, cb) {
-          helpers.clients.del(buyer.id, function (error, response) {
+          helpers.clients.del(ownerHuntKey, buyer.id, function (error, response) {
             cb(error, response);
           });
         }
@@ -2617,29 +2661,29 @@ var helpers = {
   },
 
   clients: {
-    list: function (cb) {
+    list: function (huntKey, cb) {
       request({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/admin/clients',
-        'headers': {'huntKey': ownerHuntKey},
+        'headers': {'huntKey': huntKey},
         json: true
       }, cb);
     },
 
-    get: function (id, cb) {
+    get: function (huntKey, id, cb) {
       request({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + id,
-        'headers': {'huntKey': ownerHuntKey},
+        'headers': {'huntKey': huntKey},
         json: true
       }, cb);
     },
 
-    del: function (id, cb) {
+    del: function (huntKey, id, cb) {
       request({
         'method': 'DELETE',
         'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + id,
-        'headers': {'huntKey': ownerHuntKey},
+        'headers': {'huntKey': huntKey},
         json: true
       }, cb);
     }

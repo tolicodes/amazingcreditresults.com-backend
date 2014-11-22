@@ -48,37 +48,4 @@ module.exports = exports = function(core) {
   core.app.get('/api/v1/myself', f4myself);
   core.app.all('/auth/myself', f4myself); //only used for unit tests!
 
-  //show current user balance
-  //https://oselot.atlassian.net/browse/ACR-387#
-  core.app.get('/api/v1/account', ensureRole(), function(request, response) {
-    request.model.Transaction.find({
-      'client': request.user._id
-    })
-      .sort('+timestamp')
-      .exec(function(error, transactionsFound) {
-        if (error) {
-          throw error;
-        } else {
-          var balance = 0,
-            transactionsFormatted = [];
-          transactionsFound.map(function(t) {
-            transactionsFormatted.push({
-              'id': t.id,
-              'timestamp': t.timestamp,
-              'amount': t.amount,
-              'type': t.type
-            });
-            balance = balance + t.amount;
-          });
-
-          response.json({
-            'data': {
-              'balance': balance,
-              'transactions': transactionsFormatted
-            }
-          });
-        }
-      });
-
-  });
 };
