@@ -1,4 +1,6 @@
-var MongoClient = require('mongodb').MongoClient;
+var MongoClient = require('mongodb').MongoClient,
+    _ = require('underscore');
+
 // Connection URL - may need to change depending on your local config
 var url = 'mongodb://localhost:27017/amazing-test';
 
@@ -27,7 +29,7 @@ exports.dropCollection = function(collName, callback) {
           throw new Error(err);
         }
         // You made it!
-        console.log('Dropped collection: ' + collName);
+        //console.log('Dropped collection: ' + collName);
         callback();
       });
     }
@@ -92,3 +94,9 @@ exports.resetBuyer = function(callback) {
   });
 
 };
+
+exports.findWithRole = function (role, body) {
+  return _.find(body.data, function (user) {
+    return user.roles[role];
+  });
+}

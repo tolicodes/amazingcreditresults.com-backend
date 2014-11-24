@@ -428,6 +428,29 @@ describe('init', function () {
         });
       });
 
+      it('can delete a buyer', function (done) {
+        async.series([
+          /*function (cb) {
+            helpers.clients.list(ownerHuntKey, function (error, response, body) {
+              cb(error, helper.findWithRole('buyer', body))
+            });
+          },*/
+          function (cb) {
+            helpers.clients.del(ownerHuntKey, userId, function (error, response) {
+              response.statusCode.should.be.equal(202);
+              cb(error);
+            });
+          },
+          function (cb) {
+            helpers.clients.get(ownerHuntKey, userId, function (error, response, body) {
+              body.data.isBanned.should.be.true;
+              cb(error, body);
+            });
+          }
+        ], function (error, buyer) {
+          done(error);
+        });
+      });
     });
   });
 
@@ -541,6 +564,24 @@ describe('init', function () {
         body.name.givenName.should.be.equal('John');
         body.name.familyName.should.be.equal('Doe');
         done();
+      });
+    });
+
+    it('cannot delete an owner', function (done) {
+      async.waterfall([
+        function (cb) {
+          helpers.clients.list(ownerHuntKey, function (error, response, body) {
+            cb(error, helper.findWithRole('owner', body))
+          });
+        },
+        function (owner, cb) {
+          helpers.clients.del(ownerHuntKey, owner.id, function (error, response) {
+            cb(error, response);
+          });
+        }
+      ], function (error, response) {
+        response.statusCode.should.be.equal(400);
+        done(error);
       });
     });
   });
@@ -2510,55 +2551,8 @@ describe('init', function () {
   });
 
 
-  describe('Owner editing clients', function () {
-    it('can delete a client', function (done) {
-      async.waterfall([
-        function (cb) {
-          helpers.clients.list(ownerHuntKey, function (error, response, body) {
-            cb(error, findWithRole('buyer', body))
-          });
-        },
-        function (buyer, cb) {
-          helpers.clients.del(ownerHuntKey, buyer.id, function (error, response) {
-            response.statusCode.should.be.equal(202);
-            cb(error, buyer);
-          });
-        },
-        function (buyer, cb) {
-          helpers.clients.get(ownerHuntKey, buyer.id, function (error, response, body) {
-            var buyer = body.data;
-            cb(error, buyer);
-          });
-        }
-      ], function (error, buyer) {
-        buyer.isBanned.should.be.true;
-        done(error);
-      });
-    });
-
-    it("can't delete an owner", function (done) {
-      async.waterfall([
-        function (cb) {
-          helpers.clients.list(ownerHuntKey, function (error, response, body) {
-            cb(error, findWithRole('owner', body))
-          });
-        },
-        function (buyer, cb) {
-          helpers.clients.del(ownerHuntKey, buyer.id, function (error, response) {
-            cb(error, response);
-          });
-        }
-      ], function (error, response) {
-        response.statusCode.should.be.equal(400);
-        done(error);
-      });
-    });
-
-    function findWithRole(role, body) {
-      return _.find(body.data, function (user) {
-        return user.roles[role];
-      });
-    }
+  describe('Order Management', function () {
+    // TODO
   });
 
 });
