@@ -2140,11 +2140,12 @@ describe('init', function () {
         });
       });
 
-      // TODO write more tests for this
       describe('Checkout', function () {
+        var userId;
         // Give James Doe a clean slate
-        afterEach(function(done) {
-          helper.resetBuyer(function() {
+        beforeEach(function(done) {
+          helper.resetBuyer(function(user) {
+            userId = user._id;
             done();
           });
         });
@@ -2167,7 +2168,6 @@ describe('init', function () {
                   } else {
                     response.statusCode.should.be.equal(202);
                     response.body.Success.should.be.equal('Welcome!');
-                    console.log(body);
                     cb(error, body.huntKey);
                   }
                 });
@@ -2179,17 +2179,12 @@ describe('init', function () {
                 });
               },
               function (buyerHuntKey, tradeline, cb) {
-                helpers.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error) {
+                helpers.cart.addTradeline(buyerHuntKey, tradeline.id, function (error) {
                   cb(error, buyerHuntKey, tradeline);
                 });
               },
               function (buyerHuntKey, tradeline) {
-                request({
-                  'method': 'POST',
-                  'url': 'http://localhost:' + port + '/api/v1/cart/checkout',
-                  'headers': {'huntKey': buyerHuntKey},
-                  'json': true
-                }, function (error, response, body) {
+                helpers.cart.checkout(buyerHuntKey, function (error, response, body) {
                   if(error) {
                     done(error);
                   } else {
@@ -2207,12 +2202,7 @@ describe('init', function () {
         });
 
         it('should error if cart empty', function(done){
-          request({
-            'method': 'POST',
-            'url': 'http://localhost:' + port + '/api/v1/cart/checkout',
-            'headers': {'huntKey': cartBuyerHuntKey},
-            'json': true
-          }, function (error, response, body) {
+          helpers.cart.checkout(cartBuyerHuntKey, function (error, response, body) {
             if(error) {
               done(error);
             }
@@ -2236,13 +2226,11 @@ describe('init', function () {
               async.parallel([
                 function (c) {
                   helpers.cart.addTradeline(cartBuyerHuntKey, tradelines[0].id, function (error) {
-                    console.log('tradeline 0: ' + tradelines[0].id);
                     c(error);
                   });
                 },
                 function (c) {
                   helpers.cart.addTradeline(cartBuyerHuntKey, tradelines[2].id, function (error) {
-                    console.log('tradeline 2: ' + tradelines[2].id);
                     c(error);
                   });
                 }
@@ -2253,62 +2241,111 @@ describe('init', function () {
             },
             // Try to checkout
             function(cb) {
-              request({
-                'method': 'POST',
-                'url': 'http://localhost:' + port + '/api/v1/cart/checkout',
-                'headers': {'huntKey': cartBuyerHuntKey},
-                'json': true
-              }, function (error, response, body) {
+              helpers.cart.checkout(cartBuyerHuntKey, function (error, response, body) {
                 if(error) {
                   done(error);
                 } else {
-                  console.log(body);
-                  done();
+                  cb(null, body);
                 }
               });
             }
-          ], function (error, response) {
-            // Not in use
+          ], function (error, body) {
+            body.status.should.be.equal('Error');
+            body.errors.length.should.be.equal(1);
+            body.errors[0].message.should.be.equal('Trade line in your cart "'+ body.errors[0].name +'" no longer available.');
+            done();
           });
         });
 
-        it('should work', function(done){
-          request({
-            'method': 'POST',
-            'url': 'http://localhost:' + port + '/api/v1/cart/checkout',
-            'headers': {'huntKey': cartBuyerHuntKey},
-            'json': true
-          }, function (error, response, body) {
-            if(error) {
-              done(error);
-            } else {
-              response.statusCode.should.be.equal(201);
-              body.status.should.be.equal('Ok');
-              body.transactionId.should.be.a.String;
-              var newTransactionId = body.transactionId;
+        it('should error if insufficient funds', function(done){
+          var tradelineId;
+          async.series([
+            function (cb) {
+              helpers.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
+                body.data.should.be.Array;
+                tradelineId = body.data[0].id;
+                cb(error);
+              });
+            },
+            function (cb) {
+              helpers.cart.addTradeline(cartBuyerHuntKey, tradelineId, function (error, response, body) {
+                response.statusCode.should.be.equal(202);
+                cb(error);
+              });
+            }],
+            function () {
+              helpers.cart.checkout(cartBuyerHuntKey, function (error, response, body) {
+                if(error) {
+                  done(error);
+                } else {
+                  response.statusCode.should.be.equal(402);
+                  body.status.should.be.equal('Error');
+                  body.errors[0].message.should.be.equal('Insufficient balance for this transaction');
+                  done();
+                }
+              });
+            });
+        });
+
+        it('should complete successfully if all prerequisites fulfilled', function(done){
+          var tradelineId, newTransactionId; 
+          async.series([
+            function (cb) {
+              ownReq({
+                'method': 'POST',
+                'url': 'http://localhost:' + port + '/api/v1/admin/clients/balance/' + userId,
+                'form': {'amount': 1000, 'notes': 'Feeling Generous!', date: '2014-05-03', paidBy: 'Credit Card'},
+              }, function (error, response, body) {
+                  response.statusCode.should.be.equal(202);
+                  body.status.should.be.equal('Ok');
+                  cb(error);
+              });
+            },
+            function (cb) {
+              helpers.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
+                tradelineId = body.data[0].id;
+                cb(error);
+              });
+            },
+            function (cb) {
+              helpers.cart.addTradeline(cartBuyerHuntKey, tradelineId, function (error) {
+                cb(error);
+              });
+            },
+            function (cb) {
+              helpers.cart.checkout(cartBuyerHuntKey, function (error, response, body) {
+                if(error) {
+                  done(error);
+                } else {
+                  response.statusCode.should.be.equal(201);
+                  body.status.should.be.equal('Ok');
+                  body.transactionId.should.be.a.String;
+                  newTransactionId = body.transactionId;
+                  cb();
+                }
+              });
+            }],
+            function () {
               request({
                 'method': 'GET',
                 'url': 'http://localhost:' + port + '/api/v1/account',
                 'headers': {'huntKey': cartBuyerHuntKey},
                 'json': true
-              }, function(error, response, body){
-                //console.log(body);
-                  if(error) {
-                    done(error);
-                  } else {
-                    response.statusCode.should.be.equal(200);
-                    var transactionFound1 = false;
-                    body.data.transactions.map(function(tr){
-                      if (tr.id == newTransactionId) {
-                        transactionFound1 = true
-                      }
-                    });
-                    transactionFound1.should.be.true;
-                    done();
-                  }
-              });
-
-            }
+              }, function(error, response, body) {
+                if(error) {
+                  done(error);
+                } else {
+                  response.statusCode.should.be.equal(200);
+                  var transactionFound1 = false;
+                  body.data.transactions.map(function(tr){
+                    if (tr.id == newTransactionId) {
+                      transactionFound1 = true
+                    }
+                  });
+                  transactionFound1.should.be.true;
+                  done();
+                }
+            });
           });
         });
       });
@@ -2785,6 +2822,15 @@ var helpers = {
         'url': 'http://localhost:' + port + '/api/v1/cart/tradelines',
         'headers': {'huntKey': huntKey},
         json: true
+      }, cb);
+    },
+
+    checkout: function (huntKey, cb) {
+      request({
+        'method': 'POST',
+        'url': 'http://localhost:' + port + '/api/v1/cart/checkout',
+        'headers': {'huntKey': huntKey},
+        'json': true
       }, cb);
     }
   }

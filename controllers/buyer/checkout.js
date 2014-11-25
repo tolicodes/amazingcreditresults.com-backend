@@ -7,6 +7,7 @@ var Checkout = (function() {
       tradelines = [],
       properTradeLineIds = [],
       toPay = 0,
+      sumCost = 0,
       paymentTransactionId;
 
     var checkUserVerified = function(request, response, cb) {
@@ -36,7 +37,7 @@ var Checkout = (function() {
       }
     };
 
-    var checkTradelineAvailability = function(request, response, cb) {
+    var checkTradelineAvailabilityAndSumCost = function(request, response, cb) {
       if (!request.user.profile.cart || request.user.profile.cart.length === 0) {
         response.status(400).json({
           'status': 'Error',
@@ -49,22 +50,30 @@ var Checkout = (function() {
         });
       } else {
         var unavailableTradelines = [];
-        async.each(request.user.profile.cart, function(tradeline, c) {
+        
+        async.each(_.keys(request.user.profile.cart), function(tradeline, c) {
           request.model.TradeLine.findById(tradeline)
             .populate('product')
             .exec(function (error, tradelineFound) {
               if (error) {
-                //c(error);
+                c(error);
               } else {
-                var tradeErr = {
-                  code: 400,
-                  field: 'usedAus',
-                  name: tradelineFound.product.bank + ' ' + tradelineFound.product.type + ' ' + tradelineFound.product.name,
-                  productId: tradelineFound.product._id,
-                  id: tradelineFound.id
-                };
-                tradeErr.message = 'Trade line in your cart "' + tradeErr.name + '" no longer available.';
-                unavailableTradelines.push(tradeErr);
+                if (tradelineFound.usedAus >= tradelineFound.totalAus) {
+                  var tradeErr = {
+                    code: 400,
+                    field: 'usedAus',
+                    name: tradelineFound.product.bank + ' ' + tradelineFound.product.type + ' ' + tradelineFound.product.name,
+                    productId: tradelineFound.product._id,
+                    id: tradelineFound.id
+                  };
+                  tradeErr.message = 'Trade line in your cart "' + tradeErr.name + '" no longer available.';
+                  unavailableTradelines.push(tradeErr);
+                } else {
+                  //https://oselot.atlassian.net/wiki/display/ACR/Inventory+Table+Requirements
+                  sumCost = sumCost + tradelineFound.cost;
+                  properTradeLineIds.push(tradelineFound.id);
+                  tradelines.push(tradelineFound);
+                }
                 c();
               }
           });
@@ -75,9 +84,8 @@ var Checkout = (function() {
               'status': 'Error',
               'errors' : unavailableTradelines
             });
-            cb();
           } else {
-            cb(null);
+            cb(null, sumCost);
           }
        });
      }
@@ -95,40 +103,6 @@ var Checkout = (function() {
               balance = balance + t.amount;
             });
             cb(null, balance);
-          }
-        });
-    };
-
-    var calculateSingleTradeline = function(request, tradeLineId, cb) {
-      request.model.TradeLine.findById(tradeLineId)
-        .populate('product')
-        .exec(function (error, tradeLineFound) {
-          if (error) {
-            cb(error);
-          } else {
-            if ((tradeLineFound.totalAus - tradeLineFound.usedAus) > 0 && tradeLineFound.active) {
-              //https://oselot.atlassian.net/wiki/display/ACR/Inventory+Table+Requirements
-              sumCost = sumCost + tradeLineFound.cost;
-              properTradeLineIds.push(tradeLineFound.id);
-              tradelines.push(tradeLineFound);
-            }
-            cb(null);
-          }
-        });
-    };
-
-    var calculateCostOfTradelines = function(request, cb) {
-      sumCost = 0;
-      tradelineIds = request.user.profile ? (Object.keys(request.user.profile.cart || {})) : [],
-      async.map(tradelineIds,
-        function (tradeLineId, cc) {
-          calculateSingleTradeline(request, tradeLineId, cc);
-        },
-        function (error) {
-          if (error) {
-            cb(error);
-          } else {
-            cb(null, sumCost);
           }
         });
     };
@@ -220,7 +194,7 @@ var Checkout = (function() {
             'errors': [
               {
                 'code': 402,
-                'message': 'Insufficient balance! Payment required!'
+                'message': 'Insufficient balance for this transaction'
               }
             ]
           });
@@ -230,9 +204,8 @@ var Checkout = (function() {
 
     return {
       calculateCurrentBalance: calculateCurrentBalance,
-      calculateCostOfTradelines: calculateCostOfTradelines,
       checkUserVerified: checkUserVerified,
-      checkTradelineAvailability: checkTradelineAvailability,
+      checkTradelineAvailabilityAndSumCost: checkTradelineAvailabilityAndSumCost,
       confirmCheckout: confirmCheckout,
       issueTransaction: issueTransaction,
       updateTradelineBuyers: updateTradelineBuyers,
@@ -255,18 +228,15 @@ module.exports = exports = function (core) {
           Checkout.checkUserVerified(request, response, cb);
         },
         function (cb) {
-          Checkout.checkTradelineAvailability(request, response, cb);
-        },
-        function (cb) {
           core.async.parallel({
             //calculate the current user balance
             'balance': function (c) {
               Checkout.calculateCurrentBalance(request, c);
             },
             //Calculate the cost of all tradelines Buyer want to purchase
-            //also drop non active transactions, and with
+            //Also check that tradelines all available for purchase
             'cost': function (c) {
-              Checkout.calculateCostOfTradelines(request, c);
+              Checkout.checkTradelineAvailabilityAndSumCost(request, response, c);
             }
           }, cb);
         },
@@ -278,7 +248,7 @@ module.exports = exports = function (core) {
         }
       ],
       function (error, checkoutIsDone) {
-        Checkout.confirmCheckout(request, error, checkoutIsDone);
+        Checkout.confirmCheckout(request, response, error, checkoutIsDone);
       }
     );
   });

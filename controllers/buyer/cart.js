@@ -41,9 +41,9 @@ module.exports = exports = function (core) {
           if (tradeLineFound) {
             if (tradeLineFound.active) {
               request.user.profile = request.user.profile || {};
-              request.user.profile.cart = request.user.profile.cart || []; 
+              request.user.profile.cart = request.user.profile.cart || {};
               request.user.profile.cart['' + tradeLineFound.id] = true;
-              request.user.update({$addToSet: {'profile.cart' : tradeLineFound.id}}, function (error) {
+              request.user.save(function (error) {
                 if (error) {
                   throw error;
                 } else {
@@ -51,6 +51,15 @@ module.exports = exports = function (core) {
                   response.json({'status': 'Ok'});
                 }
               });
+              // TODO implement this properly
+              /*request.user.update({$addToSet: {'profile.cart' : tradeLineFound.id}}, function (error) {
+                if (error) {
+                  throw error;
+                } else {
+                  response.status(202);
+                  response.json({'status': 'Ok'});
+                }
+              });*/
             } else {
               response.status(400);
               response.json({
@@ -58,7 +67,7 @@ module.exports = exports = function (core) {
                 'errors': [
                   {
                     'code': 400,
-                    'message': 'Tradeline is not available, it is not in active state!'
+                    'message': 'Specified tradeline is not active'
                   }
                 ]
               });
@@ -70,7 +79,7 @@ module.exports = exports = function (core) {
               'errors': [
                 {
                   'code': 404,
-                  'message': 'Tradeline with this id do not exists!'
+                  'message': 'Tradeline with this id does not exist'
                 }
               ]
             });
@@ -84,7 +93,7 @@ module.exports = exports = function (core) {
         'errors': [
           {
             'code': 400,
-            'message': 'Tradeline id is missed!'
+            'message': 'Missing field: tradelineId'
           }
         ]
       });
@@ -114,7 +123,7 @@ module.exports = exports = function (core) {
         'errors': [
           {
             'code': 400,
-            'message': 'Tradeline id is missed!'
+            'message': 'Missing field: tradelineId'
           }
         ]
       });

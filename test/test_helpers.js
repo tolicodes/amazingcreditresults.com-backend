@@ -70,6 +70,8 @@ exports.resetBuyer = function(callback) {
       'owner' : null
     },
     'profile' : {
+      'evsVerified': true,
+      'phoneVerified': true,
       'street1' : '125 Street',
       'street2' : 'Apt 3',
       'phone' : '5551239567',
@@ -77,8 +79,6 @@ exports.resetBuyer = function(callback) {
       'state': 'NY',
       'zip': '11201'
     },
-    'evsVerified': true,
-    'phoneVerified': true,
     'accountVerified' : true,
     'root' : false,
     'password' : '6ccc4a48bf6701c1d824c08276dc182b159425686f4d048d3c7abe342e83b24beb4d015a451a6a4d5ef283a6299e418367ae90cbf0ad8df06e3c24259c82129f',
@@ -90,7 +90,7 @@ exports.resetBuyer = function(callback) {
     collection.remove({ 'apiKey' : buyer.apiKey }, function(err, result) {
       collection.insert([buyer], function(err, result) {
         db.close();
-        callback();
+        callback(result[0]);
       });
     });
   });
