@@ -41,9 +41,9 @@ module.exports = exports = function (core) {
           if (tradeLineFound) {
             if (tradeLineFound.active) {
               request.user.profile = request.user.profile || {};
-              request.user.profile.cart = request.user.profile.cart || {};
+              request.user.profile.cart = request.user.profile.cart || []; 
               request.user.profile.cart['' + tradeLineFound.id] = true;
-              request.user.save(function (error) {
+              request.user.update({$addToSet: {'profile.cart' : tradeLineFound.id}}, function (error) {
                 if (error) {
                   throw error;
                 } else {

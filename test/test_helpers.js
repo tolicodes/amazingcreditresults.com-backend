@@ -55,28 +55,30 @@ exports.dropDB = function(callback) {
 exports.resetBuyer = function(callback) {
   var buyer = {
     'keychain' : {
-      'welcomeLink' : 'a84e44544afb66dedba5a',
-      'email' : 'janedoe@example.org'
+      'welcomeLink': 'a84e44544afb66dedba6a',
+      'email': 'jamesdoe@example.org',
     },
     'name' : {
-      'familyName' : 'Doe',
-      'givenName' : 'Jane',
-      'middleName' : 'Eleonor'
+      'familyName': 'Doe',
+      'middleName': 'Dean',
+      'givenName': 'James'
     },
-    'apiKey' : 'abc2',
+    'apiKey': 'abc4',
     'roles' : {
       'buyer' : true,
       'seller' : false,
       'owner' : null
     },
     'profile' : {
-      'zip' : '11201',
-      'state' : 'NY',
-      'city' : 'Brooklyn',
-      'phone' : '5551234567',
-      'street2' : 'Apt 1',
-      'street1' : '123 Street'
+      'street1' : '125 Street',
+      'street2' : 'Apt 3',
+      'phone' : '5551239567',
+      'city': 'Brooklyn',
+      'state': 'NY',
+      'zip': '11201'
     },
+    'evsVerified': true,
+    'phoneVerified': true,
     'accountVerified' : true,
     'root' : false,
     'password' : '6ccc4a48bf6701c1d824c08276dc182b159425686f4d048d3c7abe342e83b24beb4d015a451a6a4d5ef283a6299e418367ae90cbf0ad8df06e3c24259c82129f',

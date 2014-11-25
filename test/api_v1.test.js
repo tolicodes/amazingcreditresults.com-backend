@@ -1983,7 +1983,7 @@ describe('init', function () {
             // Strangely, the api key isn't actually the api key field, it's the 
             // welcome link field
             // The api key field in the DB is actually the huntKey
-            'apiKey': 'a84e44544afb66dedba5a',
+            'apiKey': 'a84e44544afb66dedba6a',
             'password': 'test123'
           },
           'json': true
@@ -2033,7 +2033,7 @@ describe('init', function () {
           });
         });
 
-        it("cannot add the same tradeline twice", function (done) {
+        it('cannot add the same tradeline twice', function (done) {
           async.waterfall([
             function (cb) {
               helpers.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
@@ -2066,7 +2066,7 @@ describe('init', function () {
           });
         });
 
-        it("fails if tradeline id not provided", function (done) {
+        it('fails if tradeline id not provided', function (done) {
           helpers.cart.addTradeline(cartBuyerHuntKey, null, function (error, response) {
             response.statusCode.should.be.equal(400);
             done(error);
@@ -2074,7 +2074,7 @@ describe('init', function () {
         });
       });
 
-      describe("list tradelines", function () {
+      describe('list tradelines', function () {
         it('should be able to list tradelines', function (done) {
           async.waterfall([
             function (cb) {
@@ -2102,8 +2102,8 @@ describe('init', function () {
         });
       });
 
-      describe("removing a tradeline from the cart", function () {
-        it("can remove a tradeline", function (done) {
+      describe('removing a tradeline from the cart', function () {
+        it('can remove a tradeline', function (done) {
           async.waterfall([
             function (cb) {
               helpers.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
@@ -2141,7 +2141,137 @@ describe('init', function () {
       });
 
       // TODO write more tests for this
-      describe('checkout', function () {
+      describe('Checkout', function () {
+        // Give James Doe a clean slate
+        afterEach(function(done) {
+          helper.resetBuyer(function() {
+            done();
+          });
+        });
+
+        it('should error if user unverified', function(done){
+            async.waterfall([
+              // Login as unverified user
+              function (cb) {
+                request({
+                  'method': 'POST',
+                  'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+                  'json': true,
+                  'form': {
+                    'apiKey': 'a84e44544afb66dedba5a',
+                    'password': 'test123'
+                  }
+                }, function (error, response, body) {
+                  if (error) {
+                    done(error);
+                  } else {
+                    response.statusCode.should.be.equal(202);
+                    response.body.Success.should.be.equal('Welcome!');
+                    console.log(body);
+                    cb(error, body.huntKey);
+                  }
+                });
+              },
+              function (buyerHuntKey, cb) {
+                helpers.tradelines.list(buyerHuntKey, function (error, response, body) {
+                  var tradeline = body.data[0];
+                  cb(error, buyerHuntKey, tradeline);
+                });
+              },
+              function (buyerHuntKey, tradeline, cb) {
+                helpers.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error) {
+                  cb(error, buyerHuntKey, tradeline);
+                });
+              },
+              function (buyerHuntKey, tradeline) {
+                request({
+                  'method': 'POST',
+                  'url': 'http://localhost:' + port + '/api/v1/cart/checkout',
+                  'headers': {'huntKey': buyerHuntKey},
+                  'json': true
+                }, function (error, response, body) {
+                  if(error) {
+                    done(error);
+                  } else {
+                    response.statusCode.should.be.equal(400);
+                    body.status.should.be.equal('Error');
+                    body.errors[0].message.should.be.equal('SSN, First Name, Last Name, or DOB not verified');
+                    done();
+                  }
+                });
+              }
+            ], function (error, response) {
+              response.statusCode.should.be.equal(400);
+              done(error);
+            });
+        });
+
+        it('should error if cart empty', function(done){
+          request({
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/api/v1/cart/checkout',
+            'headers': {'huntKey': cartBuyerHuntKey},
+            'json': true
+          }, function (error, response, body) {
+            if(error) {
+              done(error);
+            }
+            response.statusCode.should.be.equal(400);
+            body.status.should.be.equal('Error');
+            body.errors[0].message.should.be.equal('Your cart is empty, please add at least one tradeline before checkout');
+            done();
+          });
+        });
+
+        it('should error if user adds tradeline with no available AUs', function(done) {
+          async.waterfall([
+            // Read in tradelines
+            function (cb) {
+              helpers.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
+                cb(error, body.data);
+              });
+            },
+            // Add 2 tradelines, one with available AU, one with no avail AU
+            function (tradelines, cb) {
+              async.parallel([
+                function (c) {
+                  helpers.cart.addTradeline(cartBuyerHuntKey, tradelines[0].id, function (error) {
+                    console.log('tradeline 0: ' + tradelines[0].id);
+                    c(error);
+                  });
+                },
+                function (c) {
+                  helpers.cart.addTradeline(cartBuyerHuntKey, tradelines[2].id, function (error) {
+                    console.log('tradeline 2: ' + tradelines[2].id);
+                    c(error);
+                  });
+                }
+              ],
+              function(error){
+                cb(error);
+              });
+            },
+            // Try to checkout
+            function(cb) {
+              request({
+                'method': 'POST',
+                'url': 'http://localhost:' + port + '/api/v1/cart/checkout',
+                'headers': {'huntKey': cartBuyerHuntKey},
+                'json': true
+              }, function (error, response, body) {
+                if(error) {
+                  done(error);
+                } else {
+                  console.log(body);
+                  done();
+                }
+              });
+            }
+          ], function (error, response) {
+            // Not in use
+          });
+        });
+
         it('should work', function(done){
           request({
             'method': 'POST',
@@ -2553,6 +2683,20 @@ describe('init', function () {
 
   describe('Order Management', function () {
     // TODO
+    it('owner can see all orders', function(done) {
+        ownReq({
+          'method': 'GET',
+          'url': 'http://localhost:' + port + '/api/v1/orders/',
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(200);
+            body.orders.should.be.an.Array;
+            done();
+          }
+        });
+    });
   });
 
 });

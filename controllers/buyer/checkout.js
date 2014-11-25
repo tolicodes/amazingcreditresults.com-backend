@@ -1,4 +1,5 @@
 var ensureBuyerOrOwner = require('../../lib/middleware.js').ensureBuyerOrOwner,
+    _ = require('underscore'),
     async = require('async');
 
 var Checkout = (function() {
@@ -7,6 +8,80 @@ var Checkout = (function() {
       properTradeLineIds = [],
       toPay = 0,
       paymentTransactionId;
+
+    var checkUserVerified = function(request, response, cb) {
+      var err;
+      if (request.user.profile.evsVerified !== true) {
+        response.status(400).json({
+          'status': 'Error',
+          'errors': [
+            {
+              'code': 400,
+              'message': 'SSN, First Name, Last Name, or DOB not verified'
+            }
+          ]
+        });
+      } else if (request.user.profile.phoneVerified !== true) {
+        response.status(400).json({
+          'status': 'Error',
+          'errors': [
+            {
+              'code': 400,
+              'message': 'Phone not verified'
+            }
+          ]
+        });
+      } else {
+        cb(null);
+      }
+    };
+
+    var checkTradelineAvailability = function(request, response, cb) {
+      if (!request.user.profile.cart || request.user.profile.cart.length === 0) {
+        response.status(400).json({
+          'status': 'Error',
+          'errors': [
+            {
+              'code': 400,
+              'message': 'Your cart is empty, please add at least one tradeline before checkout'
+            }
+          ]
+        });
+      } else {
+        var unavailableTradelines = [];
+        async.each(request.user.profile.cart, function(tradeline, c) {
+          request.model.TradeLine.findById(tradeline)
+            .populate('product')
+            .exec(function (error, tradelineFound) {
+              if (error) {
+                //c(error);
+              } else {
+                var tradeErr = {
+                  code: 400,
+                  field: 'usedAus',
+                  name: tradelineFound.product.bank + ' ' + tradelineFound.product.type + ' ' + tradelineFound.product.name,
+                  productId: tradelineFound.product._id,
+                  id: tradelineFound.id
+                };
+                tradeErr.message = 'Trade line in your cart "' + tradeErr.name + '" no longer available.';
+                unavailableTradelines.push(tradeErr);
+                c();
+              }
+          });
+        }, function(err) {
+          // If any tradelines in cart unavailable, error out
+          if (unavailableTradelines.length !== 0) {
+            response.status(400).json({
+              'status': 'Error',
+              'errors' : unavailableTradelines
+            });
+            cb();
+          } else {
+            cb(null);
+          }
+       });
+     }
+    };
 
     var calculateCurrentBalance = function(request, cb) {
       request.model.Transaction
@@ -156,6 +231,8 @@ var Checkout = (function() {
     return {
       calculateCurrentBalance: calculateCurrentBalance,
       calculateCostOfTradelines: calculateCostOfTradelines,
+      checkUserVerified: checkUserVerified,
+      checkTradelineAvailability: checkTradelineAvailability,
       confirmCheckout: confirmCheckout,
       issueTransaction: issueTransaction,
       updateTradelineBuyers: updateTradelineBuyers,
@@ -174,6 +251,12 @@ module.exports = exports = function (core) {
   core.app.post('/api/v1/cart/checkout', ensureBuyerOrOwner, function (request, response) {
     core.async.waterfall(
       [
+        function (cb) {
+          Checkout.checkUserVerified(request, response, cb);
+        },
+        function (cb) {
+          Checkout.checkTradelineAvailability(request, response, cb);
+        },
         function (cb) {
           core.async.parallel({
             //calculate the current user balance
@@ -195,7 +278,7 @@ module.exports = exports = function (core) {
         }
       ],
       function (error, checkoutIsDone) {
-        Checkout.confirmCheckout(request, response, error, checkoutIsDone);
+        Checkout.confirmCheckout(request, error, checkoutIsDone);
       }
     );
   });
