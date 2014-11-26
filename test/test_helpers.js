@@ -54,7 +54,51 @@ exports.dropDB = function(callback) {
   });
 }
 
-exports.resetBuyer = function(callback) {
+var resetUser = function(userInfo, callback) {
+  MongoClient.connect(url, function(err, db) {
+    var collection = db.collection('users');
+    collection.remove({ 'apiKey' : userInfo.apiKey }, function(err, result) {
+      collection.insert([userInfo], function(err, result) {
+        db.close();
+        callback(err, result[0]);
+      });
+    });
+  });
+};
+
+exports.resetNewClient = function(callback) {
+  var testId = Math.floor(Math.random() * 10000),
+  userInfo = {
+    'keychain' : {
+      'email': 'unitTestUser' + testId + '@mail.ru',
+    },
+    'name': {
+      'givenName': 'John' + testId,
+      'middleName': 'Teodor' + testId,
+      'familyName': 'Doe' + testId,
+    },
+    'apiKey' : 'abc5',
+    'accountVerified' : false,
+    'root' : false,
+    'profile' : {
+      'title': 'Mr.',
+      'suffix': 'III',
+      'street1' : '123 Street',
+      'street2' : 'Apt 1',
+      'phone' : '5551234567',
+      'city': 'Brooklyn',
+      'state': 'NY',
+      'zip': '11201',
+      'needQuestionnaire': true,
+      'telefone': '555-339' + testId,
+      'street1': 'Some Address'
+    }
+  };
+  resetUser(userInfo, callback);
+};
+
+exports.resetBuyer = function(callback, mods) {
+  mods = mods || {};
   var buyer = {
     'keychain' : {
       'welcomeLink': 'a84e44544afb66dedba6a',
@@ -72,11 +116,11 @@ exports.resetBuyer = function(callback) {
       'owner' : null
     },
     'profile' : {
-      'evsVerified': true,
-      'phoneVerified': true,
+      'evsVerified': (mods.evsVerified !== undefined) ? mods.evsVerified : true,
+      'phoneVerified': (mods.phoneVerified !== undefined) ? mods.phoneVerified : true,
       'street1' : '125 Street',
       'street2' : 'Apt 3',
-      'phone' : '5551239567',
+      'phone' : mods.phone || '5551239567',
       'city': 'Brooklyn',
       'state': 'NY',
       'zip': '11201'
@@ -87,15 +131,7 @@ exports.resetBuyer = function(callback) {
     'salt' : 'fbf897be7250e952aa13ef0d1ae1c3c71b52102b64c24f7bc8a1c70ed0de482edb81680be6dc28f95c450c9677d5d8412389a736b812052edac8632c7422f808'
   };
 
-  MongoClient.connect(url, function(err, db) {
-    var collection = db.collection('users');
-    collection.remove({ 'apiKey' : buyer.apiKey }, function(err, result) {
-      collection.insert([buyer], function(err, result) {
-        db.close();
-        callback(result[0]);
-      });
-    });
-  });
+  resetUser(buyer, callback);
 
 };
 

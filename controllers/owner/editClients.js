@@ -97,7 +97,7 @@ module.exports = exports = function (core) {
               throw error;
             } else {
               response.status(200);
-              response.json(obj.data);
+              response.json(obj);
             }
           });
         } else {

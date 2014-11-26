@@ -11,7 +11,7 @@ module.exports = exports = function (core) {
       response.json({'status': 'Ok', 'phoneVerified': true, 'message': 'Phone of ' + request.user.profile.phone + ' is verified!'});
     } else {
       request.user.profile.phone = request.user.profile.phone || '3478829902'; //todo - remove from production!!!
-      getprove.verify.create({ tel: request.user.profile.phone }, function (error, verify) {
+      getprove.verify.create({ tel: request.user.profile.phone.toString() }, function (error, verify) {
         if (error) {
           throw error;
         } else {
@@ -33,7 +33,16 @@ module.exports = exports = function (core) {
     if (request.body.pin) {
       getprove.verify.pin(request.user.profile.phoneVerificationId, request.body.pin, function (err, verify) {
         if (err) {
-          throw err;
+            response.status(400);
+            response.json({
+              'status': 'Error',
+              'errors': [
+                {
+                  'code': 400,
+                  'message': err.response
+                }
+              ]
+            });
         } else {
           if (verify.verified) {
             delete request.user.profile.phoneVerificationId;
@@ -46,18 +55,6 @@ module.exports = exports = function (core) {
                 response.json({'status': 'Ok', 'phoneVerified': true, 'message': 'Phone of ' + request.user.profile.phone + ' is verified'});
               }
             });
-          } else {
-            response.status(400);
-            response.json({
-              'status': 'Error',
-              'errors': [
-                {
-                  'code': 400,
-                  'message': 'Pin code is invalid!',
-                  'field': 'pin'
-                }
-              ]
-            });
           }
         }
       });
@@ -68,7 +65,7 @@ module.exports = exports = function (core) {
         'errors': [
           {
             'code': 400,
-            'message': 'Pin code is missed!',
+            'message': 'Pin code is missing!',
             'field': 'pin'
           }
         ]

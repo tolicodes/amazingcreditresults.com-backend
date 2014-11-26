@@ -21,7 +21,7 @@ var Hunt = require('hunt'),
       'sessionExpireAfterSeconds': 500 * 60, //plan 1.4
       'apiKeyOutdates': 60 * 60 * 1000 //ttl of api key for buyer to authorize - 1 day //https://oselot.atlassian.net/browse/ACR-20
     },
-    'getProveApiKey': e.ACR_PROVE_KEY,
+    'getProveApiKey': e.ACR_PROVE_KEY || 'sk_test_tWdL1s35xEY7f8EnQ89y3kHA', // Test key, don't use in production
     'areYouAHuman': {
       'publisherKey': e.ACR_AREYOUHUMAN_PUBLISHER_KEY,
       'scoringKey': e.ACR_AREYOUHUMAN_SCORING_KEY

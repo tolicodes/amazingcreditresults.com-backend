@@ -97,8 +97,6 @@ describe('init', function () {
   describe('Owner Client Management', function () {
 
     describe('Editing Clients', function() {
-
-
       beforeEach(function (done) {
         ownReq({
           'method': 'POST',
@@ -118,7 +116,7 @@ describe('init', function () {
         });
       });
 
-      afterEach(function(done) {
+      /*afterEach(function(done) {
         ownReq({
           'method': 'DELETE',
           'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
@@ -131,7 +129,7 @@ describe('init', function () {
             done();
           }
         });
-      });
+      });*/
 
       it('owner can modify user`s name', function (done) {
         // Modify user's info
@@ -231,228 +229,318 @@ describe('init', function () {
         userId.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
       });
 
-      it('notifies this user by email message', function (done) {
-        ownReq({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/admin/clients/welcome/' + userId,
-          'form': { },
-        }, function (error, response, body) {
-          if (error) {
-            done(error);
-          } else {
-            response.statusCode.should.be.equal(202);
-            body.message.should.be.equal('sent');
-            var params = url.parse(body.welcomeLink);
-            ['http:', 'https:'].should.include(params.protocol);
-            params.pathname.should.be.equal('/');
-            params.hash.should.match(/^\#login\/[a-z]+$/);
-            welcomeLink = (/^\#login\/([a-z]+)$/.exec(params.hash))[1];
-            body.user.id.should.be.equal(userId);
-            done();
-          }
-        });
-      });
+      describe('Setting Password', function() {
 
-      it('can check if user needs to set password based on welcome link', function (done) {
-        request({
-          'method': 'GET',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/needToSetPassword/' + welcomeLink,
-          'headers': { },
-          'json': true
-        }, function (error, response, body) {
-          if (error) {
-            done(error);
-          } else {
-            response.statusCode.should.be.equal(200);
-            body.needToSetPassword.should.be.true;
-            done();
-          }
-        });
-      });
-//https://oselot.atlassian.net/browse/ACR-174
-      it('alerts unverified user if they try to log in before password is set', function (done) {
-        request({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/login',
-          'headers': { },
-          'form': {
-            'email': userInfo.email,
-            'password': 'fiflesAndFufles'
-          },
-          'json': true
-        }, function (error, response, body) {
-          if (error) {
-            done(error);
-          } else {
-            response.statusCode.should.be.equal(403);
-            body.errors[0].message.should.be.equal('Unable to authorize - wrong password!');
-            done();
-          }
-        });
-      });
-
-      it('errors if trying to login with invalid welcome link', function (done) {
-        request({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/login',
-          'headers': { },
-          'form': {
-            'email': 'thisIsSomeStupidWelcomeLink1111',
-            'password': 'fiflesAndFufles'
-          },
-          'json': true
-        }, function (error, response, body) {
-          if (error) {
-            done(error);
-          } else {
-            response.statusCode.should.be.equal(403);
-            body.errors[0].message.should.be.equal('Unable to authorize - wrong email!');
-            done();
-          }
-        });
-      });
-
-      it('errors if try to set password without apiKey (welcome link)', function (done) {
-        request({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
-          'headers': { },
-          'form': {
-            'notApiKey': welcomeLink,
-            'password': 'fiflesAndFufles'
-          }
-        }, function (error, response, body) {
-          if (error) {
-            done(error);
-          } else {
-            response.statusCode.should.be.equal(400);
-            var bodyParsed = JSON.parse(body);
-            bodyParsed.errors[0].message.should.be.equal('Missed parameter - `apiKey`!');
-            done();
-          }
-        });
-      });
-
-      it('errors if trying to set password with invalid welcome link', function (done) {
-        request({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
-          'headers': { },
-          'form': {
-            'apiKey': 'thisIsSomeStupidWelcomeLink1111',
-            'password': 'fiflesAndFufles'
-          }
-        }, function (error, response, body) {
-          if (error) {
-            done(error);
-          } else {
-            response.statusCode.should.be.equal(400);
-            var bodyParsed = JSON.parse(body);
-            bodyParsed.errors[0].message.should.be.equal('Wrong or outdated welcome link! Please, contact support for a new one!');
-            done();
-          }
-        });
-      });
-
-      it('new user can set their password', function (done) {
-        request({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
-          'headers': { },
-          'form': {
-            'apiKey': welcomeLink,
-            'password': 'fiflesAndFufles'
-          },
-          'json': true
-        }, function (error, response, body) {
-          if (error) {
-            done(error);
-          } else {
-            response.statusCode.should.be.equal(201);
-            body.Code.should.be.equal(201);
-            body.Success.should.be.equal('Password is set!');
-            done();
-          }
-        });
-      });
-
-      it('authorizes user if they log in with email and password', function (done) {
-        request({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/login',
-          'headers': { },
-          'form': {
-            'email': userInfo.email,
-            'password': 'fiflesAndFufles'
-          },
-          'json': true
-        }, function (error, response, body) {
-          if (error) {
-            done(error);
-          } else {
-            response.statusCode.should.be.equal(202);
-            body.Code.should.be.equal(202);
-            body.Success.should.be.equal('Welcome!');
-            body.huntKey.should.be.a.String;
-            buyerHuntKey = body.huntKey;
-            done();
-          }
-        });
-      });
-
-      it('can authorize new user via huntKey', function (done) {
-        request({
-          'method': 'GET',
-          'url': 'http://localhost:' + port + '/api/v1/myself',
-          'headers': {'huntKey': buyerHuntKey},
-          'json': true
-        }, function (error, response, body) {
-          response.statusCode.should.be.equal(200);
-          body.id.should.be.equal(userId);
-          done();
-        });
-      });
-
-      it('no longer needs user to set password after they have done so', function (done) {
-        request({
-          'method': 'GET',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/needToSetPassword/' + welcomeLink,
-          'headers': { },
-          'json': true
-        }, function (error, response, body) {
-          if (error) {
-            done(error);
-          } else {
-            response.statusCode.should.be.equal(200);
-            body.needToSetPassword.should.be.false;
-            done();
-          }
-        });
-      });
-
-      it('can delete a buyer', function (done) {
-        async.series([
-          /*function (cb) {
-            helpers.clients.list(ownerHuntKey, function (error, response, body) {
-              cb(error, helper.findWithRole('buyer', body))
-            });
-          },*/
-          function (cb) {
-            helpers.clients.del(ownerHuntKey, userId, function (error, response) {
+        it('notifies this user by email message', function (done) {
+          ownReq({
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/api/v1/admin/clients/welcome/' + userId,
+            'form': { },
+          }, function (error, response, body) {
+            if (error) {
+              done(error);
+            } else {
               response.statusCode.should.be.equal(202);
-              cb(error);
-            });
-          },
-          function (cb) {
-            helpers.clients.get(ownerHuntKey, userId, function (error, response, body) {
-              body.isBanned.should.be.true;
-              cb(error, body);
-            });
-          }
-        ], function (error, buyer) {
-          done(error);
+              body.message.should.be.equal('sent');
+              var params = url.parse(body.welcomeLink);
+              ['http:', 'https:'].should.include(params.protocol);
+              params.pathname.should.be.equal('/');
+              params.hash.should.match(/^\#login\/[a-z]+$/);
+              welcomeLink = (/^\#login\/([a-z]+)$/.exec(params.hash))[1];
+              body.user.id.should.be.equal(userId);
+              done();
+            }
+          });
+        });
+
+        it('can check if user needs to set password based on welcome link', function (done) {
+          request({
+            'method': 'GET',
+            'url': 'http://localhost:' + port + '/api/v1/buyer/needToSetPassword/' + welcomeLink,
+            'headers': { },
+            'json': true
+          }, function (error, response, body) {
+            if (error) {
+              done(error);
+            } else {
+              response.statusCode.should.be.equal(200);
+              body.needToSetPassword.should.be.true;
+              done();
+            }
+          });
+        });
+  //https://oselot.atlassian.net/browse/ACR-174
+        it('alerts unverified user if they try to log in before password is set', function (done) {
+          request({
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+            'headers': { },
+            'form': {
+              'email': userInfo.email,
+              'password': 'fiflesAndFufles'
+            },
+            'json': true
+          }, function (error, response, body) {
+            if (error) {
+              done(error);
+            } else {
+              response.statusCode.should.be.equal(403);
+              body.errors[0].message.should.be.equal('Unable to authorize - wrong password!');
+              done();
+            }
+          });
+        });
+
+        it('errors if trying to login with invalid welcome link', function (done) {
+          request({
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+            'headers': { },
+            'form': {
+              'email': 'thisIsSomeStupidWelcomeLink1111',
+              'password': 'fiflesAndFufles'
+            },
+            'json': true
+          }, function (error, response, body) {
+            if (error) {
+              done(error);
+            } else {
+              response.statusCode.should.be.equal(403);
+              body.errors[0].message.should.be.equal('Unable to authorize - wrong email!');
+              done();
+            }
+          });
+        });
+
+        it('errors if try to set password without apiKey (welcome link)', function (done) {
+          request({
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
+            'headers': { },
+            'form': {
+              'notApiKey': welcomeLink,
+              'password': 'fiflesAndFufles'
+            }
+          }, function (error, response, body) {
+            if (error) {
+              done(error);
+            } else {
+              response.statusCode.should.be.equal(400);
+              var bodyParsed = JSON.parse(body);
+              bodyParsed.errors[0].message.should.be.equal('Missed parameter - `apiKey`!');
+              done();
+            }
+          });
+        });
+
+        it('errors if trying to set password with invalid welcome link', function (done) {
+          request({
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
+            'headers': { },
+            'form': {
+              'apiKey': 'thisIsSomeStupidWelcomeLink1111',
+              'password': 'fiflesAndFufles'
+            }
+          }, function (error, response, body) {
+            if (error) {
+              done(error);
+            } else {
+              response.statusCode.should.be.equal(400);
+              var bodyParsed = JSON.parse(body);
+              bodyParsed.errors[0].message.should.be.equal('Wrong or outdated welcome link! Please, contact support for a new one!');
+              done();
+            }
+          });
+        });
+
+        it('new user can set their password', function (done) {
+          request({
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
+            'headers': { },
+            'form': {
+              'apiKey': welcomeLink,
+              'password': 'fiflesAndFufles'
+            },
+            'json': true
+          }, function (error, response, body) {
+            if (error) {
+              done(error);
+            } else {
+              response.statusCode.should.be.equal(201);
+              body.Code.should.be.equal(201);
+              body.Success.should.be.equal('Password is set!');
+              done();
+            }
+          });
+        });
+
+        it('authorizes user if they log in with email and password', function (done) {
+          request({
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+            'headers': { },
+            'form': {
+              'email': userInfo.email,
+              'password': 'fiflesAndFufles'
+            },
+            'json': true
+          }, function (error, response, body) {
+            if (error) {
+              done(error);
+            } else {
+              response.statusCode.should.be.equal(202);
+              body.Code.should.be.equal(202);
+              body.Success.should.be.equal('Welcome!');
+              body.huntKey.should.be.a.String;
+              buyerHuntKey = body.huntKey;
+              done();
+            }
+          });
+        });
+
+
+        it('can authorize new user via huntKey', function (done) {
+          request({
+            'method': 'GET',
+            'url': 'http://localhost:' + port + '/api/v1/myself',
+            'headers': {'huntKey': buyerHuntKey},
+            'json': true
+          }, function (error, response, body) {
+            response.statusCode.should.be.equal(200);
+            body.id.should.be.equal(userId);
+            done();
+          });
+        });
+
+        it('no longer needs user to set password after they have done so', function (done) {
+          request({
+            'method': 'GET',
+            'url': 'http://localhost:' + port + '/api/v1/buyer/needToSetPassword/' + welcomeLink,
+            'headers': { },
+            'json': true
+          }, function (error, response, body) {
+            if (error) {
+              done(error);
+            } else {
+              response.statusCode.should.be.equal(200);
+              body.needToSetPassword.should.be.false;
+              done();
+            }
+          });
+        });
+      }); // END SET PASSWORD TESTS
+
+      describe('Verify Phone', function() {
+        var phoneNum = '3152727199';
+        before(function(done) {
+          async.series([
+            function(cb) {
+              request({
+                'method': 'POST',
+                'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+                'headers': { },
+                'form': {
+                  'email': 'jamesdoe@example.org',
+                  'password': 'test123'
+                },
+                'json': true
+              }, function (error, response, body) {
+                buyerHuntKey = body.huntKey;
+                cb();
+              });
+            },
+            function() {
+              helper.resetBuyer(done, { phoneVerified: false, phone: phoneNum});
+            }
+          ]);
+        });
+
+        it('will send verification if phone is not verified', function(done) {
+          helpers.verify.phone.send(buyerHuntKey, function(error, response, body) {
+            response.statusCode.should.be.equal(202);
+            body.status.should.be.equal('Ok');
+            body.phoneVerified.should.be.false;
+            body.message.should.be.equal('Phone of '+ phoneNum + ' will be verified!');
+            done();
+          });
+        });
+
+        it('will error if no pin provided', function(done) {
+          helpers.verify.phone.checkPin(buyerHuntKey, undefined, function(error, response, body) {
+            response.statusCode.should.be.equal(400);
+            body.status.should.be.equal('Error');
+            body.errors[0].message.should.be.equal('Pin code is missing!');
+            done();
+          });
+        });
+
+        it('will error on incorrect pin', function(done) {
+          var badPin = '133700'
+          helpers.verify.phone.checkPin(buyerHuntKey, badPin, function(error, response, body) {
+            response.statusCode.should.be.equal(400);
+            body.status.should.be.equal('Error');
+            body.errors[0].message.should.be.equal('Invalid verification code, please try again');
+            done();
+          });
+        });
+
+        it('can confirm correct pin', function(done) {
+          var goodPin = '000000'
+          helpers.verify.phone.checkPin(buyerHuntKey, goodPin, function(error, response, body) {
+            response.statusCode.should.be.equal(202);
+            body.status.should.be.equal('Ok');
+            body.phoneVerified.should.be.true;
+            body.message.should.be.equal('Phone of '+ phoneNum + ' is verified');
+            done();
+          });
+        });
+
+        it('can check if phone is verified', function(done) {
+          async.series([
+            function(cb) {
+              helper.resetBuyer(cb, { phoneVerified: true, phone: phoneNum});
+            },
+            function() {
+              helpers.verify.phone.send(buyerHuntKey, function(error, response, body) {
+                response.statusCode.should.be.equal(200);
+                body.status.should.be.equal('Ok');
+                body.phoneVerified.should.be.true;
+                body.message.should.be.equal('Phone of '+ phoneNum + ' is verified!');
+                done();
+              });
+            }
+          ]);
         });
       });
+
+      describe('Deletion', function() {
+        it('can delete a buyer', function (done) {
+          async.series([
+            /*function (cb) {
+              helpers.clients.list(ownerHuntKey, function (error, response, body) {
+                cb(error, helper.findWithRole('buyer', body))
+              });
+            },*/
+            function (cb) {
+              helpers.clients.del(ownerHuntKey, userId, function (error, response) {
+                response.statusCode.should.be.equal(202);
+                cb(error);
+              });
+            },
+            function (cb) {
+              helpers.clients.get(ownerHuntKey, userId, function (error, response, body) {
+                body.data.isBanned.should.be.true;
+                cb(error, body);
+              });
+            }
+          ], function (error, buyer) {
+            done(error);
+          });
+        });
+      });
+
     });
   });
 
@@ -535,15 +623,15 @@ describe('init', function () {
           'form': {
             'username': 'owner' + testId + '@example.org',
             'password': 'test123'
-          }
+          },
+          'json': true
         }, function (error, response, body) {
           if (error) {
             done(error);
           } else {
             response.statusCode.should.be.equal(200);
-            var bodyParsed = JSON.parse(body);
-            bodyParsed.huntKey.should.be.a.String;
-            ownerHuntKey2 = bodyParsed.huntKey;
+            body.huntKey.should.be.a.String;
+            ownerHuntKey2 = body.huntKey;
             done();
           }
         });
@@ -1940,14 +2028,14 @@ describe('init', function () {
           request({
             'method': 'GET',
             'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + sellerId,
-            'headers': {'huntKey': ownerHuntKey}
+            'headers': {'huntKey': ownerHuntKey},
+            'json': true
           }, function (error, response, body1) {
             if (error) {
               done(error);
             } else {
               response.statusCode.should.be.equal(200);
-              var bodyParsed1 = JSON.parse(body1);
-              bodyParsed1.data.id.should.be.equal(sellerId);
+              body1.data.id.should.be.equal(sellerId);
               done();
             }
           });
@@ -2162,7 +2250,7 @@ describe('init', function () {
         var userId;
         // Give James Doe a clean slate
         beforeEach(function(done) {
-          helper.resetBuyer(function(user) {
+          helper.resetBuyer(function(error, user) {
             userId = user._id;
             done();
           });
@@ -2856,5 +2944,26 @@ var helpers = {
         'json': true
       }, cb);
     }
-  }
+  },
+  verify: {
+    phone: {
+      send: function(huntKey, cb) {
+        request({
+          'method': 'GET',
+          'url': 'http://localhost:' + port + '/api/v1/verifyPhone',
+          'headers': {'huntKey': huntKey},
+          'json': true
+        }, cb);
+      },
+      checkPin: function(huntKey, pin, cb) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/verifyPhone',
+          'headers': {'huntKey': huntKey},
+          'form': {'pin' : pin},
+          'json': true
+        }, cb);
+      }
+    }
+  },
 };
