@@ -335,7 +335,7 @@ module.exports = exports = function (core) {
       if (error) {
         throw error;
       } else {
-        var welcomeLink = welcomeLinkGenerator();
+        var welcomeLink = userFound.keychain.welcomeLink || welcomeLinkGenerator();
         if ((userFound.roles && userFound.roles.owner === true) || userFound.root) {
           response.status(400);
           response.json({

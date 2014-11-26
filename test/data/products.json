@@ -1,0 +1,36 @@
+{
+  "data": 
+  [{
+    "name": "Freedom",
+    "bank": "Chase",
+    "type": "Visa",
+    "reportsToExperian": true,
+    "reportsToEquifax": false,
+    "reportsToTransunion": true,
+    "maximumAus": 15
+  }, {
+    "name": "Sapphire",
+    "bank": "Chase",
+    "type": "American Express",
+    "reportsToExperian": true,
+    "reportsToEquifax": true,
+    "reportsToTransunion": true,
+    "maximumAus": 15
+  }, {
+    "name": "Americard",
+    "bank": "Bank of America",
+    "type": "MasterCard",
+    "reportsToExperian": false,
+    "reportsToEquifax": false,
+    "reportsToTransunion": false,
+    "maximumAus": 15
+  }, {
+    "name": "Premium",
+    "bank": "Bank of America",
+    "type": "Visa",
+    "reportsToExperian": true,
+    "reportsToEquifax": true,
+    "reportsToTransunion": true,
+    "maximumAus": 5
+  }]
+}

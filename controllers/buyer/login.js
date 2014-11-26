@@ -100,12 +100,15 @@ module.exports = exports = function(core) {
 
   //authorizing (aka getting huntKey) by apiKey and password - second
   core.app.post('/api/v1/buyer/login', function(request, response) {
-    if (request.body.apiKey && request.body.password) {
-      request.model.User.findOneByKeychain('welcomeLink', request.body.apiKey, function(error, userFound) {
+    if (request.body.email && request.body.password) {
+      request.model.User.findOneByKeychain('email', request.body.email, function(error, userFound) {
         if (error) {
           throw error;
         } else {
           if (userFound) {
+            //console.log(request.body.password);
+            //console.log(userFound);
+            //console.log(userFound.verifyPassword(request.body.password));
             if (userFound.verifyPassword(request.body.password)) {
               response.status(202);
               response.json({
@@ -130,22 +133,22 @@ module.exports = exports = function(core) {
               'status': 'Error',
               'errors': [{
                 'code': 403,
-                'message': 'Unable to authorize - wrong welcome link!',
-                'field': 'welcome'
+                'message': 'Unable to authorize - wrong email!',
+                'field': 'email'
               }]
             });
           }
         }
       });
     } else {
-      //no apiKey and password in post request body
+      //no email and password in post request body
       response.status(400);
       var errors = [];
-      if (!request.body.apiKey) {
+      if (!request.body.email) {
         errors.push({
           'code': 400,
-          'message': 'Missed parameter - `apiKey`!',
-          'field': 'apiKey'
+          'message': 'Missed parameter - `email`!',
+          'field': 'email'
         });
       }
       if (!request.body.password) {

@@ -187,6 +187,8 @@ describe('init', function () {
     // Beware these tests are interdependent
     describe('Managing Buyer Account', function () {
 
+      // Reset testId
+      testId = Math.floor(Math.random() * 10000);
       var userInfo = {
         'email': 'unitTestUser' + testId + '@mail.ru',
         'name': {
@@ -255,35 +257,35 @@ describe('init', function () {
         request({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/buyer/needToSetPassword/' + welcomeLink,
-          'headers': { }
+          'headers': { },
+          'json': true
         }, function (error, response, body) {
           if (error) {
             done(error);
           } else {
             response.statusCode.should.be.equal(200);
-            var bodyParsed = JSON.parse(body);
-            bodyParsed.needToSetPassword.should.be.true;
+            body.needToSetPassword.should.be.true;
             done();
           }
         });
       });
 //https://oselot.atlassian.net/browse/ACR-174
-      it('alerts unverified user if they try to log in with invalid password', function (done) {
+      it('alerts unverified user if they try to log in before password is set', function (done) {
         request({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/buyer/login',
           'headers': { },
           'form': {
-            'apiKey': welcomeLink,
+            'email': userInfo.email,
             'password': 'fiflesAndFufles'
-          }
+          },
+          'json': true
         }, function (error, response, body) {
           if (error) {
             done(error);
           } else {
             response.statusCode.should.be.equal(403);
-            var bodyParsed = JSON.parse(body);
-            bodyParsed.errors[0].message.should.be.equal('Unable to authorize - wrong password!');
+            body.errors[0].message.should.be.equal('Unable to authorize - wrong password!');
             done();
           }
         });
@@ -295,38 +297,16 @@ describe('init', function () {
           'url': 'http://localhost:' + port + '/api/v1/buyer/login',
           'headers': { },
           'form': {
-            'apiKey': 'thisIsSomeStupidWelcomeLink1111',
+            'email': 'thisIsSomeStupidWelcomeLink1111',
             'password': 'fiflesAndFufles'
-          }
+          },
+          'json': true
         }, function (error, response, body) {
           if (error) {
             done(error);
           } else {
             response.statusCode.should.be.equal(403);
-            var bodyParsed = JSON.parse(body);
-            bodyParsed.errors[0].message.should.be.equal('Unable to authorize - wrong welcome link!');
-            done();
-          }
-        });
-      });
-
-      it('new user can set their password', function (done) {
-        request({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
-          'headers': { },
-          'form': {
-            'apiKey': welcomeLink,
-            'password': 'fiflesAndFufles'
-          }
-        }, function (error, response, body) {
-          if (error) {
-            done(error);
-          } else {
-            response.statusCode.should.be.equal(201);
-            var bodyParsed = JSON.parse(body);
-            bodyParsed.Code.should.be.equal(201);
-            bodyParsed.Success.should.be.equal('Password is set!');
+            body.errors[0].message.should.be.equal('Unable to authorize - wrong email!');
             done();
           }
         });
@@ -374,25 +354,47 @@ describe('init', function () {
         });
       });
 
-      it('authorizes user if they log in with valid welcome link and password', function (done) {
+      it('new user can set their password', function (done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
+          'headers': { },
+          'form': {
+            'apiKey': welcomeLink,
+            'password': 'fiflesAndFufles'
+          },
+          'json': true
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(201);
+            body.Code.should.be.equal(201);
+            body.Success.should.be.equal('Password is set!');
+            done();
+          }
+        });
+      });
+
+      it('authorizes user if they log in with email and password', function (done) {
         request({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/buyer/login',
           'headers': { },
           'form': {
-            'apiKey': welcomeLink,
+            'email': userInfo.email,
             'password': 'fiflesAndFufles'
-          }
+          },
+          'json': true
         }, function (error, response, body) {
           if (error) {
             done(error);
           } else {
             response.statusCode.should.be.equal(202);
-            var bodyParsed = JSON.parse(body);
-            bodyParsed.Code.should.be.equal(202);
-            bodyParsed.Success.should.be.equal('Welcome!');
-            bodyParsed.huntKey.should.be.a.String;
-            buyerHuntKey = bodyParsed.huntKey;
+            body.Code.should.be.equal(202);
+            body.Success.should.be.equal('Welcome!');
+            body.huntKey.should.be.a.String;
+            buyerHuntKey = body.huntKey;
             done();
           }
         });
@@ -835,6 +837,7 @@ describe('init', function () {
     });
 
     // Reset the products
+    // NOTE: This fucks up the tradelines created at the beginning
     afterEach(function(done) {
       helper.dropCollection('products', function() {
         done();
@@ -1186,6 +1189,7 @@ describe('init', function () {
         }]);
     });
 
+
     it('cannot create tradeline with invalid product', function (done) {
       ownReq({
         'method': 'POST',
@@ -1297,6 +1301,7 @@ describe('init', function () {
         if (error) {
           done(error);
         } else {
+          //console.log(body.data);
           response.statusCode.should.be.equal(200);
           Array.isArray(body.data).should.be.true;
           body.data.length.should.be.above(1);
@@ -1475,6 +1480,7 @@ describe('init', function () {
     });
   });
 
+  // DEPRECATED
   describe('Seller editing his/her tradelines', function () {
     var sellerId,
       productId,
@@ -1486,7 +1492,7 @@ describe('init', function () {
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/buyer/login',
         'form': {
-          'apiKey': 'a4544afb66dedba584e4a', // do not change!
+          'email': 'gracedoe@example.org', // do not change!
           'password': 'test123'
         }
       }, function (error, response, body) {
@@ -1562,6 +1568,7 @@ describe('init', function () {
       });
     });
 
+    // ============= SELLER: Edit Tradelines (DEPRECATED) ===============
     describe('seller can create tradeline with existant product id', function () {
       before(function (done) {
         request({
@@ -1975,29 +1982,40 @@ describe('init', function () {
       var cartBuyerHuntKey;
       // Login the buyer
       before(function(done) {
-        request({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/login',
-          'headers': { },
-          'form': {
-            // Strangely, the api key isn't actually the api key field, it's the 
-            // welcome link field
-            // The api key field in the DB is actually the huntKey
-            'apiKey': 'a84e44544afb66dedba6a',
-            'password': 'test123'
+        async.parallel([
+          function(cb) {
+            request({
+              'method': 'POST',
+              'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+              'headers': { },
+              'form': {
+                // Strangely, the api key isn't actually the api key field, it's the 
+                // welcome link field
+                // The api key field in the DB is actually the huntKey
+                'email': 'jamesdoe@example.org',
+                'password': 'test123'
+              },
+              'json': true
+            }, function (error, response, body) {
+              if (error) {
+                cb(error);
+              } else {
+                response.statusCode.should.be.equal(202);
+                body.Code.should.be.equal(202);
+                body.Success.should.be.equal('Welcome!');
+                body.huntKey.should.be.a.String;
+                cartBuyerHuntKey = body.huntKey;
+                cb();
+              }
+            });
           },
-          'json': true
-        }, function (error, response, body) {
-          if (error) {
-            done(error);
-          } else {
-            response.statusCode.should.be.equal(202);
-            body.Code.should.be.equal(202);
-            body.Success.should.be.equal('Welcome!');
-            body.huntKey.should.be.a.String;
-            cartBuyerHuntKey = body.huntKey;
-            done();
+          function(cb) {
+            helper.resetProductsAndTradelines(function() {
+              cb();
+            });
           }
+        ], function(err) {
+          done(err);
         });
       });
 
@@ -2159,7 +2177,7 @@ describe('init', function () {
                   'url': 'http://localhost:' + port + '/api/v1/buyer/login',
                   'json': true,
                   'form': {
-                    'apiKey': 'a84e44544afb66dedba5a',
+                    'email': 'janedoe@example.org',
                     'password': 'test123'
                   }
                 }, function (error, response, body) {
@@ -2308,7 +2326,12 @@ describe('init', function () {
               });
             },
             function (cb) {
-              helpers.cart.addTradeline(cartBuyerHuntKey, tradelineId, function (error) {
+              helpers.cart.addTradeline(cartBuyerHuntKey, tradelineId, function (error, response, body) {
+                cb(error);
+              });
+            },
+            function (cb) {
+              helpers.cart.getTradelines(cartBuyerHuntKey, function (error, response, body) {
                 cb(error);
               });
             },
@@ -2423,7 +2446,7 @@ describe('init', function () {
         'url': 'http://localhost:' + port + '/api/v1/buyer/login',
         'json': true,
         'form': {
-          'apiKey': 'a4544afb66dedba584e4a',
+          'email': 'gracedoe@example.org',
           'password': 'test123'
         }
       }, function (error, response, body) {
@@ -2720,7 +2743,7 @@ describe('init', function () {
 
   describe('Order Management', function () {
     // TODO
-    it('owner can see all orders', function(done) {
+    xit('owner can see all orders', function(done) {
         ownReq({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/orders/',

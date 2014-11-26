@@ -1,4 +1,6 @@
 var MongoClient = require('mongodb').MongoClient,
+    async = require('async'),
+    fs = require('fs'),
     _ = require('underscore');
 
 // Connection URL - may need to change depending on your local config
@@ -101,4 +103,65 @@ exports.findWithRole = function (role, body) {
   return _.find(body.data, function (user) {
     return user.roles[role];
   });
-}
+};
+
+exports.resetProductsAndTradelines = function(callback) {
+  var products, tradelines;
+  MongoClient.connect(url, function(err, db) {
+    var sellerId;
+    async.parallel([
+        function(cb) {
+          fs.readFile('data/tradelines.json', function(err, data) {
+            tradelines = JSON.parse(data).data;
+            cb();
+          });
+        },
+        function(cb) {
+          fs.readFile('data/products.json', function(err, data) {
+            products = JSON.parse(data).data;
+            cb();
+          });
+        },
+        function(cb) {
+          exports.dropCollection('tradelines', cb);
+        },
+        function(cb) {
+          exports.dropCollection('products', cb);
+        },
+        function(cb) {
+          var coll = db.collection('users');
+          coll.find({'roles.seller': true}).limit(1).toArray(function(err, docs){
+            sellerId = docs[0]._id;
+            cb();
+          });
+        }
+      ],
+      // Now insert them into DB
+      function() {
+        var productIds = [];
+        var collection;
+        async.series([
+          function(cb) {
+            collection = db.collection('products');
+            collection.insert(products, function(err, result) {
+              productIds = _(result).pluck('_id');
+              cb();
+            });
+          },
+          function(cb) {
+            collection = db.collection('tradelines');
+            for(var i in tradelines) {
+              tradelines[i].product = productIds[i];
+              tradelines[i].seller = sellerId;
+            }
+            collection.insert(tradelines, function(err, result) {
+              db.close();
+              console.log('Tradelines and Products reset');
+              callback();
+            });
+          }
+        ]);
+      }
+    );
+  });
+};

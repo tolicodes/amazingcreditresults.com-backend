@@ -50,6 +50,7 @@ var Checkout = (function() {
         });
       } else {
         var unavailableTradelines = [];
+        sumCost = 0;
         
         async.each(_.keys(request.user.profile.cart), function(tradeline, c) {
           request.model.TradeLine.findById(tradeline)
@@ -109,7 +110,7 @@ var Checkout = (function() {
 
     // Issue Transaction if Buyer can afford it
     var issueTransaction = function(request, obj, cb) {
-      console.log('=====OBJ=======');
+      console.log('=====USER BALANCE=======');
       console.log(obj);
       if (obj.cost <= obj.balance) {
         //Buyer can afford the packages we issue new transaction for it
