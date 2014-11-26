@@ -445,7 +445,7 @@ describe('init', function () {
           },
           function (cb) {
             helpers.clients.get(ownerHuntKey, userId, function (error, response, body) {
-              body.data.isBanned.should.be.true;
+              body.isBanned.should.be.true;
               cb(error, body);
             });
           }
