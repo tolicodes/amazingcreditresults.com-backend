@@ -276,7 +276,7 @@ describe('init', function () {
             'url': 'http://localhost:' + port + '/api/v1/buyer/login',
             'headers': { },
             'form': {
-              'email': userInfo.email,
+              'username': userInfo.email,
               'password': 'fiflesAndFufles'
             },
             'json': true
@@ -297,7 +297,7 @@ describe('init', function () {
             'url': 'http://localhost:' + port + '/api/v1/buyer/login',
             'headers': { },
             'form': {
-              'email': 'thisIsSomeStupidWelcomeLink1111',
+              'username': 'thisIsSomeStupidWelcomeLink1111',
               'password': 'fiflesAndFufles'
             },
             'json': true
@@ -382,7 +382,7 @@ describe('init', function () {
             'url': 'http://localhost:' + port + '/api/v1/buyer/login',
             'headers': { },
             'form': {
-              'email': userInfo.email,
+              'username': userInfo.email,
               'password': 'fiflesAndFufles'
             },
             'json': true
@@ -442,7 +442,7 @@ describe('init', function () {
                 'url': 'http://localhost:' + port + '/api/v1/buyer/login',
                 'headers': { },
                 'form': {
-                  'email': 'jamesdoe@example.org',
+                  'username': 'jamesdoe@example.org',
                   'password': 'test123'
                 },
                 'json': true
@@ -1580,7 +1580,7 @@ describe('init', function () {
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/buyer/login',
         'form': {
-          'email': 'gracedoe@example.org', // do not change!
+          'username': 'gracedoe@example.org', // do not change!
           'password': 'test123'
         }
       }, function (error, response, body) {
@@ -2080,7 +2080,7 @@ describe('init', function () {
                 // Strangely, the api key isn't actually the api key field, it's the 
                 // welcome link field
                 // The api key field in the DB is actually the huntKey
-                'email': 'jamesdoe@example.org',
+                'username': 'jamesdoe@example.org',
                 'password': 'test123'
               },
               'json': true
@@ -2265,7 +2265,7 @@ describe('init', function () {
                   'url': 'http://localhost:' + port + '/api/v1/buyer/login',
                   'json': true,
                   'form': {
-                    'email': 'janedoe@example.org',
+                    'username': 'janedoe@example.org',
                     'password': 'test123'
                   }
                 }, function (error, response, body) {
@@ -2534,7 +2534,7 @@ describe('init', function () {
         'url': 'http://localhost:' + port + '/api/v1/buyer/login',
         'json': true,
         'form': {
-          'email': 'gracedoe@example.org',
+          'username': 'gracedoe@example.org',
           'password': 'test123'
         }
       }, function (error, response, body) {

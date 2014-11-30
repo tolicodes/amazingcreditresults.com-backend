@@ -100,8 +100,8 @@ module.exports = exports = function(core) {
 
   //authorizing (aka getting huntKey) by apiKey and password - second
   core.app.post('/api/v1/buyer/login', function(request, response) {
-    if (request.body.email && request.body.password) {
-      request.model.User.findOneByKeychain('email', request.body.email, function(error, userFound) {
+    if (request.body.username && request.body.password) {
+      request.model.User.findOneByKeychain('email', request.body.username, function(error, userFound) {
         if (error) {
           throw error;
         } else {
@@ -134,21 +134,21 @@ module.exports = exports = function(core) {
               'errors': [{
                 'code': 403,
                 'message': 'Unable to authorize - wrong email!',
-                'field': 'email'
+                'field': 'username'
               }]
             });
           }
         }
       });
     } else {
-      //no email and password in post request body
+      //no username and password in post request body
       response.status(400);
       var errors = [];
-      if (!request.body.email) {
+      if (!request.body.username) {
         errors.push({
           'code': 400,
           'message': 'Missed parameter - `email`!',
-          'field': 'email'
+          'field': 'username'
         });
       }
       if (!request.body.password) {
