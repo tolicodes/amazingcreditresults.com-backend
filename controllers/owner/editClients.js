@@ -278,7 +278,7 @@ module.exports = exports = function (core) {
               },
               function (newApiKey, cb) {
 //              welcomeLink = core.config.hostUrl+'buyer/welcome/'+welcomeLink;
-                welcomeLink = core.config.hostUrl + '#login/' + welcomeLink;
+                welcomeLink = core.config.hostUrl + 'welcome/' + welcomeLink;
                 var tpl = 'emails/welcomeBuyer';
                 if (userCreated.roles && userCreated.roles.buyer) {
                   tpl = 'emails/welcomeBuyer';
@@ -352,7 +352,7 @@ module.exports = exports = function (core) {
             },
             function (newApiKey, cb) {
 //              welcomeLink = core.config.hostUrl+'buyer/welcome/'+welcomeLink;
-              welcomeLink = core.config.hostUrl + '#login/' + welcomeLink;
+              welcomeLink = core.config.hostUrl + 'welcome/' + welcomeLink;
               var tpl = 'emails/welcomeBuyer';
               if (userFound.roles && userFound.roles.buyer) {
                 tpl = 'emails/welcomeBuyer';
@@ -417,7 +417,7 @@ module.exports = exports = function (core) {
             },
             function (newApiKey, cb) {
 //              welcomeLink = core.config.hostUrl+'buyer/welcome/'+welcomeLink;
-              welcomeLink = core.config.hostUrl + '#login/' + welcomeLink;
+              welcomeLink = core.config.hostUrl + 'welcome/' + welcomeLink;
               userFound.notifyByEmail({
                 'layout': false,
                 'template': 'emails/welcomeResetPassword',

@@ -242,9 +242,8 @@ describe('init', function () {
             body.message.should.be.equal('sent');
             var params = url.parse(body.welcomeLink);
             ['http:', 'https:'].should.include(params.protocol);
-            params.pathname.should.be.equal('/');
-            params.hash.should.match(/^\#login\/[a-z]+$/);
-            welcomeLink = (/^\#login\/([a-z]+)$/.exec(params.hash))[1];
+            params.pathname.should.match(/^\/welcome\/[a-z]+$/);
+            welcomeLink = (/^\/welcome\/([a-z]+)$/.exec(params.pathname))[1];
             body.user.id.should.be.equal(userId);
             done();
           }
