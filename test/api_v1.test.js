@@ -42,11 +42,12 @@ var request = require('request'),
     'needQuestionnaire': true,
     'telefone': '555-339' + testId
   };
-describe('init', function () {
+
+describe('AmazingCreditResults', function () {
   // ownerHuntKey used by many other tests
   function loginOwner(done) {
     request({
-      'method': 'POST',
+      'method': 'POST' ,
       'url': 'http://localhost:' + port + '/api/v1/owner/login',
       'form': {
         'username': 'owner@example.org',
@@ -92,95 +93,322 @@ describe('init', function () {
   });
 
   describe('Owner Client Management', function () {
+    describe('Buyer', function () {
 
-    describe('Editing Clients', function() {
-      beforeEach(function (done) {
-        ownReq({
+      describe('Editing Clients', function () {
+        beforeEach(function (done) {
+          ownReq({
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/api/v1/admin/clients',
+            'form': userInfo
+          }, function (error, response, body) {
+            if (error) {
+              done(error);
+            } else {
+              response.statusCode.should.be.equal(201);
+              userId = body.id;
+              // Sanity check
+              body.name.title.should.be.equal(userInfo.name.title);
+              body.name.suffix.should.be.equal(userInfo.name.suffix);
+              done();
+            }
+          });
+        });
+
+        it('owner can modify user`s name', function (done) {
+          // Modify user's info
+          var modUser = helper.clone(userInfo);
+          modUser.name.givenName = 'Jemima' + testId;
+          modUser.name.middleName = 'Jackson' + testId;
+          modUser.name.familyName = 'Koern' + testId;
+          modUser.name.title = 'Ms.';
+          modUser.name.suffix = 'Jr.';
+
+          ownReq({
+            'method': 'PUT',
+            'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
+            'form': modUser
+          }, function (error, response, body) {
+            response.statusCode.should.be.equal(202);
+            body.name.givenName.should.be.equal(modUser.name.givenName);
+            body.name.middleName.should.be.equal(modUser.name.middleName);
+            body.name.familyName.should.be.equal(modUser.name.familyName);
+            body.name.title.should.be.equal(modUser.name.title);
+            body.name.suffix.should.be.equal(modUser.name.suffix);
+            done();
+          });
+        });
+
+        it('owner can modify user`s location', function (done) {
+          // Modify user's info
+          var modUser = helper.clone(userInfo);
+          modUser.city = 'Orlando';
+          modUser.state = 'Fl';
+          modUser.zip = '13311';
+          modUser.street1 = '456 Ave';
+          modUser.street2 = 'Apt 4';
+          // TODO can move this out later
+          modUser.phone = '5550001111';
+
+          ownReq({
+            'method': 'PUT',
+            'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
+            'form': modUser
+          }, function (error, response, body) {
+            response.statusCode.should.be.equal(202);
+            var modified = ['city', 'state', 'zip', 'street1', 'street2', 'phone'];
+            modified.forEach(function (mod) {
+              body[mod].should.be.equal(modUser[mod]);
+            });
+            done();
+          });
+        });
+      });
+
+      describe('Issue balance adjustment for buyer', function () {
+        // Can't cleanup because other tests dependent on this
+        before(function (done) {
+          ownReq({
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/api/v1/admin/clients',
+            'form': userInfo
+          }, function (error, response, body) {
+            if (error) {
+              done(error);
+            } else {
+              response.statusCode.should.be.equal(201);
+              userId = body.id;
+              done();
+            }
+          });
+        });
+
+        it('Owner can increase buyer funds', function (done) {
+          ownReq({
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/api/v1/admin/clients/balance/' + userId,
+            'form': {
+              'amount': 1,
+              'notes': 'Merry Christmas, fuck you!',
+              'date': '2014-05-03',
+              'paidBy': 'Credit Card'
+            }
+          }, function (error, response, body) {
+            if (error) {
+              done(error);
+            } else {
+              response.statusCode.should.be.equal(202);
+              body.status.should.be.equal('Ok');
+              done();
+            }
+          });
+        });
+
+        it('Owner can check that he uploaded the funds', function (done) {
+          ownReq({
+            'method': 'GET',
+            'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
+            'form': {
+              'amount': 1,
+              'notes': 'Merry Christmas, fuck you!'
+            }
+          }, function (error, response, body) {
+            if (error) {
+              done(error);
+            } else {
+              response.statusCode.should.be.equal(200);
+              body.transactions.should.be.an.Array;
+              body.transactions.length.should.be.above(0);
+              var transactionFound = false;
+              body.transactions.map(function (t) {
+                if (t.amount == 1 && t.type == 'ownerUpload' && t.date == 'Sat May 03 2014' && t.paidBy == 'Credit Card') {
+                  transactionFound = true;
+                }
+              });
+              transactionFound.should.be.true;
+              done();
+            }
+          });
+        });
+      });
+
+      describe('Deletion', function() {
+        it('can delete a buyer', function (done) {
+          async.series([
+            /*function (cb) {
+             helpers.clients.list(ownerHuntKey, function (error, response, body) {
+             cb(error, helper.findWithRole('buyer', body))
+             });
+             },*/
+            function (cb) {
+              helpers.clients.del(ownerHuntKey, userId, function (error, response) {
+                response.statusCode.should.be.equal(202);
+                cb(error);
+              });
+            },
+            function (cb) {
+              helpers.clients.get(ownerHuntKey, userId, function (error, response, body) {
+                body.data.isBanned.should.be.true;
+                cb(error);
+              });
+            }
+          ], function (error) {
+            done(error);
+          });
+        });
+      });
+    });
+
+    describe('Seller', function () {
+      it('can create new seller', function (done) {
+        request({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/admin/clients',
-          'form': userInfo
+          'headers': {'huntKey': ownerHuntKey},
+          'form': {
+            'email': 'unitTestSeller' + testId + '@mail.ru',
+            'name': {
+              'givenName': 'John' + testId,
+              'middleName': 'Teodor' + testId,
+              'familyName': 'Doe' + testId,
+              'title': 'Mr.'
+            },
+            'needQuestionnaire': true,
+            'phone': '555-339' + testId,
+            'street1': 'Some Address',
+            'roles': {
+              'seller': true,
+              'buyer': false
+            }
+          }
         }, function (error, response, body) {
           if (error) {
             done(error);
           } else {
             response.statusCode.should.be.equal(201);
-            userId = body.id;
-            // Sanity check
-            body.name.title.should.be.equal(userInfo.name.title);
-            body.name.suffix.should.be.equal(userInfo.name.suffix);
+            var bodyParsed = JSON.parse(body);
+            bodyParsed.id.should.be.a.String;
+            bodyParsed.id.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
+
+            sellerId = bodyParsed.id;
+
+            bodyParsed.email.should.be.equal('unitTestSeller' + testId + '@mail.ru');
+            bodyParsed.name.givenName.should.be.equal('John' + testId);
+            bodyParsed.name.middleName.should.be.equal('Teodor' + testId);
+            bodyParsed.name.familyName.should.be.equal('Doe' + testId);
+            bodyParsed.name.title.should.be.equal('Mr.');
+            bodyParsed.phone.should.be.equal('555-339' + testId);
+            bodyParsed.street1.should.be.equal('Some Address');
+            bodyParsed.email.should.be.equal('unitTestSeller' + testId + '@mail.ru');
+            bodyParsed.root.should.be.a.false;
+            bodyParsed.roles.seller.should.be.true;
+            bodyParsed.roles.buyer.should.be.false;
+            sellerHuntKey = bodyParsed.huntKey;
+//and we can get this client
+            request({
+              'method': 'GET',
+              'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + sellerId,
+              'headers': {'huntKey': ownerHuntKey},
+              'json': true
+            }, function (error, response, body1) {
+              if (error) {
+                done(error);
+              } else {
+                response.statusCode.should.be.equal(200);
+                body1.data.id.should.be.equal(sellerId);
+                done();
+              }
+            });
+          }
+        });
+      });
+    });
+
+    // Beware these tests are interdependent
+    describe('Other Owners', function () {
+      it('can create new owner', function (done) {
+        ownReq({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/admin/owners',
+          'form': {
+            'username': 'owner' + testId + '@example.org',
+            'password': 'test123',
+            name: {
+              givenName: 'John',
+              familyName: 'Doe',
+              middleName: ''
+            }
+          }
+        }, function (error, response) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(201);
             done();
           }
         });
       });
 
-      /*afterEach(function(done) {
-        ownReq({
-          'method': 'DELETE',
-          'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
-          'form': {}
+      it('can login as newly created owner', function (done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/owner/login',
+          'form': {
+            'username': 'owner' + testId + '@example.org',
+            'password': 'test123'
+          },
+          'json': true
         }, function (error, response, body) {
           if (error) {
             done(error);
           } else {
-            response.statusCode.should.be.equal(202);
+            response.statusCode.should.be.equal(200);
+            body.huntKey.should.be.a.String;
+            ownerHuntKey2 = body.huntKey;
             done();
           }
         });
-      });*/
+      });
 
-      it('owner can modify user`s name', function (done) {
-        // Modify user's info
-        var modUser = helper.clone(userInfo);
-        modUser.name.givenName = 'Jemima' + testId;
-        modUser.name.middleName = 'Jackson' + testId;
-        modUser.name.familyName = 'Koern' + testId;
-        modUser.name.title = 'Ms.';
-        modUser.name.suffix = 'Jr.';
-
-        ownReq({
-          'method': 'PUT',
-          'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
-          'form': modUser
+      it('has valid info for new owner', function (done) {
+        request({
+          'method': 'GET',
+          'url': 'http://localhost:' + port + '/api/v1/myself',
+          'headers': {'huntKey': ownerHuntKey2},
+          'json': true
         }, function (error, response, body) {
-          response.statusCode.should.be.equal(202);
-          body.name.givenName.should.be.equal(modUser.name.givenName);
-          body.name.middleName.should.be.equal(modUser.name.middleName);
-          body.name.familyName.should.be.equal(modUser.name.familyName);
-          body.name.title.should.be.equal(modUser.name.title);
-          body.name.suffix.should.be.equal(modUser.name.suffix);
+          response.statusCode.should.be.equal(200);
+          body.id.should.be.a.String;
+          body.id.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
+          body.huntKey.should.be.equal(ownerHuntKey2);
+          body.email.should.be.equal('owner' + testId + '@example.org');
+          body.roles.owner.should.be.true;
+          body.profile.should.be.an.Object;
+          body.name.givenName.should.be.equal('John');
+          body.name.familyName.should.be.equal('Doe');
           done();
         });
       });
 
-      it('owner can modify user`s location', function (done) {
-        // Modify user's info
-        var modUser = helper.clone(userInfo);
-        modUser.city = 'Orlando';
-        modUser.state = 'Fl';
-        modUser.zip = '13311';
-        modUser.street1 = '456 Ave';
-        modUser.street2 = 'Apt 4';
-        // TODO can move this out later
-        modUser.phone = '5550001111';
-
-        ownReq({
-          'method': 'PUT',
-          'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
-          'form': modUser
-        }, function (error, response, body) {
-          response.statusCode.should.be.equal(202);
-          var modified = ['city', 'state', 'zip', 'street1', 'street2', 'phone'];
-          modified.forEach(function(mod) {
-            body[mod].should.be.equal(modUser[mod]);
-          });
-          done();
+      it('cannot delete an owner', function (done) {
+        async.waterfall([
+          function (cb) {
+            helpers.clients.list(ownerHuntKey, function (error, response, body) {
+              cb(error, helper.findWithRole('owner', body))
+            });
+          },
+          function (owner, cb) {
+            helpers.clients.del(ownerHuntKey, owner.id, function (error, response) {
+              cb(error, response);
+            });
+          }
+        ], function (error, response) {
+          response.statusCode.should.be.equal(400);
+          done(error);
         });
       });
-
     });
-
   });
-
   // Beware these tests are interdependent
   describe('Managing Buyer Account', function () {
 
@@ -228,7 +456,6 @@ describe('init', function () {
     });
 
     describe('Setting Password', function() {
-
       it('notifies this user by email message', function (done) {
         ownReq({
           'method': 'POST',
@@ -266,6 +493,7 @@ describe('init', function () {
           }
         });
       });
+
       //https://oselot.atlassian.net/browse/ACR-174
       it('alerts unverified user if they try to log in before password is set', function (done) {
         request({
@@ -517,10 +745,10 @@ describe('init', function () {
         helper.resetBuyer(done);
       });
 
-      it('cannot reset owner password', function(done) {
+      xit('can reset owner password', function(done) {
         request({
           'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/resetPassword/',
+          'url': 'http://localhost:' + port + '/api/v1/account/resetPassword/',
           'headers': {},
           'form': {
             'username': 'owner@example.org'
@@ -537,11 +765,12 @@ describe('init', function () {
       it('cannot reset password without providing username', function(done) {
         request({
           'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/resetPassword/',
+          'url': 'http://localhost:' + port + '/api/v1/account/resetPassword/',
           'headers': {},
           'form': {},
           'json': true
         }, function (error, response, body) {
+          console.log(body);
           response.statusCode.should.be.equal(400);
           body.status.should.be.equal('Error');
           body.errors[0].message.should.be.equal('Username required to reset password!');
@@ -557,7 +786,7 @@ describe('init', function () {
           function(user, cb) {
             request({
               'method': 'POST',
-              'url': 'http://localhost:' + port + '/api/v1/buyer/resetPassword/',
+              'url': 'http://localhost:' + port + '/api/v1/account/resetPassword/',
               'headers': { },
               'form': {
                 'username' : user.keychain.email,
@@ -617,31 +846,7 @@ describe('init', function () {
       });
     });
 
-    describe('Deletion', function() {
-      it('can delete a buyer', function (done) {
-        async.series([
-          /*function (cb) {
-           helpers.clients.list(ownerHuntKey, function (error, response, body) {
-           cb(error, helper.findWithRole('buyer', body))
-           });
-           },*/
-          function (cb) {
-            helpers.clients.del(ownerHuntKey, userId, function (error, response) {
-              response.statusCode.should.be.equal(202);
-              cb(error);
-            });
-          },
-          function (cb) {
-            helpers.clients.get(ownerHuntKey, userId, function (error, response, body) {
-              body.data.isBanned.should.be.true;
-              cb(error);
-            });
-          }
-        ], function (error) {
-          done(error);
-        });
-      });
-    });
+
 
   });
 
@@ -692,223 +897,235 @@ describe('init', function () {
     });
   });
 
-  // Beware these tests are interdependent
-  describe('Other Owners Managment', function () {
-    it('can create new owner', function (done) {
-      ownReq({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/admin/owners',
-        'form': {
-          'username': 'owner' + testId + '@example.org',
-          'password': 'test123',
-          name: {
-              givenName: 'John',
-              familyName: 'Doe',
-              middleName: ''
-          }
-        }
-      }, function (error, response) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(201);
-          done();
-        }
-      });
-    });
 
-    it('can login as newly created owner', function (done) {
+
+  describe('Managing Owner Account', function() {
+    describe('Login', function () {
+      it('returns 200 && `huntKey` for correct password via application/x-www-form-urlencoded', function (done) {
         request({
           'method': 'POST',
           'url': 'http://localhost:' + port + '/api/v1/owner/login',
           'form': {
-            'username': 'owner' + testId + '@example.org',
+            'username': 'owner@example.org',
             'password': 'test123'
-          },
-          'json': true
+          }
         }, function (error, response, body) {
           if (error) {
             done(error);
           } else {
             response.statusCode.should.be.equal(200);
-            body.huntKey.should.be.a.String;
-            ownerHuntKey2 = body.huntKey;
+            var bodyParsed = JSON.parse(body);
+            bodyParsed.Code.should.be.equal(200);
+            bodyParsed.huntKey.should.be.a.String;
+            huntKeys.push(bodyParsed.huntKey);
             done();
           }
         });
-    });
-
-    it('has valid info for new owner', function (done) {
-      request({
-        'method': 'GET',
-        'url': 'http://localhost:' + port + '/api/v1/myself',
-        'headers': {'huntKey': ownerHuntKey2},
-        'json': true
-      }, function (error, response, body) {
-        response.statusCode.should.be.equal(200);
-        body.id.should.be.a.String;
-        body.id.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
-        body.huntKey.should.be.equal(ownerHuntKey2);
-        body.email.should.be.equal('owner' + testId + '@example.org');
-        body.roles.owner.should.be.true;
-        body.profile.should.be.an.Object;
-        body.name.givenName.should.be.equal('John');
-        body.name.familyName.should.be.equal('Doe');
-        done();
       });
-    });
 
-    it('cannot delete an owner', function (done) {
-      async.waterfall([
-        function (cb) {
-          helpers.clients.list(ownerHuntKey, function (error, response, body) {
-            cb(error, helper.findWithRole('owner', body))
-          });
-        },
-        function (owner, cb) {
-          helpers.clients.del(ownerHuntKey, owner.id, function (error, response) {
-            cb(error, response);
-          });
-        }
-      ], function (error, response) {
-        response.statusCode.should.be.equal(400);
-        done(error);
-      });
-    });
-  });
-
-  describe('Owner Login', function () {
-    it('returns 200 && `huntKey` for correct password via application/x-www-form-urlencoded', function (done) {
-      request({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/owner/login',
-        'form': {
-          'username': 'owner@example.org',
-          'password': 'test123'
-        }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(200);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.Code.should.be.equal(200);
-          bodyParsed.huntKey.should.be.a.String;
-          huntKeys.push(bodyParsed.huntKey);
-          done();
-        }
-      });
-    });
-
-    it('returns 200 && `huntKey` for correct password via application/json', function (done) {
-      request({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/owner/login',
-        'json': {
-          'username': 'owner@example.org',
-          'password': 'test123'
-        }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(200);
-          var bodyParsed = body;
-          bodyParsed.Code.should.be.equal(200);
-          bodyParsed.huntKey.should.be.a.String;
-          huntKeys.push(bodyParsed.huntKey);
-          done();
-        }
-      });
-    });
-
-    it('returned valid huntKeys', function () {
-      Array.isArray(huntKeys).should.be.true;
-      huntKeys.length.should.be.equal(2);
-      huntKeys[0].should.be.equal(huntKeys[1]);
-    });
-
-    it('returns 403 && message for wrong password', function (done) {
-      request({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/owner/login',
-        'json': {
-          'username': 'owner@example.org',
-          'password': 'someWrongPassword'
-        }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(403);
-          var bodyParsed = body;
-          bodyParsed.status.should.be.equal('Error');
-          bodyParsed.errors[0].code.should.be.equal(403);
-          bodyParsed.errors[0].message.should.be.equal('Invalid username or password. Please try again using correct username and password.');
-          should.not.exist(bodyParsed.huntKey);
-          done();
-        }
-      });
-    });
-
-    it('returns 400 && message for absent username or password', function (done) {
-      request({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/owner/login',
-        'json': {
-          'notAusername': 'owner@example.org',
-          'notAPassword': 'someWrongPassword'
-        }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(400);
-          var bodyParsed = body;
-          Array.isArray(bodyParsed.errors).should.be.true;
-          bodyParsed.errors.should.containEql(
-            {
-              'code': 400,
-              'message': 'Username is not provided!',
-              'field': 'username'
-            });
-
-          bodyParsed.errors.should.containEql(
-            {
-              'code': 400,
-              'message': 'Password is not provided!',
-              'field': 'password'
-            });
-
-          should.not.exist(bodyParsed.huntKey);
-          done();
-        }
-      });
-    });
-
-    describe('Using huntKey as header for BANNED owner', function () {
-      it('alerts user their account has been deactivated', function (done) {
+      it('returns 200 && `huntKey` for correct password via application/json', function (done) {
         request({
-          'method': 'GET',
-          'url': 'http://localhost:' + port + '/api/v1/myself',
-          'headers': {'huntKey': bannedOwnerHuntKey}
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/owner/login',
+          'json': {
+            'username': 'owner@example.org',
+            'password': 'test123'
+          }
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(200);
+            var bodyParsed = body;
+            bodyParsed.Code.should.be.equal(200);
+            bodyParsed.huntKey.should.be.a.String;
+            huntKeys.push(bodyParsed.huntKey);
+            done();
+          }
+        });
+      });
+
+      it('returned valid huntKeys', function () {
+        Array.isArray(huntKeys).should.be.true;
+        huntKeys.length.should.be.equal(2);
+        huntKeys[0].should.be.equal(huntKeys[1]);
+      });
+
+      it('returns 403 && message for wrong password', function (done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/owner/login',
+          'json': {
+            'username': 'owner@example.org',
+            'password': 'someWrongPassword'
+          }
         }, function (error, response, body) {
           if (error) {
             done(error);
           } else {
             response.statusCode.should.be.equal(403);
-            var bodyParsed = JSON.parse(body);
+            var bodyParsed = body;
             bodyParsed.status.should.be.equal('Error');
-            bodyParsed.errors.should.be.an.Array;
-            bodyParsed.errors.length.should.be.equal(1);
-            bodyParsed.errors.should.containEql(
-                {
-                  'code': 403,
-                  'message': 'Access denied! your account has been deactivated!'
-                });
-
+            bodyParsed.errors[0].code.should.be.equal(403);
+            bodyParsed.errors[0].message.should.be.equal('Invalid username or password. Please try again using correct username and password.');
+            should.not.exist(bodyParsed.huntKey);
             done();
           }
+        });
+      });
+
+      it('returns 400 && message for absent username or password', function (done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/owner/login',
+          'json': {
+            'notAusername': 'owner@example.org',
+            'notAPassword': 'someWrongPassword'
+          }
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(400);
+            var bodyParsed = body;
+            Array.isArray(bodyParsed.errors).should.be.true;
+            bodyParsed.errors.should.containEql(
+                {
+                  'code': 400,
+                  'message': 'Username is not provided!',
+                  'field': 'username'
+                });
+
+            bodyParsed.errors.should.containEql(
+                {
+                  'code': 400,
+                  'message': 'Password is not provided!',
+                  'field': 'password'
+                });
+
+            should.not.exist(bodyParsed.huntKey);
+            done();
+          }
+        });
+      });
+
+      describe('Using huntKey as header for BANNED owner', function () {
+        it('alerts user their account has been deactivated', function (done) {
+          request({
+            'method': 'GET',
+            'url': 'http://localhost:' + port + '/api/v1/myself',
+            'headers': {'huntKey': bannedOwnerHuntKey}
+          }, function (error, response, body) {
+            if (error) {
+              done(error);
+            } else {
+              response.statusCode.should.be.equal(403);
+              var bodyParsed = JSON.parse(body);
+              bodyParsed.status.should.be.equal('Error');
+              bodyParsed.errors.should.be.an.Array;
+              bodyParsed.errors.length.should.be.equal(1);
+              bodyParsed.errors.should.containEql(
+                  {
+                    'code': 403,
+                    'message': 'Access denied! your account has been deactivated!'
+                  });
+
+              done();
+            }
+          });
+        });
+      });
+    });
+    describe('Reset Password', function() {
+      it('can reset password', function() {
+        // todo
+      });
+    });
+
+    describe('Using /api/v1/myself', function () {
+
+      describe('with huntKey as query parameter', function () {
+        it('works with `huntKey` as `GET` parameter', function (done) {
+          request({
+            'method': 'GET',
+            'url': 'http://localhost:' + port + '/api/v1/myself?huntKey=' + huntKeys[0]
+          }, function (error, response, body) {
+            testingCallback(error, response, body, done);
+          });
+        });
+      });
+
+      describe('with huntKey as form field', function () {
+        it('works with `huntKey` as `POST` form parameter', function (done) {
+          request({
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/auth/myself',
+            'form': {'huntKey': huntKeys[0]}
+          }, function (error, response, body) {
+            testingCallback(error, response, body, done);
+          });
+        });
+
+        it('with `huntKey` as `PUT` form parameter', function (done) {
+          request({
+            'method': 'PUT',
+            'url': 'http://localhost:' + port + '/auth/myself',
+            'form': {'huntKey': huntKeys[0]}
+          }, function (error, response, body) {
+            testingCallback(error, response, body, done);
+          });
+        });
+
+        it('with `huntKey` as `DELETE` form parameter', function (done) {
+          request({
+            'method': 'DELETE',
+            'url': 'http://localhost:' + port + '/auth/myself',
+            'form': {'huntKey': huntKeys[0]}
+          }, function (error, response, body) {
+            testingCallback(error, response, body, done);
+          });
+        });
+      });
+
+      describe('Using huntKey as header', function () {
+        it('works with `huntKey` as custom header for GET response', function (done) {
+          request({
+            'method': 'GET',
+            'url': 'http://localhost:' + port + '/auth/myself',
+            'headers': {'huntKey': huntKeys[0]}
+          }, function (error, response, body) {
+            testingCallback(error, response, body, done);
+          });
+        });
+
+        it('works with `huntKey` as custom header for POST response', function (done) {
+          request({
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/auth/myself',
+            'headers': {'huntKey': huntKeys[0]}
+          }, function (error, response, body) {
+            testingCallback(error, response, body, done);
+          });
+        });
+
+        it('works with `huntKey` as custom header for PUT response', function (done) {
+          request({
+            'method': 'PUT',
+            'url': 'http://localhost:' + port + '/auth/myself',
+            'headers': {'huntKey': huntKeys[0]}
+          }, function (error, response, body) {
+            testingCallback(error, response, body, done);
+          });
+        });
+
+        it('works with `huntKey` as custom header for DELETE response', function (done) {
+          request({
+            'method': 'DELETE',
+            'url': 'http://localhost:' + port + '/auth/myself',
+            'headers': {'huntKey': huntKeys[0]}
+          }, function (error, response, body) {
+            testingCallback(error, response, body, done);
+          });
         });
       });
     });
@@ -936,95 +1153,9 @@ describe('init', function () {
     }
   }
 
-  describe('/api/v1/myself works for owner', function () {
 
-    describe('Using huntKey as query parameter', function () {
-      it('works with `huntKey` as `GET` parameter', function (done) {
-        request({
-          'method': 'GET',
-          'url': 'http://localhost:' + port + '/api/v1/myself?huntKey=' + huntKeys[0]
-        }, function (error, response, body) {
-          testingCallback(error, response, body, done);
-        });
-      });
-    });
 
-    describe('Using huntKey as form field', function () {
-      it('works with `huntKey` as `POST` form parameter', function (done) {
-        request({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/auth/myself',
-          'form': {'huntKey': huntKeys[0]}
-        }, function (error, response, body) {
-          testingCallback(error, response, body, done);
-        });
-      });
-
-      it('works with `huntKey` as `PUT` form parameter', function (done) {
-        request({
-          'method': 'PUT',
-          'url': 'http://localhost:' + port + '/auth/myself',
-          'form': {'huntKey': huntKeys[0]}
-        }, function (error, response, body) {
-          testingCallback(error, response, body, done);
-        });
-      });
-
-      it('works with `huntKey` as `DELETE` form parameter', function (done) {
-        request({
-          'method': 'DELETE',
-          'url': 'http://localhost:' + port + '/auth/myself',
-          'form': {'huntKey': huntKeys[0]}
-        }, function (error, response, body) {
-          testingCallback(error, response, body, done);
-        });
-      });
-    });
-
-    describe('Using huntKey as header', function () {
-      it('works with `huntKey` as custom header for GET response', function (done) {
-        request({
-          'method': 'GET',
-          'url': 'http://localhost:' + port + '/auth/myself',
-          'headers': {'huntKey': huntKeys[0]}
-        }, function (error, response, body) {
-          testingCallback(error, response, body, done);
-        });
-      });
-
-      it('works with `huntKey` as custom header for POST response', function (done) {
-        request({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/auth/myself',
-          'headers': {'huntKey': huntKeys[0]}
-        }, function (error, response, body) {
-          testingCallback(error, response, body, done);
-        });
-      });
-
-      it('works with `huntKey` as custom header for PUT response', function (done) {
-        request({
-          'method': 'PUT',
-          'url': 'http://localhost:' + port + '/auth/myself',
-          'headers': {'huntKey': huntKeys[0]}
-        }, function (error, response, body) {
-          testingCallback(error, response, body, done);
-        });
-      });
-
-      it('works with `huntKey` as custom header for DELETE response', function (done) {
-        request({
-          'method': 'DELETE',
-          'url': 'http://localhost:' + port + '/auth/myself',
-          'headers': {'huntKey': huntKeys[0]}
-        }, function (error, response, body) {
-          testingCallback(error, response, body, done);
-        });
-      });
-    });
-  });
-
-  describe('Owner Product Management', function () {
+  describe('Product Management', function () {
     // Create a test product 
     beforeEach(function (done) {
       ownReq({
@@ -1340,7 +1471,7 @@ describe('init', function () {
 
   });
 
-  describe('Owner Tradeline Management', function () {
+  describe('Tradeline Management', function () {
     // Login, create product, create tradeline
     before(function (done) {
       async.series([
@@ -2082,92 +2213,7 @@ describe('init', function () {
     });
   });
 
-  describe('Owner Seller Management', function () {
-    it('can create new seller', function (done) {
-      request({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/admin/clients',
-        'headers': {'huntKey': ownerHuntKey},
-        'form': {
-          'email': 'unitTestSeller' + testId + '@mail.ru',
-          'name': {
-            'givenName': 'John' + testId,
-            'middleName': 'Teodor' + testId,
-            'familyName': 'Doe' + testId,
-            'title': 'Mr.'
-          },
-          'needQuestionnaire': true,
-          'phone': '555-339' + testId,
-          'street1': 'Some Address',
-          'roles': {
-            'seller': true,
-            'buyer': false
-          }
-        }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(201);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.id.should.be.a.String;
-          bodyParsed.id.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
 
-          sellerId = bodyParsed.id;
-
-          bodyParsed.email.should.be.equal('unitTestSeller' + testId + '@mail.ru');
-          bodyParsed.name.givenName.should.be.equal('John' + testId);
-          bodyParsed.name.middleName.should.be.equal('Teodor' + testId);
-          bodyParsed.name.familyName.should.be.equal('Doe' + testId);
-          bodyParsed.name.title.should.be.equal('Mr.');
-          bodyParsed.phone.should.be.equal('555-339' + testId);
-          bodyParsed.street1.should.be.equal('Some Address');
-          bodyParsed.email.should.be.equal('unitTestSeller' + testId + '@mail.ru');
-          bodyParsed.root.should.be.a.false;
-          bodyParsed.roles.seller.should.be.true;
-          bodyParsed.roles.buyer.should.be.false;
-          sellerHuntKey = bodyParsed.huntKey;
-//and we can get this client
-          request({
-            'method': 'GET',
-            'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + sellerId,
-            'headers': {'huntKey': ownerHuntKey},
-            'json': true
-          }, function (error, response, body1) {
-            if (error) {
-              done(error);
-            } else {
-              response.statusCode.should.be.equal(200);
-              body1.data.id.should.be.equal(sellerId);
-              done();
-            }
-          });
-        }
-      });
-    });
-
-    /*
-    describe('seller do things', function () {
-      xit('seller logins', function (done) {
-        request({
-          'method': 'GET',
-          'url': 'http://localhost:' + port + '/api/v1/myself',
-          'headers': {'huntKey': sellerHuntKey}
-        }, function (error, response, body) {
-          response.statusCode.should.be.equal(200);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.id.should.be.equal(sellerId);
-          done();
-        });
-      });
-      it('seller creates tradeline1');
-      it('seller updates tradeline1');
-      it('seller creates tradeline2');
-      it('seller updates tradeline2');
-
-    });
-    */
-  });
 
   describe('Buyer Cart Management', function () {
       var cartBuyerHuntKey;
@@ -2283,8 +2329,7 @@ describe('init', function () {
         });
       });
 
-      describe('list tradelines', function () {
-        it('should be able to list tradelines', function (done) {
+      it('should be able to list tradelines', function (done) {
           async.waterfall([
             function (cb) {
               helpers.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
@@ -2309,10 +2354,8 @@ describe('init', function () {
             done(error)
           });
         });
-      });
 
-      describe('removing a tradeline from the cart', function () {
-        it('can remove a tradeline', function (done) {
+      it('can remove a tradeline from the cart', function (done) {
           async.waterfall([
             function (cb) {
               helpers.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
@@ -2347,7 +2390,6 @@ describe('init', function () {
             done(error);
           });
         });
-      });
 
       describe('Checkout', function () {
         var userId;
@@ -2570,72 +2612,6 @@ describe('init', function () {
       });
   });
 
-  describe('Issue balance adjustment for buyer', function () {
-    // Can't cleanup because other tests dependent on this
-    before(function (done) {
-      ownReq({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/admin/clients',
-        'form': userInfo
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(201);
-          userId = body.id;
-          done();
-        }
-      });
-    });
-
-    it('Owner can increase buyer funds', function (done) {
-      ownReq({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/admin/clients/balance/' + userId,
-        'form': {
-          'amount': 1,
-          'notes': 'Merry Christmas, fuck you!',
-          'date': '2014-05-03',
-          'paidBy': 'Credit Card'
-        }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(202);
-          body.status.should.be.equal('Ok');
-          done();
-        }
-      });
-    });
-
-    it('Owner can check that he uploaded the funds', function (done) {
-      ownReq({
-        'method': 'GET',
-        'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
-        'form': {
-          'amount': 1,
-          'notes': 'Merry Christmas, fuck you!'
-        }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(200);
-          body.transactions.should.be.an.Array;
-          body.transactions.length.should.be.above(0);
-          var transactionFound = false;
-          body.transactions.map(function (t) {
-            if (t.amount == 1 && t.type == 'ownerUpload' && t.date == 'Sat May 03 2014' && t.paidBy == 'Credit Card') {
-              transactionFound = true;
-            }
-          });
-          transactionFound.should.be.true;
-          done();
-        }
-      });
-    });
-  });
 
   describe('Seller creates two tradelines and made revisions for them, and Owner rejects first one, and approves second one', function () {
     var tradelineId1,
