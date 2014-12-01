@@ -24,8 +24,6 @@ var request = require('request'),
   sellerId,
   huntKeys = [],
   bannedOwnerHuntKey = 'iaqtumioxrunxvyemsebsvcodytumioxrunxvyemsebsviaqcody',
-  firstTradelineId,
-  secondTradelineId,
   userInfo = {
     'email': 'unitTestUser' + testId + '@mail.ru',
     'name': {
@@ -42,8 +40,7 @@ var request = require('request'),
     'state': 'NY',
     'zip': '11201',
     'needQuestionnaire': true,
-    'telefone': '555-339' + testId,
-    'street1': 'Some Address',
+    'telefone': '555-339' + testId
   };
 describe('init', function () {
   // ownerHuntKey used by many other tests
@@ -76,7 +73,7 @@ describe('init', function () {
   before(function (done) {
     backend.once('start', function (evnt) {
       if (evnt.type === 'webserver' || evnt.port === port) {
-        backend.once('populated', function (evnt) {
+        backend.once('populated', function () {
           loginOwner(done);
         });
       } else {
@@ -143,7 +140,7 @@ describe('init', function () {
         ownReq({
           'method': 'PUT',
           'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
-          'form': modUser,
+          'form': modUser
         }, function (error, response, body) {
           response.statusCode.should.be.equal(202);
           body.name.givenName.should.be.equal(modUser.name.givenName);
@@ -169,7 +166,7 @@ describe('init', function () {
         ownReq({
           'method': 'PUT',
           'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
-          'form': modUser,
+          'form': modUser
         }, function (error, response, body) {
           response.statusCode.should.be.equal(202);
           var modified = ['city', 'state', 'zip', 'street1', 'street2', 'phone'];
@@ -182,366 +179,471 @@ describe('init', function () {
 
     });
 
-    // Beware these tests are interdependent
-    describe('Managing Buyer Account', function () {
+  });
 
-      // Reset testId
-      testId = Math.floor(Math.random() * 10000);
-      var userInfo = {
-        'email': 'unitTestUser' + testId + '@mail.ru',
-        'name': {
-          'givenName': 'John' + testId,
-          'middleName': 'Teodor' + testId,
-          'familyName': 'Doe' + testId,
-          'title': 'Mr.',
-          'suffix': 'III'
-        },
-        'street1' : '123 Street',
-        'street2' : 'Apt 1',
-        'phone' : '5551234567',
-        'city': 'Brooklyn',
-        'state': 'NY',
-        'zip': '11201',
-        'needQuestionnaire': true,
-        'telefone': '555-339' + testId,
-        'street1': 'Some Address',
-      };
+  // Beware these tests are interdependent
+  describe('Managing Buyer Account', function () {
 
-      // Can't cleanup because other tests dependent on this
-      before(function (done) {
+    // Reset testId
+    testId = Math.floor(Math.random() * 10000);
+    var userInfo = {
+      'email': 'unitTestUser' + testId + '@mail.ru',
+      'name': {
+        'givenName': 'John' + testId,
+        'middleName': 'Teodor' + testId,
+        'familyName': 'Doe' + testId,
+        'title': 'Mr.',
+        'suffix': 'III'
+      },
+      'street1' : '123 Street',
+      'street2' : 'Apt 1',
+      'phone' : '5551234567',
+      'city': 'Brooklyn',
+      'state': 'NY',
+      'zip': '11201',
+      'needQuestionnaire': true,
+      'telefone': '555-339' + testId
+    };
+
+    // Can't cleanup because other tests dependent on this
+    before(function (done) {
+      ownReq({
+        'method': 'POST',
+        'url': 'http://localhost:' + port + '/api/v1/admin/clients',
+        'form': userInfo
+      }, function (error, response, body) {
+        if (error) {
+          done(error);
+        } else {
+          response.statusCode.should.be.equal(201);
+          userId = body.id;
+          done();
+        }
+      });
+    });
+
+    it('creates user without verified account', function () {
+      userId.should.be.a.String;
+      userId.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
+    });
+
+    describe('Setting Password', function() {
+
+      it('notifies this user by email message', function (done) {
         ownReq({
           'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/admin/clients',
-          'form': userInfo
+          'url': 'http://localhost:' + port + '/api/v1/admin/clients/welcome/' + userId,
+          'form': { }
         }, function (error, response, body) {
           if (error) {
             done(error);
           } else {
-            response.statusCode.should.be.equal(201);
-            userId = body.id;
+            response.statusCode.should.be.equal(202);
+            body.message.should.be.equal('sent');
+            var params = url.parse(body.welcomeLink);
+            ['http:', 'https:'].should.include(params.protocol);
+            params.pathname.should.be.equal('/');
+            params.hash.should.match(/^\#login\/[a-z]+$/);
+            welcomeLink = (/^\#login\/([a-z]+)$/.exec(params.hash))[1];
+            body.user.id.should.be.equal(userId);
             done();
           }
         });
       });
 
-      it('creates user without verified account', function () {
-        userId.should.be.a.String;
-        userId.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
-      });
-
-      describe('Setting Password', function() {
-
-        it('notifies this user by email message', function (done) {
-          ownReq({
-            'method': 'POST',
-            'url': 'http://localhost:' + port + '/api/v1/admin/clients/welcome/' + userId,
-            'form': { },
-          }, function (error, response, body) {
-            if (error) {
-              done(error);
-            } else {
-              response.statusCode.should.be.equal(202);
-              body.message.should.be.equal('sent');
-              var params = url.parse(body.welcomeLink);
-              ['http:', 'https:'].should.include(params.protocol);
-              params.pathname.should.be.equal('/');
-              params.hash.should.match(/^\#login\/[a-z]+$/);
-              welcomeLink = (/^\#login\/([a-z]+)$/.exec(params.hash))[1];
-              body.user.id.should.be.equal(userId);
-              done();
-            }
-          });
-        });
-
-        it('can check if user needs to set password based on welcome link', function (done) {
-          request({
-            'method': 'GET',
-            'url': 'http://localhost:' + port + '/api/v1/buyer/needToSetPassword/' + welcomeLink,
-            'headers': { },
-            'json': true
-          }, function (error, response, body) {
-            if (error) {
-              done(error);
-            } else {
-              response.statusCode.should.be.equal(200);
-              body.needToSetPassword.should.be.true;
-              done();
-            }
-          });
-        });
-  //https://oselot.atlassian.net/browse/ACR-174
-        it('alerts unverified user if they try to log in before password is set', function (done) {
-          request({
-            'method': 'POST',
-            'url': 'http://localhost:' + port + '/api/v1/buyer/login',
-            'headers': { },
-            'form': {
-              'username': userInfo.email,
-              'password': 'fiflesAndFufles'
-            },
-            'json': true
-          }, function (error, response, body) {
-            if (error) {
-              done(error);
-            } else {
-              response.statusCode.should.be.equal(403);
-              body.errors[0].message.should.be.equal('Unable to authorize - wrong password!');
-              done();
-            }
-          });
-        });
-
-        it('errors if trying to login with invalid welcome link', function (done) {
-          request({
-            'method': 'POST',
-            'url': 'http://localhost:' + port + '/api/v1/buyer/login',
-            'headers': { },
-            'form': {
-              'username': 'thisIsSomeStupidWelcomeLink1111',
-              'password': 'fiflesAndFufles'
-            },
-            'json': true
-          }, function (error, response, body) {
-            if (error) {
-              done(error);
-            } else {
-              response.statusCode.should.be.equal(403);
-              body.errors[0].message.should.be.equal('Unable to authorize - wrong email!');
-              done();
-            }
-          });
-        });
-
-        it('errors if try to set password without apiKey (welcome link)', function (done) {
-          request({
-            'method': 'POST',
-            'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
-            'headers': { },
-            'form': {
-              'notApiKey': welcomeLink,
-              'password': 'fiflesAndFufles'
-            }
-          }, function (error, response, body) {
-            if (error) {
-              done(error);
-            } else {
-              response.statusCode.should.be.equal(400);
-              var bodyParsed = JSON.parse(body);
-              bodyParsed.errors[0].message.should.be.equal('Missed parameter - `apiKey`!');
-              done();
-            }
-          });
-        });
-
-        it('errors if trying to set password with invalid welcome link', function (done) {
-          request({
-            'method': 'POST',
-            'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
-            'headers': { },
-            'form': {
-              'apiKey': 'thisIsSomeStupidWelcomeLink1111',
-              'password': 'fiflesAndFufles'
-            }
-          }, function (error, response, body) {
-            if (error) {
-              done(error);
-            } else {
-              response.statusCode.should.be.equal(400);
-              var bodyParsed = JSON.parse(body);
-              bodyParsed.errors[0].message.should.be.equal('Wrong or outdated welcome link! Please, contact support for a new one!');
-              done();
-            }
-          });
-        });
-
-        it('new user can set their password', function (done) {
-          request({
-            'method': 'POST',
-            'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
-            'headers': { },
-            'form': {
-              'apiKey': welcomeLink,
-              'password': 'fiflesAndFufles'
-            },
-            'json': true
-          }, function (error, response, body) {
-            if (error) {
-              done(error);
-            } else {
-              response.statusCode.should.be.equal(201);
-              body.Code.should.be.equal(201);
-              body.Success.should.be.equal('Password is set!');
-              done();
-            }
-          });
-        });
-
-        it('authorizes user if they log in with email and password', function (done) {
-          request({
-            'method': 'POST',
-            'url': 'http://localhost:' + port + '/api/v1/buyer/login',
-            'headers': { },
-            'form': {
-              'username': userInfo.email,
-              'password': 'fiflesAndFufles'
-            },
-            'json': true
-          }, function (error, response, body) {
-            if (error) {
-              done(error);
-            } else {
-              response.statusCode.should.be.equal(202);
-              body.Code.should.be.equal(202);
-              body.Success.should.be.equal('Welcome!');
-              body.huntKey.should.be.a.String;
-              buyerHuntKey = body.huntKey;
-              done();
-            }
-          });
-        });
-
-
-        it('can authorize new user via huntKey', function (done) {
-          request({
-            'method': 'GET',
-            'url': 'http://localhost:' + port + '/api/v1/myself',
-            'headers': {'huntKey': buyerHuntKey},
-            'json': true
-          }, function (error, response, body) {
-            response.statusCode.should.be.equal(200);
-            body.id.should.be.equal(userId);
-            done();
-          });
-        });
-
-        it('no longer needs user to set password after they have done so', function (done) {
-          request({
-            'method': 'GET',
-            'url': 'http://localhost:' + port + '/api/v1/buyer/needToSetPassword/' + welcomeLink,
-            'headers': { },
-            'json': true
-          }, function (error, response, body) {
-            if (error) {
-              done(error);
-            } else {
-              response.statusCode.should.be.equal(200);
-              body.needToSetPassword.should.be.false;
-              done();
-            }
-          });
-        });
-      }); // END SET PASSWORD TESTS
-
-      describe('Verify Phone', function() {
-        var phoneNum = '3152727199';
-        before(function(done) {
-          async.series([
-            function(cb) {
-              request({
-                'method': 'POST',
-                'url': 'http://localhost:' + port + '/api/v1/buyer/login',
-                'headers': { },
-                'form': {
-                  'username': 'jamesdoe@example.org',
-                  'password': 'test123'
-                },
-                'json': true
-              }, function (error, response, body) {
-                buyerHuntKey = body.huntKey;
-                cb();
-              });
-            },
-            function() {
-              helper.resetBuyer(done, { phoneVerified: false, phone: phoneNum});
-            }
-          ]);
-        });
-
-        it('will send verification if phone is not verified', function(done) {
-          helpers.verify.phone.send(buyerHuntKey, function(error, response, body) {
-            response.statusCode.should.be.equal(202);
-            body.status.should.be.equal('Ok');
-            body.phoneVerified.should.be.false;
-            body.message.should.be.equal('Phone of '+ phoneNum + ' will be verified!');
-            done();
-          });
-        });
-
-        it('will error if no pin provided', function(done) {
-          helpers.verify.phone.checkPin(buyerHuntKey, undefined, function(error, response, body) {
-            response.statusCode.should.be.equal(400);
-            body.status.should.be.equal('Error');
-            body.errors[0].message.should.be.equal('Pin code is missing!');
-            done();
-          });
-        });
-
-        it('will error on incorrect pin', function(done) {
-          var badPin = '133700'
-          helpers.verify.phone.checkPin(buyerHuntKey, badPin, function(error, response, body) {
-            response.statusCode.should.be.equal(400);
-            body.status.should.be.equal('Error');
-            body.errors[0].message.should.be.equal('Invalid verification code, please try again');
-            done();
-          });
-        });
-
-        it('can confirm correct pin', function(done) {
-          var goodPin = '000000'
-          helpers.verify.phone.checkPin(buyerHuntKey, goodPin, function(error, response, body) {
-            response.statusCode.should.be.equal(202);
-            body.status.should.be.equal('Ok');
-            body.phoneVerified.should.be.true;
-            body.message.should.be.equal('Phone of '+ phoneNum + ' is verified');
-            done();
-          });
-        });
-
-        it('can check if phone is verified', function(done) {
-          async.series([
-            function(cb) {
-              helper.resetBuyer(cb, { phoneVerified: true, phone: phoneNum});
-            },
-            function() {
-              helpers.verify.phone.send(buyerHuntKey, function(error, response, body) {
-                response.statusCode.should.be.equal(200);
-                body.status.should.be.equal('Ok');
-                body.phoneVerified.should.be.true;
-                body.message.should.be.equal('Phone of '+ phoneNum + ' is verified!');
-                done();
-              });
-            }
-          ]);
-        });
-      });
-
-      describe('Deletion', function() {
-        it('can delete a buyer', function (done) {
-          async.series([
-            /*function (cb) {
-              helpers.clients.list(ownerHuntKey, function (error, response, body) {
-                cb(error, helper.findWithRole('buyer', body))
-              });
-            },*/
-            function (cb) {
-              helpers.clients.del(ownerHuntKey, userId, function (error, response) {
-                response.statusCode.should.be.equal(202);
-                cb(error);
-              });
-            },
-            function (cb) {
-              helpers.clients.get(ownerHuntKey, userId, function (error, response, body) {
-                body.data.isBanned.should.be.true;
-                cb(error, body);
-              });
-            }
-          ], function (error, buyer) {
+      it('can check if user needs to set password based on welcome link', function (done) {
+        request({
+          'method': 'GET',
+          'url': 'http://localhost:' + port + '/api/v1/buyer/needToSetPassword/' + welcomeLink,
+          'headers': { },
+          'json': true
+        }, function (error, response, body) {
+          if (error) {
             done(error);
-          });
+          } else {
+            response.statusCode.should.be.equal(200);
+            body.needToSetPassword.should.be.true;
+            done();
+          }
+        });
+      });
+      //https://oselot.atlassian.net/browse/ACR-174
+      it('alerts unverified user if they try to log in before password is set', function (done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+          'headers': { },
+          'form': {
+            'username': userInfo.email,
+            'password': 'fiflesAndFufles'
+          },
+          'json': true
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(403);
+            body.errors[0].message.should.be.equal('Unable to authorize - wrong password!');
+            done();
+          }
         });
       });
 
+      it('errors if trying to login with invalid welcome link', function (done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+          'headers': { },
+          'form': {
+            'username': 'thisIsSomeStupidWelcomeLink1111',
+            'password': 'fiflesAndFufles'
+          },
+          'json': true
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(403);
+            body.errors[0].message.should.be.equal('Unable to authorize - wrong email!');
+            done();
+          }
+        });
+      });
+
+      it('errors if try to set password without apiKey (welcome link)', function (done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
+          'headers': { },
+          'form': {
+            'notApiKey': welcomeLink,
+            'password': 'fiflesAndFufles'
+          }
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(400);
+            var bodyParsed = JSON.parse(body);
+            bodyParsed.errors[0].message.should.be.equal('Missed parameter - `apiKey`!');
+            done();
+          }
+        });
+      });
+
+      it('errors if trying to set password with invalid welcome link', function (done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
+          'headers': { },
+          'form': {
+            'apiKey': 'thisIsSomeStupidWelcomeLink1111',
+            'password': 'fiflesAndFufles'
+          }
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(400);
+            var bodyParsed = JSON.parse(body);
+            bodyParsed.errors[0].message.should.be.equal('Wrong or outdated welcome link! Please, contact support for a new one!');
+            done();
+          }
+        });
+      });
+
+      it('new user can set their password', function (done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
+          'headers': { },
+          'form': {
+            'apiKey': welcomeLink,
+            'password': 'fiflesAndFufles'
+          },
+          'json': true
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(201);
+            body.Code.should.be.equal(201);
+            body.Success.should.be.equal('Password is set!');
+            done();
+          }
+        });
+      });
+
+      it('authorizes user if they log in with email and password', function (done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+          'headers': { },
+          'form': {
+            'username': userInfo.email,
+            'password': 'fiflesAndFufles'
+          },
+          'json': true
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(202);
+            body.Code.should.be.equal(202);
+            body.Success.should.be.equal('Welcome!');
+            body.huntKey.should.be.a.String;
+            buyerHuntKey = body.huntKey;
+            done();
+          }
+        });
+      });
+
+
+      it('can authorize new user via huntKey', function (done) {
+        request({
+          'method': 'GET',
+          'url': 'http://localhost:' + port + '/api/v1/myself',
+          'headers': {'huntKey': buyerHuntKey},
+          'json': true
+        }, function (error, response, body) {
+          response.statusCode.should.be.equal(200);
+          body.id.should.be.equal(userId);
+          done();
+        });
+      });
+
+      it('no longer needs user to set password after they have done so', function (done) {
+        request({
+          'method': 'GET',
+          'url': 'http://localhost:' + port + '/api/v1/buyer/needToSetPassword/' + welcomeLink,
+          'headers': { },
+          'json': true
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(200);
+            body.needToSetPassword.should.be.false;
+            done();
+          }
+        });
+      });
+    }); // END SET PASSWORD TESTS
+
+    describe('Verify Phone', function() {
+      var phoneNum = '3152727199';
+      before(function(done) {
+        async.series([
+          function(cb) {
+            request({
+              'method': 'POST',
+              'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+              'headers': { },
+              'form': {
+                'username': 'jamesdoe@example.org',
+                'password': 'test123'
+              },
+              'json': true
+            }, function (error, response, body) {
+              buyerHuntKey = body.huntKey;
+              cb();
+            });
+          },
+          function() {
+            helper.resetBuyer(done, { phoneVerified: false, phone: phoneNum});
+          }
+        ]);
+      });
+
+      it('will send verification if phone is not verified', function(done) {
+        helpers.verify.phone.send(buyerHuntKey, function(error, response, body) {
+          response.statusCode.should.be.equal(202);
+          body.status.should.be.equal('Ok');
+          body.phoneVerified.should.be.false;
+          body.message.should.be.equal('Phone of '+ phoneNum + ' will be verified!');
+          done();
+        });
+      });
+
+      it('will error if no pin provided', function(done) {
+        helpers.verify.phone.checkPin(buyerHuntKey, undefined, function(error, response, body) {
+          response.statusCode.should.be.equal(400);
+          body.status.should.be.equal('Error');
+          body.errors[0].message.should.be.equal('Pin code is missing!');
+          done();
+        });
+      });
+
+      it('will error on incorrect pin', function(done) {
+        var badPin = '133700';
+        helpers.verify.phone.checkPin(buyerHuntKey, badPin, function(error, response, body) {
+          response.statusCode.should.be.equal(400);
+          body.status.should.be.equal('Error');
+          body.errors[0].message.should.be.equal('Invalid verification code, please try again');
+          done();
+        });
+      });
+
+      it('can confirm correct pin', function(done) {
+        var goodPin = '000000';
+        helpers.verify.phone.checkPin(buyerHuntKey, goodPin, function(error, response, body) {
+          response.statusCode.should.be.equal(202);
+          body.status.should.be.equal('Ok');
+          body.phoneVerified.should.be.true;
+          body.message.should.be.equal('Phone of '+ phoneNum + ' is verified');
+          done();
+        });
+      });
+
+      it('can check if phone is verified', function(done) {
+        async.series([
+          function(cb) {
+            helper.resetBuyer(cb, { phoneVerified: true, phone: phoneNum});
+          },
+          function() {
+            helpers.verify.phone.send(buyerHuntKey, function(error, response, body) {
+              response.statusCode.should.be.equal(200);
+              body.status.should.be.equal('Ok');
+              body.phoneVerified.should.be.true;
+              body.message.should.be.equal('Phone of '+ phoneNum + ' is verified!');
+              done();
+            });
+          }
+        ]);
+      });
     });
+
+    describe('Resetting Password', function() {
+      after(function(done) {
+        helper.resetBuyer(done);
+      });
+
+      it('cannot reset owner password', function(done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/buyer/resetPassword/',
+          'headers': {},
+          'form': {
+            'username': 'owner@example.org'
+          },
+          'json': true
+        }, function (error, response, body) {
+          response.statusCode.should.be.equal(400);
+          body.status.should.be.equal('Error');
+          body.errors[0].message.should.be.equal('Unable to send password reset link to buyer!');
+          done();
+        });
+      });
+
+      it('cannot reset password without providing username', function(done) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/buyer/resetPassword/',
+          'headers': {},
+          'form': {},
+          'json': true
+        }, function (error, response, body) {
+          response.statusCode.should.be.equal(400);
+          body.status.should.be.equal('Error');
+          body.errors[0].message.should.be.equal('Username required to reset password!');
+          done();
+        });
+      });
+
+      it('can reset buyer password', function(done) {
+        async.waterfall([
+          function(cb) {
+            helper.resetBuyer(cb);
+          },
+          function(user, cb) {
+            request({
+              'method': 'POST',
+              'url': 'http://localhost:' + port + '/api/v1/buyer/resetPassword/',
+              'headers': { },
+              'form': {
+                'username' : user.keychain.email,
+                'debug' : 'true' // Used to return welcomeLink
+              },
+              'json': true
+            }, function (error, response, body) {
+              var params, newLink;
+              response.statusCode.should.be.equal(202);
+              body.message.should.be.equal('Reset email sent');
+
+              params = url.parse(body.welcomeLink);
+              ['http:', 'https:'].should.include(params.protocol);
+              params.pathname.should.match(/^\/password\/[a-z]+$/);
+
+              // Parse welcome link
+              newLink = (/^\/password\/([a-z]+)$/.exec(params.pathname))[1];
+              newLink.should.not.equal(user.keychain.welcomeLink);
+              cb(error, newLink, user.keychain.email);
+            });
+          },
+          function(welcomeLink, email, cb) {
+            var newPass = 'test456';
+            request({
+              'method': 'POST',
+              'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword/',
+              'headers': { },
+              'form': {
+                'apiKey' : welcomeLink,
+                'password' : newPass
+              },
+              'json': true
+            }, function (error, response, body) {
+              response.statusCode.should.be.equal(201);
+              body.Success.should.equal('Password is set!');
+              cb(error, email, newPass);
+            });
+          }
+        ], function(err, email, newPass) {
+          console.log(email);
+          request({
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+            'headers': { },
+            'form': {
+              'username': email,
+              'password': newPass
+            },
+            'json': true
+          }, function (error, response, body) {
+            response.statusCode.should.be.equal(202);
+            body.Success.should.equal('Welcome!');
+            done();
+          });
+        });
+
+      });
+    });
+
+    describe('Deletion', function() {
+      it('can delete a buyer', function (done) {
+        async.series([
+          /*function (cb) {
+           helpers.clients.list(ownerHuntKey, function (error, response, body) {
+           cb(error, helper.findWithRole('buyer', body))
+           });
+           },*/
+          function (cb) {
+            helpers.clients.del(ownerHuntKey, userId, function (error, response) {
+              response.statusCode.should.be.equal(202);
+              cb(error);
+            });
+          },
+          function (cb) {
+            helpers.clients.get(ownerHuntKey, userId, function (error, response, body) {
+              body.data.isBanned.should.be.true;
+              cb(error);
+            });
+          }
+        ], function (error) {
+          done(error);
+        });
+      });
+    });
+
   });
 
   // TODO Is this in scope? 
@@ -606,7 +708,7 @@ describe('init', function () {
               middleName: ''
           }
         }
-      }, function (error, response, body) {
+      }, function (error, response) {
         if (error) {
           done(error);
         } else {
@@ -782,6 +884,33 @@ describe('init', function () {
           should.not.exist(bodyParsed.huntKey);
           done();
         }
+      });
+    });
+
+    describe('Using huntKey as header for BANNED owner', function () {
+      it('alerts user their account has been deactivated', function (done) {
+        request({
+          'method': 'GET',
+          'url': 'http://localhost:' + port + '/api/v1/myself',
+          'headers': {'huntKey': bannedOwnerHuntKey}
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(403);
+            var bodyParsed = JSON.parse(body);
+            bodyParsed.status.should.be.equal('Error');
+            bodyParsed.errors.should.be.an.Array;
+            bodyParsed.errors.length.should.be.equal(1);
+            bodyParsed.errors.should.containEql(
+                {
+                  'code': 403,
+                  'message': 'Access denied! your account has been deactivated!'
+                });
+
+            done();
+          }
+        });
       });
     });
   });
@@ -969,7 +1098,7 @@ describe('init', function () {
     it('can list products', function (done) {
       ownReq({
         'method': 'GET',
-        'url': 'http://localhost:' + port + '/api/v1/owner/products',
+        'url': 'http://localhost:' + port + '/api/v1/owner/products'
       }, function (error, response, body) {
         if (error) {
           done(error);
@@ -1003,7 +1132,7 @@ describe('init', function () {
     it('can list one product', function (done) {
       ownReq({
         'method': 'GET',
-        'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
+        'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId
       }, function (error, response, body) {
         if (error) {
           done(error);
@@ -1052,7 +1181,7 @@ describe('init', function () {
 
           ownReq({
               'method': 'GET',
-              'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
+              'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId
             }, function (error1, response1, body) {
               if (error1) {
                 done(error1);
@@ -1145,7 +1274,7 @@ describe('init', function () {
       it('can delete product with no tradelines associated', function (done) {
         ownReq({
           'method': 'DELETE',
-          'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
+          'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId
         }, function (error, response, body) {
           if (error) {
             done(error);
@@ -1155,8 +1284,8 @@ describe('init', function () {
 
             ownReq({
                 'method': 'GET',
-                'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
-              }, function (error1, response1, body) {
+                'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId
+              }, function (error1, response1) {
                 if (error1) {
                   done(error1);
                 } else {
@@ -1188,13 +1317,13 @@ describe('init', function () {
             'cost': 1000,
             'notes': 'Some notes'
           }
-        }, function (error, response, body) {
+        }, function (error) {
           if (error) {
             done(error);
           } else {
            ownReq({
               'method': 'DELETE',
-              'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId,
+              'url': 'http://localhost:' + port + '/api/v1/owner/products/' + productId
            }, function (error, response, body) {
               if (error) {
                 done(error);
@@ -1384,7 +1513,7 @@ describe('init', function () {
     it('can list tradelines', function (done) {
       ownReq({
         'method': 'GET',
-        'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
+        'url': 'http://localhost:' + port + '/api/v1/owner/tradelines'
       }, function (error, response, body) {
         if (error) {
           done(error);
@@ -1427,10 +1556,10 @@ describe('init', function () {
       });
 
     });
-    it('owner can list one tradeline', function (done) {
+    it('can list one tradeline', function (done) {
       ownReq({
         'method': 'GET',
-        'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradeLineId,
+        'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradeLineId
       }, function (error, response, body) {
         if (error) {
           done(error);
@@ -1495,7 +1624,7 @@ describe('init', function () {
 
           ownReq({
             'method': 'GET',
-            'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradeLineId,
+            'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradeLineId
           }, function (error, response, body) {
             if (error) {
               done(error);
@@ -1527,7 +1656,7 @@ describe('init', function () {
     });
     */
 
-    describe('Archiving', function(done) {
+    describe('Archiving', function() {
       it('owner can archive active tradeline', function (done) {
         helpers.tradelines.archive(ownerHuntKey, tradeLineId,
         function (error, response, body) {
@@ -1954,33 +2083,6 @@ describe('init', function () {
     });
   });
 
-  describe('Using huntKey as header for BANNED owner', function () {
-    it('alerts user their account has been deactivated', function (done) {
-      request({
-        'method': 'GET',
-        'url': 'http://localhost:' + port + '/api/v1/myself',
-        'headers': {'huntKey': bannedOwnerHuntKey}
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(403);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.status.should.be.equal('Error');
-          bodyParsed.errors.should.be.an.Array;
-          bodyParsed.errors.length.should.be.equal(1);
-          bodyParsed.errors.should.containEql(
-            {
-              'code': 403,
-              'message': 'Access denied! your account has been deactivated!'
-            });
-
-          done();
-        }
-      });
-    });
-  });
-
   describe('Owner Seller Management', function () {
     it('can create new seller', function (done) {
       request({
@@ -2291,7 +2393,7 @@ describe('init', function () {
                   cb(error, buyerHuntKey, tradeline);
                 });
               },
-              function (buyerHuntKey, tradeline) {
+              function (buyerHuntKey) {
                 helpers.cart.checkout(buyerHuntKey, function (error, response, body) {
                   if(error) {
                     done(error);
@@ -2376,7 +2478,7 @@ describe('init', function () {
               });
             },
             function (cb) {
-              helpers.cart.addTradeline(cartBuyerHuntKey, tradelineId, function (error, response, body) {
+              helpers.cart.addTradeline(cartBuyerHuntKey, tradelineId, function (error, response) {
                 response.statusCode.should.be.equal(202);
                 cb(error);
               });
@@ -2402,7 +2504,12 @@ describe('init', function () {
               ownReq({
                 'method': 'POST',
                 'url': 'http://localhost:' + port + '/api/v1/admin/clients/balance/' + userId,
-                'form': {'amount': 1000, 'notes': 'Feeling Generous!', date: '2014-05-03', paidBy: 'Credit Card'},
+                'form': {
+                  amount: 1000,
+                  notes: 'Feeling Generous!',
+                  date: '2014-05-03',
+                  paidBy: 'Credit Card'
+                }
               }, function (error, response, body) {
                   response.statusCode.should.be.equal(202);
                   body.status.should.be.equal('Ok');
@@ -2416,12 +2523,12 @@ describe('init', function () {
               });
             },
             function (cb) {
-              helpers.cart.addTradeline(cartBuyerHuntKey, tradelineId, function (error, response, body) {
+              helpers.cart.addTradeline(cartBuyerHuntKey, tradelineId, function (error) {
                 cb(error);
               });
             },
             function (cb) {
-              helpers.cart.getTradelines(cartBuyerHuntKey, function (error, response, body) {
+              helpers.cart.getTradelines(cartBuyerHuntKey, function (error) {
                 cb(error);
               });
             },
@@ -2470,7 +2577,7 @@ describe('init', function () {
       ownReq({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/admin/clients',
-        'form': userInfo,
+        'form': userInfo
       }, function (error, response, body) {
         if (error) {
           done(error);
@@ -2486,7 +2593,12 @@ describe('init', function () {
       ownReq({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/admin/clients/balance/' + userId,
-        'form': {'amount': 1, 'notes': 'Merry Christmas, fuck you!', date: '2014-05-03', paidBy: 'Credit Card'},
+        'form': {
+          'amount': 1,
+          'notes': 'Merry Christmas, fuck you!',
+          'date': '2014-05-03',
+          'paidBy': 'Credit Card'
+        }
       }, function (error, response, body) {
         if (error) {
           done(error);
@@ -2502,7 +2614,10 @@ describe('init', function () {
       ownReq({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
-        'form': {'amount': 1, 'notes': 'Merry Christmas, fuck you!'},
+        'form': {
+          'amount': 1,
+          'notes': 'Merry Christmas, fuck you!'
+        }
       }, function (error, response, body) {
         if (error) {
           done(error);
@@ -2648,7 +2763,7 @@ describe('init', function () {
               }
             });
           }
-        }, function (error, obj) {
+        }, function (error) {
           done(error);
         });
       });
@@ -2668,7 +2783,7 @@ describe('init', function () {
                 'moRating': 'Gold'
               },
               'headers': {'huntKey': sellerHuntKey}
-            }, function (error, response, body) {
+            }, function (error, response) {
               if (error) {
                 cb(error);
               } else {
@@ -2690,7 +2805,7 @@ describe('init', function () {
                 'moRating': 'Gold'
               },
               'headers': {'huntKey': sellerHuntKey}
-            }, function (error, response, body) {
+            }, function (error, response) {
               if (error) {
                 cb(error);
               } else {
@@ -2699,7 +2814,7 @@ describe('init', function () {
               }
             });
           }
-        }, function (error, obj) {
+        }, function (error) {
           done(error);
         });
 
@@ -2711,7 +2826,7 @@ describe('init', function () {
       before(function (done) {
         ownReq({
           'method': 'GET',
-          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId1,
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId1
         }, function (error, response, body) {
           if (error) {
             done(error);
@@ -2731,7 +2846,7 @@ describe('init', function () {
       it('owner can reject first tradeline changes', function (done) {
         ownReq({
           'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId1 + '/changeset/' + changesId + '/deny',
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId1 + '/changeset/' + changesId + '/deny'
         }, function (error, response, body) {
           if (error) {
             done(error);
@@ -2747,7 +2862,7 @@ describe('init', function () {
       after(function (done) {
         ownReq({
           'method': 'GET',
-          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId1,
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId1
         }, function (error, response, body) {
           if (error) {
             done(error);
@@ -2773,7 +2888,7 @@ describe('init', function () {
       before(function (done) {
         ownReq({
           'method': 'GET',
-          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId2,
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId2
         }, function (error, response, body) {
           if (error) {
             done(error);
@@ -2794,7 +2909,7 @@ describe('init', function () {
       it('Owner can accept second tradeline changes', function (done) {
         ownReq({
           'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId2 + '/changeset/' + changesId + '/approve',
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId2 + '/changeset/' + changesId + '/approve'
         }, function (error, response, body) {
           if (error) {
             done(error);
@@ -2809,7 +2924,7 @@ describe('init', function () {
       after(function (done) {
         ownReq({
           'method': 'GET',
-          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId2,
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradelineId2
         }, function (error, response, body) {
           if (error) {
             done(error);
@@ -2836,7 +2951,7 @@ describe('init', function () {
     xit('owner can see all orders', function(done) {
         ownReq({
           'method': 'GET',
-          'url': 'http://localhost:' + port + '/api/v1/orders/',
+          'url': 'http://localhost:' + port + '/api/v1/orders/'
         }, function (error, response, body) {
           if (error) {
             done(error);
@@ -2967,5 +3082,5 @@ var helpers = {
         }, cb);
       }
     }
-  },
+  }
 };

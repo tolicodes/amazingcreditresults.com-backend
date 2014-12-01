@@ -9,11 +9,6 @@ var welcomeLinkGenerator = require('./../../lib/welcome.js'),
 
 module.exports = exports = function (core) {
 
-  // Ex: 'Saturday, November 22, 2014 2:17 AM GMT'
-  var frmDt = function (today) {
-    return moment.utc(today).format('dddd, MMMM D, YYYY h:mm A') + ' GMT';
-  };
-
   core.app.get('/api/v1/admin/clients', ensureOwner, function (request, response) {
     var page = request.query.page || 1,
       perPage = request.query.perPage || 100,
@@ -299,7 +294,7 @@ module.exports = exports = function (core) {
                   'welcomeLink': welcomeLink,
                   'phone': userCreated.profile.phone,
                   'street1': userCreated.profile.street1,
-                  'date': frmDt(new Date())
+                  'date': utilities.frmDt(new Date())
                 });
                 cb();
               }
@@ -373,7 +368,7 @@ module.exports = exports = function (core) {
                 'welcomeLink': welcomeLink,
                 'phone': userFound.profile.phone,
                 'street1': userFound.profile.street1,
-                'date': frmDt(new Date())
+                'date': utilities.frmDt(new Date())
               });
               cb();
             }
@@ -426,12 +421,12 @@ module.exports = exports = function (core) {
               userFound.notifyByEmail({
                 'layout': false,
                 'template': 'emails/welcomeResetPassword',
-                'subject': 'Site access hyperlink to reset password', //todo - change to somethig more meaningfull
+                'subject': 'Reset password on Amazingcreditresults.com',
                 'name': userFound.name,
                 'welcomeLink': welcomeLink,
                 'phone': userFound.profile ? userFound.profile.phone : null,
                 'street1': userFound.profile ? userFound.profile.street1 : null,
-                'date': frmDt(new Date())
+                'date': utilities.frmDt(new Date())
               });
               cb();
             }

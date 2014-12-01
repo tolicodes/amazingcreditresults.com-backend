@@ -36,7 +36,7 @@ exports.dropCollection = function(collName, callback) {
       });
     }
   });
-}
+};
 
 exports.dropDB = function(callback) {
   // Use connect method to connect to the Server
@@ -52,12 +52,12 @@ exports.dropDB = function(callback) {
       callback();
     });
   });
-}
+};
 
 var resetUser = function(userInfo, callback) {
   MongoClient.connect(url, function(err, db) {
     var collection = db.collection('users');
-    collection.remove({ 'apiKey' : userInfo.apiKey }, function(err, result) {
+    collection.remove({ 'keychain.email' : userInfo.keychain.email }, function() {
       collection.insert([userInfo], function(err, result) {
         db.close();
         callback(err, result[0]);
@@ -70,12 +70,12 @@ exports.resetNewClient = function(callback) {
   var testId = Math.floor(Math.random() * 10000),
   userInfo = {
     'keychain' : {
-      'email': 'unitTestUser' + testId + '@mail.ru',
+      'email': 'unitTestUser' + testId + '@mail.ru'
     },
     'name': {
       'givenName': 'John' + testId,
       'middleName': 'Teodor' + testId,
-      'familyName': 'Doe' + testId,
+      'familyName': 'Doe' + testId
     },
     'apiKey' : 'abc5',
     'accountVerified' : false,
@@ -90,8 +90,7 @@ exports.resetNewClient = function(callback) {
       'state': 'NY',
       'zip': '11201',
       'needQuestionnaire': true,
-      'telefone': '555-339' + testId,
-      'street1': 'Some Address'
+      'telefone': '555-339' + testId
     }
   };
   resetUser(userInfo, callback);
@@ -102,7 +101,7 @@ exports.resetBuyer = function(callback, mods) {
   var buyer = {
     'keychain' : {
       'welcomeLink': 'a84e44544afb66dedba6a',
-      'email': 'jamesdoe@example.org',
+      'email': 'jamesdoe@example.org'
     },
     'name' : {
       'familyName': 'Doe',
@@ -192,13 +191,13 @@ exports.resetProductsAndTradelines = function(callback) {
               cb();
             });
           },
-          function(cb) {
+          function() {
             collection = db.collection('tradelines');
             for(var i in tradelines) {
               tradelines[i].product = productIds[i];
               tradelines[i].seller = sellerId;
             }
-            collection.insert(tradelines, function(err, result) {
+            collection.insert(tradelines, function() {
               db.close();
               console.log('Tradelines and Products reset');
               callback();

@@ -1,3 +1,6 @@
+var welcomeLinkGenerator = require('./../../lib/welcome.js'),
+    utilities = require('../../lib/utilities');
+
 //controller for buyer login process
 module.exports = exports = function(core) {
   /*
@@ -14,7 +17,7 @@ module.exports = exports = function(core) {
           } else {
             if (userFound && !userFound.accountVerified && !userFound.root) { //just in case
               var apiKeyAge = Date.now() - userFound.apiKeyCreatedAt.getTime();
-              console.log(apiKeyAge)
+              //console.log(apiKeyAge);
               if (apiKeyAge < core.config.passport.apiKeyOutdates) {
                 //key is fresh
                 if (userFound.verifyPassword(request.body.password)) {
@@ -98,6 +101,77 @@ module.exports = exports = function(core) {
   });
 
 
+  core.app.post('/api/v1/buyer/resetPassword/', function (request, response) {
+    if (!request.body.username) {
+        response.status(400).json({
+          'status': 'Error',
+          'errors': [
+            {
+              'code': 400,
+              'message': 'Username required to reset password!'
+            }
+          ]
+        });
+    } else {
+      request.model.User.findOneByKeychain('email', request.body.username, function(error, userFound) {
+        if (error) {
+          throw error;
+        } else {
+          var welcomeLink = welcomeLinkGenerator();
+          if (!userFound || (userFound.roles && userFound.roles.buyer !== true)) {
+            response.status(400);
+            response.json({
+              'status': 'Error',
+              'errors': [
+                {
+                  'code': 400,
+                  'message': 'Unable to send password reset link to buyer!'
+                }
+              ]
+            });
+          } else {
+            core.async.waterfall([
+              function (cb) {
+                userFound.keychain.welcomeLink = welcomeLink;
+                userFound.markModified('keychain');
+                userFound.accountVerified = false;
+                userFound.apiKeyCreatedAt = Date.now();
+                userFound.invalidateSession(cb);
+              },
+              function (newApiKey, cb) {
+                welcomeLink = core.config.hostUrl + 'password/'+welcomeLink;
+                userFound.notifyByEmail({
+                  'layout': false,
+                  'template': 'emails/welcomeResetPassword',
+                  'subject': 'Reset Your AmazingCreditResults Password',
+                  'name': userFound.name,
+                  'welcomeLink': welcomeLink,
+                  'phone': userFound.profile ? userFound.profile.phone : null,
+                  'street1': userFound.profile ? userFound.profile.street1 : null,
+                  'date': utilities.frmDt(new Date())
+                });
+                cb();
+              }
+            ], function (err) {
+              if (err) {
+                throw err;
+              } else {
+                var json = {
+                  'message': 'Reset email sent'
+                };
+                if (request.body.debug === 'true') {
+                 json.welcomeLink = welcomeLink; // Is it too unsafe to return this? Am using it for testing
+                }
+                response.status(202).json(json);
+              }
+            });
+          }
+        }
+      });
+    }
+
+  });
+
   //authorizing (aka getting huntKey) by apiKey and password - second
   core.app.post('/api/v1/buyer/login', function(request, response) {
     if (request.body.username && request.body.password) {
@@ -147,7 +221,7 @@ module.exports = exports = function(core) {
       if (!request.body.username) {
         errors.push({
           'code': 400,
-          'message': 'Missed parameter - `email`!',
+          'message': 'Missed parameter - `username`!',
           'field': 'username'
         });
       }
