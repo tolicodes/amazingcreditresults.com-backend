@@ -1408,7 +1408,9 @@ describe('init', function () {
             }
             tradeline.cost.should.be.a.Number;
             tradeline.price.should.be.a.Number;
-            tradeline.notes.should.be.a.String;
+            if (tradeline.notes) {
+              tradeline.notes.should.be.a.String;
+            }
             tradeline.seller.should.be.a.String;
             tradeline.seller.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
             tradeline.dateOpen.should.be.a.Date;

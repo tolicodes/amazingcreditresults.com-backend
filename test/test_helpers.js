@@ -145,15 +145,23 @@ exports.resetProductsAndTradelines = function(callback) {
   var products, tradelines;
   MongoClient.connect(url, function(err, db) {
     var sellerId;
+    console.log(__dirname);
     async.parallel([
         function(cb) {
-          fs.readFile('data/tradelines.json', function(err, data) {
+          fs.readFile(__dirname + '/data/tradelines.json', function(err, data) {
+            if (err) {
+              cb(err);
+            }
+            console.log(data);
             tradelines = JSON.parse(data).data;
             cb();
           });
         },
         function(cb) {
-          fs.readFile('data/products.json', function(err, data) {
+          fs.readFile(__dirname + '/data/products.json', function(err, data) {
+            if (err) {
+              cb(err);
+            }
             products = JSON.parse(data).data;
             cb();
           });
