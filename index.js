@@ -26,6 +26,7 @@ var Hunt = require('hunt'),
       'publisherKey': e.ACR_AREYOUHUMAN_PUBLISHER_KEY,
       'scoringKey': e.ACR_AREYOUHUMAN_SCORING_KEY
     },
+    'balancedApiKey': e.ACR_BALANCED_KEY || 'ak-test-80ghejLg4UXZ4F6Z1XacoFzf2vsXxAji', // Test key, don't use in production
     'echoSign': {
       'auth': {
         'userCredentials': {
@@ -106,6 +107,7 @@ hunt.extendMiddleware(function(core) {
 //loading different controllers for buyers
 hunt.extendRoutes(require('./controllers/buyer/myself.js'));
 hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
+hunt.extendRoutes(require('./controllers/buyer/verifications/achaccount.js'));
 hunt.extendRoutes(require('./controllers/buyer/verifications/echosign.js'));
 hunt.extendRoutes(require('./controllers/buyer/verifications/getprove.js'));
 hunt.extendRoutes(require('./controllers/buyer/verifications/called.in.js'));

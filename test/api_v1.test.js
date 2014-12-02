@@ -910,6 +910,69 @@ describe('AmazingCreditResults', function () {
 
     });
 
+    describe.only('Verify ACH Account', function() {
+      var bank = {
+        acct: '9900000000',
+        route: '021000021',
+        type: 'checking',
+        meta: {
+          test: true
+        }
+      };
+      beforeEach(function(done){
+        helper.resetBuyer(function(err, user){
+          buyerHuntKey = user.apiKey;
+          done();
+        });
+      });
+
+      describe('Invalid Requests', function() {
+        it('requires an account number', function(done){
+          helpers.verify.ach.create(buyerHuntKey, null, bank.route, bank.type, function(error, response, body){
+            response.statusCode.should.be.equal(400);
+            body.errors[0].message.should.equal('Account Number is not provided!');
+            body.errors[0].field.should.equal('accountNumber');
+            done();
+          });
+        });
+
+        it('requires an account type', function(done){
+          helpers.verify.ach.create(buyerHuntKey, bank.acct, bank.route, null, function(error, response, body){
+            response.statusCode.should.be.equal(400);
+            //body.errors[0].message.should.equal('Account number is not provided!');
+            body.errors[0].field.should.equal('accountType');
+            done();
+          });
+        });
+
+        it('requires a valid account type', function(done){
+          helpers.verify.ach.create(buyerHuntKey, bank.acct, bank.route, 'fakeType', function(error, response, body) {
+            response.statusCode.should.be.equal(400);
+            //body.errors[0].message.should.equal('Account number is not provided!');
+            body.errors[0].field.should.equal('accountType');
+            done();
+          });
+        });
+
+        it('requires a routing number', function(done){
+          helpers.verify.ach.create(buyerHuntKey, bank.acct, null, bank.type, function(error, response, body) {
+            response.statusCode.should.be.equal(400);
+            body.errors[0].message.should.equal('Routing Number is not provided!');
+            body.errors[0].field.should.equal('routingNumber');
+            done();
+          });
+        });
+      });
+
+      it('can create verification', function(done){
+        helpers.verify.ach.create(buyerHuntKey, bank.acct, bank.route, bank.type, function(error, response, body) {
+          console.log(body);
+          response.statusCode.should.be.equal(202);
+          done();
+        });
+
+      });
+    });
   });
 
   // TODO Is this in scope? 
@@ -3106,6 +3169,24 @@ var helpers = {
     }
   },
   verify: {
+    ach: {
+      create: function(huntKey, acct, route, type, cb) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/myself/billing/achAccount',
+          'headers': {'huntKey': huntKey},
+          'form': {
+            'accountNumber': acct,
+            'routingNumber': route,
+            'accountType': type,
+            'meta': {
+              'test': true
+            }
+          },
+          'json': true
+        }, cb);
+      }
+    },
     phone: {
       send: function(huntKey, cb) {
         request({
