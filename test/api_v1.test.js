@@ -417,9 +417,9 @@ describe('AmazingCreditResults', function () {
           done(error);
         } else {
           response.statusCode.should.be.equal(201);
+          userId = body.id;
           userId.should.be.a.String;
           userId.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
-          userId = body.id;
           done();
         }
       });
@@ -768,6 +768,148 @@ describe('AmazingCreditResults', function () {
 
       });
     });
+
+    describe('Using /api/v1/myself', function () {
+      var buyerUser;
+      beforeEach(function(done){
+        helper.resetBuyer(function(err, user){
+          buyerHuntKey = user.apiKey;
+          buyerUser = user;
+          done();
+        });
+      });
+
+      it('works with GET', function (done) {
+        request({
+          'method': 'GET',
+          'url': 'http://localhost:' + port + '/api/v1/myself',
+          'headers': {'huntKey': buyerHuntKey},
+          'json': true
+        }, function (error, response, body) {
+          response.statusCode.should.be.equal(200);
+          body.huntKey.should.be.equal(buyerHuntKey);
+          body.name.givenName.should.be.equal(buyerUser.name.givenName);
+          done();
+        });
+      });
+
+      describe('PUT', function () {
+        var myInfo, newInfo = {
+          'zip': '13413',
+          'phone': '4321122121',
+          'city': 'New Hartford',
+          'name': {
+            'givenName' : 'George',
+            'middleName': 'Dubya'
+          },
+          'ssn': '555-555-5555'
+        };
+
+        it('cannot update name, address of evs verified user', function(done) {
+          async.series([
+            function(cb) {
+              helper.resetBuyer(cb, { phoneVerified: false, evsVerified: true });
+            }],
+            function() {
+              myInfo = helper.clone(newInfo);
+              request({
+                'method': 'PUT',
+                'url': 'http://localhost:' + port + '/api/v1/myself',
+                'headers': {'huntKey': buyerHuntKey},
+                'form': myInfo,
+                'json': true
+              }, function (error, response, body) {
+                response.statusCode.should.be.equal(400);
+                body.errors[0].message.should.equal('Cannot modify these fields after EVS Verification');
+                done();
+              });
+            }
+          );
+        });
+
+        it('can update phone of EVS verified user', function(done){
+          async.series([
+              function(cb) {
+                helper.resetBuyer(cb, { phoneVerified: false, evsVerified: true });
+              }],
+              function() {
+                myInfo = {
+                  phone: '4310110112'
+                };
+                request({
+                  'method': 'PUT',
+                  'url': 'http://localhost:' + port + '/api/v1/myself',
+                  'headers': {'huntKey': buyerHuntKey},
+                  'form': myInfo,
+                  'json': true
+                }, function (error, response, body) {
+                  response.statusCode.should.be.equal(202);
+                  body.phone.should.be.equal(myInfo.phone);
+                  body.phoneVerified.should.be.equal(false);
+                  body.evsVerified.should.be.equal(true);
+                  done();
+                });
+              }
+          );
+        });
+
+        it('will reset verification when changing phone number of phone verified user', function(done) {
+          async.series([
+                function(cb) {
+                  helper.resetBuyer(cb, { phoneVerified: true, evsVerified: false });
+                }],
+              function() {
+                myInfo = helper.clone(newInfo);
+                request({
+                  'method': 'PUT',
+                  'url': 'http://localhost:' + port + '/api/v1/myself',
+                  'headers': {'huntKey': buyerHuntKey},
+                  'form': myInfo,
+                  'json': true
+                }, function (error, response, body) {
+                  response.statusCode.should.be.equal(202);
+                  body.phone.should.be.equal(myInfo.phone);
+                  body.phoneVerified.should.be.equal(false);
+                  body.evsVerified.should.be.equal(false);
+                  body.ssn.should.be.equal(myInfo.ssn.slice(-4));
+                  done();
+                });
+              }
+          );
+        });
+
+        it('can update name, phone, address of unverified user', function(done) {
+          async.series([
+            function(cb) {
+              helper.resetBuyer(cb, { phoneVerified: false, evsVerified: false });
+            }],
+            function() {
+              request({
+                'method': 'PUT',
+                'url': 'http://localhost:' + port + '/api/v1/myself',
+                'headers': {'huntKey': buyerHuntKey},
+                'form' : newInfo,
+                'json': true
+              }, function (error, response, body) {
+                response.statusCode.should.be.equal(202);
+                body.name.givenName.should.equal(newInfo.name.givenName);
+                body.name.middleName.should.equal(newInfo.name.middleName);
+                body.name.familyName.should.equal('Doe'); // Shouldn't erase original info
+                body.zip.should.equal(newInfo.zip.toString());
+                body.phone.should.equal(newInfo.phone.toString());
+                body.city.should.equal(newInfo.city);
+                body.phoneVerified.should.equal(false);
+                body.evsVerified.should.equal(false);
+                done(error);
+              });
+            }
+          );
+        });
+
+      });
+
+    });
+
   });
 
   // TODO Is this in scope? 
@@ -1004,8 +1146,7 @@ describe('AmazingCreditResults', function () {
               'password': newPass
             },
             'json': true
-          }, function (error, response, body) {
-            console.log(body);
+          }, function (error, response) {
             response.statusCode.should.be.equal(200);
             done();
           });
@@ -1031,7 +1172,6 @@ describe('AmazingCreditResults', function () {
             'url': 'http://localhost:' + port + '/api/v1/myself',
             'headers': {'huntKey': huntKeys[0]}
           }, function (error, response, body) {
-            console.log(JSON.parse(body));
             testingCallback(error, response, body, done);
           });
         });
@@ -1045,7 +1185,8 @@ describe('AmazingCreditResults', function () {
             'name': {
               'givenName' : 'George',
               'middleName': 'Dubya'
-            }
+            },
+            'ssn': '111-222-3322'
           };
           request({
             'method': 'PUT',
@@ -1054,12 +1195,14 @@ describe('AmazingCreditResults', function () {
             'form' : newInfo,
             'json': true
           }, function (error, response, body) {
+            console.log(body);
             response.statusCode.should.be.equal(202);
             body.name.givenName.should.equal(newInfo.name.givenName);
             body.name.middleName.should.equal(newInfo.name.middleName);
             body.name.familyName.should.equal('Zorg'); // Shouldn't erase original info
             body.zip.should.equal(newInfo.zip.toString());
             body.city.should.equal(newInfo.city);
+            body.ssn.length.should.equal(4);
             done();
           });
         });
@@ -1206,7 +1349,6 @@ describe('AmazingCreditResults', function () {
           done(error);
         } else {
           response.statusCode.should.be.equal(200);
-          //console.log(body);
           body.id.should.be.equal(productId);
           body.name.should.be.equal('SuperMega' + testId);
           body.bank.should.be.equal('SuperMegaBank' + testId);
@@ -2154,7 +2296,7 @@ describe('AmazingCreditResults', function () {
 
 
 
-  describe.only('Buyer Cart Management', function () {
+  describe('Buyer Cart Management', function () {
       var cartBuyerHuntKey;
       // Login the buyer
       before(function(done) {
@@ -2369,6 +2511,7 @@ describe('AmazingCreditResults', function () {
           });
         });
 
+        // TODO fix Flickering Test
         it('should error if user adds tradeline with no available AUs', function(done) {
           async.waterfall([
             // Read in tradelines

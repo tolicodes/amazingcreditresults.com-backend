@@ -111,65 +111,42 @@ module.exports = exports = function (core) {
   });
 
   core.app.put('/api/v1/admin/clients/:id', ensureOwner, function (request, response) {
-    // ========= Anatoliy's Version ==========
-    /*
-    var patch = utilities.createModel(request.body, 
-      ['accountVerified', 'isBanned', 'name.familyName', 'name.givenName', 'name.middleName', 'name.title', 'name.generation', 'roles'], {
-      'email': 'keychain.email',
-      'title': 'profile.title',
-      'street1': 'profile.street1', 
-      'street2': 'profile.street2',
-      'phone': 'profile.phone',  
-      'state': 'profile.state',
-      'city': 'profile.city', 
-      'ssn': 'profile.ssn', 
-      'birthday': 'profile.birthday',
-      'zip': 'profile.zip'
-    });
-    */
-
-    // ======= Original Version =======
-    var patch = {},
+    var patch,
       roles = {},
       rolesToSet = false;
+
+    var nameFields = ['familyName', 'givenName', 'middleName', 'suffix', 'title'];
+
+    fieldMap = {
+      'street1': 'profile.street1',
+      'street2': 'profile.street2',
+      'state': 'profile.state',
+      'city': 'profile.city',
+      'ssn': 'profile.ssn',
+      'birthday': 'profile.birthday',
+      'zip': 'profile.zip'
+    };
+
+    patch = utilities.createPatch(request.body, nameFields, fieldMap);
+    console.log(patch);
+
+    if (patch !== {}) {
+      // An EVS field was changed, so reset verification
+      patch['profile.evsVerified'] = false;
+    }
 
     if (request.body.email) {
       patch['keychain.email'] = request.body.email;
     }
 
-    if (request.body.accountVerified === true || request.body.accountVerified === false) {
-      patch.accountVerified = request.body.accountVerified;
+    // Would need to do API request to figure out if phone number changing
+    // so to be on the same side unset phone verify flag on each change
+    if (request.body.phone) {
+      patch['profile.phone'] = request.body.phone;
+      patch['profile.phoneVerified'] = false;
     }
 
-    if (request.body.isBanned === true || request.body.isBanned === false) {
-      patch.isBanned = request.body.isBanned;
-    }
-
-    ['familyName', 'givenName', 'middleName'].map(function (a) {
-      if (request.body.name && request.body.name[a]) {
-        patch['name.' + a] = request.body.name[a];
-      }
-    });
-
-    // This is a silly hack because we store title & suffix
-    // in the profile object but pretend to store in the name object
-    ['title', 'suffix'].map(function (a) {
-      if (request.body.name && request.body.name[a]) {
-        patch['profile.' + a] = request.body.name[a];
-      }
-    });
-
-    [
-      'street1', 'street2',
-      'phone', 'altPhone', 'state',
-      'city', 'ssn', 'birthday',
-      'zip', 'needQuestionnaire'
-    ].map(function (b) {
-      if (request.body[b]) {
-        patch['profile.' + b] = request.body[b];
-      }
-    });
-
+    // TODO write a test to find out if there is a bug here that can turn an Owner into a non-owner
     if (request.body.roles) {
       ['seller', 'buyer'].map(function (role) {
         if (request.body.roles[role] === true || request.body.roles[role] === false) {
@@ -183,10 +160,6 @@ module.exports = exports = function (core) {
       }
     }
 
-    if (request.body.preSelectTradeLines && Array.isArray(request.body.preSelectTradeLines)) {
-      patch.profile.preSelectTradeLines = request.body.preSelectTradeLines;
-    }
-        
     request.model.User.findOneAndUpdate(
       {
         '_id': request.params.id
@@ -196,12 +169,8 @@ module.exports = exports = function (core) {
         'upsert': false // important!
       },
       function (error, userFound) {
-        utilities.checkError(error, userFound, 'User with this ID do not exists!', response, function(data, response){
-          response.status(202);
-          response.json(formatUser(data));
-
-          //console.log('saved user:');
-         // console.log(data);
+        utilities.checkError(error, userFound, 'User not found!', response, function(data, response){
+          response.status(202).json(formatUser(data));
         });
       }
     );
@@ -240,7 +209,6 @@ module.exports = exports = function (core) {
         'accountVerified': request.body.accountVerified ? true : false,
         'isBanned': request.body.isBanned ? true : false,
         'profile': {
-          'needQuestionnaire': request.body.needQuestionnaire ? true : false,
           'phone': request.body.phone,
           'altPhone': request.body.altPhone,
           'state': request.body.state,
@@ -317,7 +285,7 @@ module.exports = exports = function (core) {
         'errors': [
           {
             'code': 400,
-            'message': 'Required value of ' + missed + ' is missed!'
+            'message': 'Required value of ' + missed + ' is missing!'
           }
         ]
       });

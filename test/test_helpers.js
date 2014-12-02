@@ -148,7 +148,8 @@ exports.resetBuyer = function(callback, mods) {
       'phone' : mods.phone || '5551239567',
       'city': 'Brooklyn',
       'state': 'NY',
-      'zip': '11201'
+      'zip': '11201',
+      'ssn': '333-555-1111'
     },
     'accountVerified' : true,
     'root' : false,
