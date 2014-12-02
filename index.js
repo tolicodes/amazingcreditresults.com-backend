@@ -104,7 +104,6 @@ hunt.extendMiddleware(function(core) {
 });
 
 //loading different controllers for buyers
-hunt.extendRoutes(require('./controllers/buyer/login.js'));
 hunt.extendRoutes(require('./controllers/buyer/account.js'));
 hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
 hunt.extendRoutes(require('./controllers/buyer/verifications/echosign.js'));
@@ -121,7 +120,6 @@ hunt.extendRoutes(require('./controllers/buyer/cart.js'));
 hunt.extendRoutes(require('./controllers/buyer/checkout.js'));
 
 //loading different controllers for owners
-hunt.extendRoutes(require('./controllers/owner/login.js'));
 hunt.extendRoutes(require('./controllers/owner/editOwners.js'));
 hunt.extendRoutes(require('./controllers/owner/editClients.js'));
 hunt.extendRoutes(require('./controllers/owner/editProducts.js'));
@@ -133,7 +131,8 @@ hunt.extendRoutes(require('./controllers/seller/listProducts.js'));
 hunt.extendRoutes(require('./controllers/seller/editMyTradelines.js'));
 
 //loading controller shared by all users
-hunt.extendRoutes(require('./controllers/shared.js'));
+hunt.extendRoutes(require('./controllers/shared/myself.js'));
+hunt.extendRoutes(require('./controllers/shared/account.js'));
 
 //processing payment notifications from stripe
 hunt.extendRoutes(require('./controllers/stripe/webhooks.js'));
@@ -149,7 +148,7 @@ hrw(hunt, {
 //Development route to test error catcher middleware
 if (hunt.config.env === 'development' || hunt.config.env === 'test') {
   hunt.extendRoutes(function(core) {
-    core.app.get('/testError', function(request, response) {
+    core.app.get('/testError', function() {
       throw new Error('Test error!');
     });
   });
@@ -171,7 +170,7 @@ hunt.extendRoutes(function(core) {
 //JSON error reporter middleware.
 //https://oselot.atlassian.net/browse/ACR-105
 hunt.extendRoutes(function(core) {
-  core.app.use(function(error, request, response, next) {
+  core.app.use(function(error, request, response) {
     //http://mongoosejs.com/docs/validation.html
     //    if (core.config.env === 'development') {
     console.log('============================================');
@@ -225,7 +224,7 @@ hunt.extendRoutes(function(core) {
   });
 });
 
-hunt.once('start', function(evnt) {
+hunt.once('start', function() {
   //populating database with test data in development environment!
   if (hunt.config.env === 'development' || hunt.config.env === 'test') {
     require('./lib/populateDatabase.js')(hunt); //uncomment to repopulate database on every start

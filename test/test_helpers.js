@@ -96,6 +96,32 @@ exports.resetNewClient = function(callback) {
   resetUser(userInfo, callback);
 };
 
+exports.resetOwner = function(callback) {
+  var owner = {
+    'keychain' : {
+      'email': 'pandadoe@example.org'
+    },
+    'name' : {
+      'familyName': 'Doe',
+      'middleName': 'Jones',
+      'givenName': 'Panda'
+    },
+    'apiKey': 'abc9',
+    'roles' : {
+      'buyer' : false,
+      'seller' : false,
+      'owner' : true
+    },
+    'profile' : {},
+    'accountVerified' : true,
+    'root' : false,
+    'password' : '6ccc4a48bf6701c1d824c08276dc182b159425686f4d048d3c7abe342e83b24beb4d015a451a6a4d5ef283a6299e418367ae90cbf0ad8df06e3c24259c82129f',
+    'salt' : 'fbf897be7250e952aa13ef0d1ae1c3c71b52102b64c24f7bc8a1c70ed0de482edb81680be6dc28f95c450c9677d5d8412389a736b812052edac8632c7422f808'
+  };
+
+  resetUser(owner, callback);
+};
+
 exports.resetBuyer = function(callback, mods) {
   mods = mods || {};
   var buyer = {

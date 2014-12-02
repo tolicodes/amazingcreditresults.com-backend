@@ -15,6 +15,7 @@ var request = require('request'),
   welcomeLink,
   ownerHuntKey,
   ownerHuntKey2,
+  ownerId,
   ownReq,
   buyerHuntKey,
   productId,
@@ -46,29 +47,14 @@ var request = require('request'),
 describe('AmazingCreditResults', function () {
   // ownerHuntKey used by many other tests
   function loginOwner(done) {
-    request({
-      'method': 'POST' ,
-      'url': 'http://localhost:' + port + '/api/v1/owner/login',
-      'form': {
-        'username': 'owner@example.org',
-        'password': 'test123'
-      }
-    }, function (error, response, body) {
-      if (error) {
-        done(error);
-      } else {
-        response.statusCode.should.be.equal(200);
-        var bodyParsed = JSON.parse(body);
-        bodyParsed.Code.should.be.equal(200);
-        bodyParsed.huntKey.should.be.a.String;
-        ownerHuntKey = bodyParsed.huntKey;
-        ownerId = bodyParsed.id;
-        ownReq = request.defaults({
-          'headers': {'huntKey': ownerHuntKey},
-          'json': true
-        });
-        done();
-      }
+    helpers.login('owner@example.org', 'test123', function(err, body) {
+      ownerHuntKey = body.huntKey;
+      ownerId = body.id;
+      ownReq = request.defaults({
+        'headers': {'huntKey': ownerHuntKey},
+        'json': true
+      });
+      done();
     });
   }
   before(function (done) {
@@ -350,23 +336,10 @@ describe('AmazingCreditResults', function () {
       });
 
       it('can login as newly created owner', function (done) {
-        request({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/owner/login',
-          'form': {
-            'username': 'owner' + testId + '@example.org',
-            'password': 'test123'
-          },
-          'json': true
-        }, function (error, response, body) {
-          if (error) {
-            done(error);
-          } else {
-            response.statusCode.should.be.equal(200);
-            body.huntKey.should.be.a.String;
+        var username = 'owner' + testId + '@example.org';
+        helpers.login(username, 'test123', function(err, body) {
             ownerHuntKey2 = body.huntKey;
             done();
-          }
         });
       });
 
@@ -444,15 +417,12 @@ describe('AmazingCreditResults', function () {
           done(error);
         } else {
           response.statusCode.should.be.equal(201);
+          userId.should.be.a.String;
+          userId.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
           userId = body.id;
           done();
         }
       });
-    });
-
-    it('creates user without verified account', function () {
-      userId.should.be.a.String;
-      userId.should.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
     });
 
     describe('Setting Password', function() {
@@ -498,7 +468,7 @@ describe('AmazingCreditResults', function () {
       it('alerts unverified user if they try to log in before password is set', function (done) {
         request({
           'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+          'url': 'http://localhost:' + port + '/api/v1/account/login',
           'headers': { },
           'form': {
             'username': userInfo.email,
@@ -510,7 +480,7 @@ describe('AmazingCreditResults', function () {
             done(error);
           } else {
             response.statusCode.should.be.equal(403);
-            body.errors[0].message.should.be.equal('Unable to authorize - wrong password!');
+            body.errors[0].message.should.be.equal('Invalid username or password. Please try again using correct username and password.');
             done();
           }
         });
@@ -519,7 +489,7 @@ describe('AmazingCreditResults', function () {
       it('errors if trying to login with invalid welcome link', function (done) {
         request({
           'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+          'url': 'http://localhost:' + port + '/api/v1/account/login',
           'headers': { },
           'form': {
             'username': 'thisIsSomeStupidWelcomeLink1111',
@@ -531,7 +501,7 @@ describe('AmazingCreditResults', function () {
             done(error);
           } else {
             response.statusCode.should.be.equal(403);
-            body.errors[0].message.should.be.equal('Unable to authorize - wrong email!');
+            body.errors[0].message.should.be.equal('Invalid username or password. Please try again using correct username and password.');
             done();
           }
         });
@@ -540,7 +510,7 @@ describe('AmazingCreditResults', function () {
       it('errors if try to set password without apiKey (welcome link)', function (done) {
         request({
           'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
+          'url': 'http://localhost:' + port + '/api/v1/account/setPassword',
           'headers': { },
           'form': {
             'notApiKey': welcomeLink,
@@ -561,7 +531,7 @@ describe('AmazingCreditResults', function () {
       it('errors if trying to set password with invalid welcome link', function (done) {
         request({
           'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
+          'url': 'http://localhost:' + port + '/api/v1/account/setPassword',
           'headers': { },
           'form': {
             'apiKey': 'thisIsSomeStupidWelcomeLink1111',
@@ -582,7 +552,7 @@ describe('AmazingCreditResults', function () {
       it('new user can set their password', function (done) {
         request({
           'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword',
+          'url': 'http://localhost:' + port + '/api/v1/account/setPassword',
           'headers': { },
           'form': {
             'apiKey': welcomeLink,
@@ -602,29 +572,11 @@ describe('AmazingCreditResults', function () {
       });
 
       it('authorizes user if they log in with email and password', function (done) {
-        request({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/buyer/login',
-          'headers': { },
-          'form': {
-            'username': userInfo.email,
-            'password': 'fiflesAndFufles'
-          },
-          'json': true
-        }, function (error, response, body) {
-          if (error) {
-            done(error);
-          } else {
-            response.statusCode.should.be.equal(202);
-            body.Code.should.be.equal(202);
-            body.Success.should.be.equal('Welcome!');
-            body.huntKey.should.be.a.String;
-            buyerHuntKey = body.huntKey;
-            done();
-          }
+        helpers.login(userInfo.email, 'fiflesAndFufles', function(err, body) {
+          buyerHuntKey = body.huntKey;
+          done();
         });
       });
-
 
       it('can authorize new user via huntKey', function (done) {
         request({
@@ -664,7 +616,7 @@ describe('AmazingCreditResults', function () {
           function(cb) {
             request({
               'method': 'POST',
-              'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+              'url': 'http://localhost:' + port + '/api/v1/account/login',
               'headers': { },
               'form': {
                 'username': 'jamesdoe@example.org',
@@ -745,23 +697,6 @@ describe('AmazingCreditResults', function () {
         helper.resetBuyer(done);
       });
 
-      xit('can reset owner password', function(done) {
-        request({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/account/resetPassword/',
-          'headers': {},
-          'form': {
-            'username': 'owner@example.org'
-          },
-          'json': true
-        }, function (error, response, body) {
-          response.statusCode.should.be.equal(400);
-          body.status.should.be.equal('Error');
-          body.errors[0].message.should.be.equal('Unable to send password reset link to buyer!');
-          done();
-        });
-      });
-
       it('cannot reset password without providing username', function(done) {
         request({
           'method': 'POST',
@@ -812,7 +747,7 @@ describe('AmazingCreditResults', function () {
             var newPass = 'test456';
             request({
               'method': 'POST',
-              'url': 'http://localhost:' + port + '/api/v1/buyer/setPassword/',
+              'url': 'http://localhost:' + port + '/api/v1/account/setPassword/',
               'headers': { },
               'form': {
                 'apiKey' : welcomeLink,
@@ -826,28 +761,13 @@ describe('AmazingCreditResults', function () {
             });
           }
         ], function(err, email, newPass) {
-          console.log(email);
-          request({
-            'method': 'POST',
-            'url': 'http://localhost:' + port + '/api/v1/buyer/login',
-            'headers': { },
-            'form': {
-              'username': email,
-              'password': newPass
-            },
-            'json': true
-          }, function (error, response, body) {
-            response.statusCode.should.be.equal(202);
-            body.Success.should.equal('Welcome!');
-            done();
+          helpers.login(email, newPass, function(err) {
+            done(err);
           });
         });
 
       });
     });
-
-
-
   });
 
   // TODO Is this in scope? 
@@ -855,24 +775,9 @@ describe('AmazingCreditResults', function () {
     //todo - with clustering this test behaves strange
     var ownerHuntKey1;
     before(function (done) {
-      request({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/owner/login',
-        'form': {
-          'username': 'owner@example.org',
-          'password': 'test123'
-        }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(200);
-          var bodyParsed = JSON.parse(body);
-          bodyParsed.Code.should.be.equal(200);
-          bodyParsed.huntKey.should.be.a.String;
-          ownerHuntKey1 = bodyParsed.huntKey;
+      helpers.login('owner@example.org', 'test123', function(err, body) {
+          ownerHuntKey1 = body.huntKey;
           done();
-        }
       });
     });
 
@@ -897,14 +802,12 @@ describe('AmazingCreditResults', function () {
     });
   });
 
-
-
   describe('Managing Owner Account', function() {
     describe('Login', function () {
       it('returns 200 && `huntKey` for correct password via application/x-www-form-urlencoded', function (done) {
         request({
           'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/owner/login',
+          'url': 'http://localhost:' + port + '/api/v1/account/login',
           'form': {
             'username': 'owner@example.org',
             'password': 'test123'
@@ -926,7 +829,7 @@ describe('AmazingCreditResults', function () {
       it('returns 200 && `huntKey` for correct password via application/json', function (done) {
         request({
           'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/owner/login',
+          'url': 'http://localhost:' + port + '/api/v1/account/login',
           'json': {
             'username': 'owner@example.org',
             'password': 'test123'
@@ -954,7 +857,7 @@ describe('AmazingCreditResults', function () {
       it('returns 403 && message for wrong password', function (done) {
         request({
           'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/owner/login',
+          'url': 'http://localhost:' + port + '/api/v1/account/login',
           'json': {
             'username': 'owner@example.org',
             'password': 'someWrongPassword'
@@ -977,7 +880,7 @@ describe('AmazingCreditResults', function () {
       it('returns 400 && message for absent username or password', function (done) {
         request({
           'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/owner/login',
+          'url': 'http://localhost:' + port + '/api/v1/account/login',
           'json': {
             'notAusername': 'owner@example.org',
             'notAPassword': 'someWrongPassword'
@@ -1036,15 +939,84 @@ describe('AmazingCreditResults', function () {
         });
       });
     });
-    describe('Reset Password', function() {
-      it('can reset password', function() {
-        // todo
+
+    describe('Resetting Password', function() {
+      var testOwner;
+      beforeEach(function(done) {
+        helper.resetOwner(function(err, user) {
+          testOwner = user;
+          console.log('Created test user!');
+          done(err);
+        });
+      });
+
+      it('can reset owner password', function(done) {
+        async.waterfall([
+          function(cb) {
+            request({
+              'method': 'POST',
+              'url': 'http://localhost:' + port + '/api/v1/account/resetPassword/',
+              'headers': { },
+              'form': {
+                'username' : testOwner.keychain.email,
+                'debug' : 'true' // Used to return welcomeLink
+              },
+              'json': true
+            }, function (error, response, body) {
+              var params, newLink;
+              response.statusCode.should.be.equal(202);
+              body.message.should.be.equal('Reset email sent');
+
+              params = url.parse(body.welcomeLink);
+              ['http:', 'https:'].should.include(params.protocol);
+              params.pathname.should.match(/^\/password\/[a-z]+$/);
+
+              // Parse welcome link
+              newLink = (/^\/password\/([a-z]+)$/.exec(params.pathname))[1];
+              newLink.should.not.equal(testOwner.keychain.welcomeLink);
+              cb(error, newLink);
+            });
+          },
+          function(welcomeLink, cb) {
+            var newPass = 'test456';
+            request({
+              'method': 'POST',
+              'url': 'http://localhost:' + port + '/api/v1/account/setPassword/',
+              'headers': { },
+              'form': {
+                'apiKey' : welcomeLink,
+                'password' : newPass
+              },
+              'json': true
+            }, function (error, response, body) {
+              response.statusCode.should.be.equal(201);
+              body.Success.should.equal('Password is set!');
+              cb(error, newPass);
+            });
+          }
+        ], function(error, newPass) {
+          request({
+            'method': 'POST',
+            'url': 'http://localhost:' + port + '/api/v1/account/login',
+            'headers': { },
+            'form': {
+              'username' : testOwner.keychain.email,
+              'password': newPass
+            },
+            'json': true
+          }, function (error, response, body) {
+            console.log(body);
+            response.statusCode.should.be.equal(200);
+            done();
+          });
+        });
+
       });
     });
 
     describe('Using /api/v1/myself', function () {
 
-      describe('with huntKey as query parameter', function () {
+      describe('GET', function () {
         it('works with `huntKey` as `GET` parameter', function (done) {
           request({
             'method': 'GET',
@@ -1053,81 +1025,47 @@ describe('AmazingCreditResults', function () {
             testingCallback(error, response, body, done);
           });
         });
-      });
-
-      describe('with huntKey as form field', function () {
-        it('works with `huntKey` as `POST` form parameter', function (done) {
-          request({
-            'method': 'POST',
-            'url': 'http://localhost:' + port + '/auth/myself',
-            'form': {'huntKey': huntKeys[0]}
-          }, function (error, response, body) {
-            testingCallback(error, response, body, done);
-          });
-        });
-
-        it('with `huntKey` as `PUT` form parameter', function (done) {
-          request({
-            'method': 'PUT',
-            'url': 'http://localhost:' + port + '/auth/myself',
-            'form': {'huntKey': huntKeys[0]}
-          }, function (error, response, body) {
-            testingCallback(error, response, body, done);
-          });
-        });
-
-        it('with `huntKey` as `DELETE` form parameter', function (done) {
-          request({
-            'method': 'DELETE',
-            'url': 'http://localhost:' + port + '/auth/myself',
-            'form': {'huntKey': huntKeys[0]}
-          }, function (error, response, body) {
-            testingCallback(error, response, body, done);
-          });
-        });
-      });
-
-      describe('Using huntKey as header', function () {
         it('works with `huntKey` as custom header for GET response', function (done) {
           request({
             'method': 'GET',
-            'url': 'http://localhost:' + port + '/auth/myself',
+            'url': 'http://localhost:' + port + '/api/v1/myself',
             'headers': {'huntKey': huntKeys[0]}
           }, function (error, response, body) {
-            testingCallback(error, response, body, done);
-          });
-        });
-
-        it('works with `huntKey` as custom header for POST response', function (done) {
-          request({
-            'method': 'POST',
-            'url': 'http://localhost:' + port + '/auth/myself',
-            'headers': {'huntKey': huntKeys[0]}
-          }, function (error, response, body) {
-            testingCallback(error, response, body, done);
-          });
-        });
-
-        it('works with `huntKey` as custom header for PUT response', function (done) {
-          request({
-            'method': 'PUT',
-            'url': 'http://localhost:' + port + '/auth/myself',
-            'headers': {'huntKey': huntKeys[0]}
-          }, function (error, response, body) {
-            testingCallback(error, response, body, done);
-          });
-        });
-
-        it('works with `huntKey` as custom header for DELETE response', function (done) {
-          request({
-            'method': 'DELETE',
-            'url': 'http://localhost:' + port + '/auth/myself',
-            'headers': {'huntKey': huntKeys[0]}
-          }, function (error, response, body) {
+            console.log(JSON.parse(body));
             testingCallback(error, response, body, done);
           });
         });
       });
+
+      describe('PUT', function () {
+        it('updates name, address of a user', function(done) {
+          var newInfo = {
+            'zip': 13413,
+            'city': 'New Hartford',
+            'name': {
+              'givenName' : 'George',
+              'middleName': 'Dubya'
+            }
+          };
+          request({
+            'method': 'PUT',
+            'url': 'http://localhost:' + port + '/api/v1/myself',
+            'headers': {'huntKey': huntKeys[0]},
+            'form' : newInfo,
+            'json': true
+          }, function (error, response, body) {
+            response.statusCode.should.be.equal(202);
+            body.name.givenName.should.equal(newInfo.name.givenName);
+            body.name.middleName.should.equal(newInfo.name.middleName);
+            body.name.familyName.should.equal('Zorg'); // Shouldn't erase original info
+            body.zip.should.equal(newInfo.zip.toString());
+            body.city.should.equal(newInfo.city);
+            done();
+          });
+        });
+
+      });
+
     });
   });
 
@@ -1830,7 +1768,7 @@ describe('AmazingCreditResults', function () {
   });
 
   // DEPRECATED
-  describe('Seller editing his/her tradelines', function () {
+  xdescribe('Seller editing his/her tradelines', function () {
     var sellerId,
       productId,
       sellerHuntKey,
@@ -1839,7 +1777,7 @@ describe('AmazingCreditResults', function () {
     before(function (done) {
       request({
         'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+        'url': 'http://localhost:' + port + '/api/v1/account/login',
         'form': {
           'username': 'gracedoe@example.org', // do not change!
           'password': 'test123'
@@ -1859,7 +1797,7 @@ describe('AmazingCreditResults', function () {
     });
 
 
-    it('seller is able to access /api/v1/myself at first to see, if it has proper huntKey', function (done) {
+    xit('seller is able to access /api/v1/myself at first to see, if it has proper huntKey', function (done) {
       request({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/myself',
@@ -2221,29 +2159,9 @@ describe('AmazingCreditResults', function () {
       before(function(done) {
         async.parallel([
           function(cb) {
-            request({
-              'method': 'POST',
-              'url': 'http://localhost:' + port + '/api/v1/buyer/login',
-              'headers': { },
-              'form': {
-                // Strangely, the api key isn't actually the api key field, it's the 
-                // welcome link field
-                // The api key field in the DB is actually the huntKey
-                'username': 'jamesdoe@example.org',
-                'password': 'test123'
-              },
-              'json': true
-            }, function (error, response, body) {
-              if (error) {
-                cb(error);
-              } else {
-                response.statusCode.should.be.equal(202);
-                body.Code.should.be.equal(202);
-                body.Success.should.be.equal('Welcome!');
-                body.huntKey.should.be.a.String;
-                cartBuyerHuntKey = body.huntKey;
-                cb();
-              }
+            helpers.login('jamesdoe@example.org', 'test123', function(err, body) {
+              cartBuyerHuntKey = body.huntKey;
+              cb();
             });
           },
           function(cb) {
@@ -2405,22 +2323,8 @@ describe('AmazingCreditResults', function () {
             async.waterfall([
               // Login as unverified user
               function (cb) {
-                request({
-                  'method': 'POST',
-                  'url': 'http://localhost:' + port + '/api/v1/buyer/login',
-                  'json': true,
-                  'form': {
-                    'username': 'janedoe@example.org',
-                    'password': 'test123'
-                  }
-                }, function (error, response, body) {
-                  if (error) {
-                    done(error);
-                  } else {
-                    response.statusCode.should.be.equal(202);
-                    response.body.Success.should.be.equal('Welcome!');
-                    cb(error, body.huntKey);
-                  }
+                helpers.login('janedoe@example.org', 'test123', function(error, body){
+                  cb(error, body.huntKey);
                 });
               },
               function (buyerHuntKey, cb) {
@@ -2613,7 +2517,8 @@ describe('AmazingCreditResults', function () {
   });
 
 
-  describe('Seller creates two tradelines and made revisions for them, and Owner rejects first one, and approves second one', function () {
+  // DEPRECATED
+  xdescribe('Seller creates two tradelines and made revisions for them, and Owner rejects first one, and approves second one', function () {
     var tradelineId1,
       tradelineId2,
       productId,
@@ -2623,7 +2528,7 @@ describe('AmazingCreditResults', function () {
 //getting huntKey for seller of Grace Doe
       request({
         'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/buyer/login',
+        'url': 'http://localhost:' + port + '/api/v1/account/login',
         'json': true,
         'form': {
           'username': 'gracedoe@example.org',
@@ -2633,7 +2538,7 @@ describe('AmazingCreditResults', function () {
         if (error) {
           done(error);
         } else {
-          response.statusCode.should.be.equal(202);
+          response.statusCode.should.be.equal(200);
           response.body.Success.should.be.equal('Welcome!');
           sellerHuntKey = body.huntKey;
           done();
@@ -2943,6 +2848,25 @@ describe('AmazingCreditResults', function () {
 
 
 var helpers = {
+  login: function(username, password, cb) {
+    request({
+      'method': 'POST',
+      'url': 'http://localhost:' + port + '/api/v1/account/login',
+      'form': {
+        'username': username,
+        'password': password
+      },
+      'json': true
+    }, function (error, response, body) {
+      if (error) {
+        cb(error);
+      } else {
+        response.statusCode.should.be.equal(200);
+        body.huntKey.should.be.a.String;
+        cb(null, body);
+      }
+    });
+  },
   clients: {
     list: function (huntKey, cb) {
       request({
