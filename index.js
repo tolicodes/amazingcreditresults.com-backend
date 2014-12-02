@@ -104,7 +104,7 @@ hunt.extendMiddleware(function(core) {
 });
 
 //loading different controllers for buyers
-hunt.extendRoutes(require('./controllers/buyer/account.js'));
+hunt.extendRoutes(require('./controllers/buyer/myself.js'));
 hunt.extendRoutes(require('./controllers/buyer/questionnaire.js'));
 hunt.extendRoutes(require('./controllers/buyer/verifications/echosign.js'));
 hunt.extendRoutes(require('./controllers/buyer/verifications/getprove.js'));

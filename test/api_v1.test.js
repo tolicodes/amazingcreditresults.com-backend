@@ -1474,111 +1474,112 @@ describe('AmazingCreditResults', function () {
         }]);
     });
 
+    describe('Creating', function() {
+      it('cannot create tradeline with invalid product', function (done) {
+        ownReq({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
+          'form': {
+            'name': 'TestTradeline' + testId,
+            'product': '5366506291e1e82b0f4be503', //non existant, but valid id
+            'seller': ownerId,
+            'totalAus': 10,
+            'usedAus': 5,
+            'price': 1100,
+            'creditLimit': 10000,
+            'cashLimit': 10000,
+            'currentBalance': 1000,
+            'ncRating': 'Silver',
+            'bcRating': 'Silver',
+            'moRating': 'Silver',
+            'cost': 1000,
+            'notes': 'Some notes'
+          }
+        }, function (error, response, body) {
+          //console.log(response);
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(400);
+            body.status.should.be.equal('Error');
+            body.errors.should.be.an.Array;
+            body.errors.length.should.be.equal(1);
+            body.errors[0].message.should.be.equal('Unable to find corresponding Product!');
+            body.errors[0].field.should.be.equal('product');
+            body.errors[0].value.should.be.equal('5366506291e1e82b0f4be503');
+            done();
+          }
+        });
+      });
 
-    it('cannot create tradeline with invalid product', function (done) {
-      ownReq({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
-        'form': {
-          'name': 'TestTradeline' + testId,
-          'product': '5366506291e1e82b0f4be503', //non existant, but valid id
-          'seller': ownerId,
-          'totalAus': 10,
-          'usedAus': 5,
-          'price': 1100,
-          'creditLimit': 10000,
-          'cashLimit': 10000,
-          'currentBalance': 1000,
-          'ncRating': 'Silver',
-          'bcRating': 'Silver',
-          'moRating': 'Silver',
-          'cost': 1000,
-          'notes': 'Some notes'
-        }
-      }, function (error, response, body) {
-        //console.log(response);
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(400);
-          body.status.should.be.equal('Error');
-          body.errors.should.be.an.Array;
-          body.errors.length.should.be.equal(1);
-          body.errors[0].message.should.be.equal('Unable to find corresponding Product!');
-          body.errors[0].field.should.be.equal('product');
-          body.errors[0].value.should.be.equal('5366506291e1e82b0f4be503');
-          done();
-        }
+      it('owner cannot create tradeline with invalid seller', function (done) {
+        ownReq({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
+          'form': {
+            'name': 'TestTradeline' + testId,
+            'product': productId,
+            'seller': '5366506291e1e82b0f4be503', //non existant, but valid id
+            'totalAus': 10,
+            'usedAus': 5,
+            'price': 1100,
+            'creditLimit': 10000,
+            'cashLimit': 10000,
+            'currentBalance': 1000,
+            'ncRating': 'Silver',
+            'bcRating': 'Silver',
+            'moRating': 'Silver',
+            'cost': 1000,
+            'notes': 'Some notes'
+          }
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(400);
+            body.status.should.be.equal('Error');
+            body.errors.should.be.an.Array;
+            body.errors.length.should.be.equal(1);
+            body.errors[0].message.should.be.equal('Unable to find corresponding Seller among the Users!');
+            body.errors[0].field.should.be.equal('seller');
+            body.errors[0].value.should.be.equal('5366506291e1e82b0f4be503');
+            done();
+          }
+        });
+      });
+
+      it('can create tradeline with valid product and seller', function (done) {
+        ownReq({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
+          'form': {
+            'product': productId,
+            'seller': ownerId,
+            'totalAus': 10,
+            'usedAus': 5,
+            'price': 1100,
+            'creditLimit': 10000,
+            'cashLimit': 10000,
+            'currentBalance': 1000,
+            'ncRating': 'Silver',
+            'bcRating': 'Silver',
+            'moRating': 'Silver',
+            'cost': 1000,
+            'notes': 'Some notes'
+          }
+        }, function (error, response, body) {
+          if (error) {
+            done(error);
+          } else {
+            response.statusCode.should.be.equal(201);
+            tradeLineId = body.id;
+            done();
+          }
+        });
       });
     });
-    
-    it('owner cannot create tradeline with invalid seller', function (done) {
-      ownReq({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
-        'form': {
-          'name': 'TestTradeline' + testId,
-          'product': productId,
-          'seller': '5366506291e1e82b0f4be503', //non existant, but valid id
-          'totalAus': 10,
-          'usedAus': 5,
-          'price': 1100,
-          'creditLimit': 10000,
-          'cashLimit': 10000,
-          'currentBalance': 1000,
-          'ncRating': 'Silver',
-          'bcRating': 'Silver',
-          'moRating': 'Silver',
-          'cost': 1000,
-          'notes': 'Some notes'
-        }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(400);
-          body.status.should.be.equal('Error');
-          body.errors.should.be.an.Array;
-          body.errors.length.should.be.equal(1);
-          body.errors[0].message.should.be.equal('Unable to find corresponding Seller among the Users!');
-          body.errors[0].field.should.be.equal('seller');
-          body.errors[0].value.should.be.equal('5366506291e1e82b0f4be503');
-          done();
-        }
-      });
-    });
 
-    it('can create tradeline with valid product and seller', function (done) {
-      ownReq({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/owner/tradelines',
-        'form': {
-          'product': productId,
-          'seller': ownerId,
-          'totalAus': 10,
-          'usedAus': 5,
-          'price': 1100,
-          'creditLimit': 10000,
-          'cashLimit': 10000,
-          'currentBalance': 1000,
-          'ncRating': 'Silver',
-          'bcRating': 'Silver',
-          'moRating': 'Silver',
-          'cost': 1000,
-          'notes': 'Some notes'
-        }
-      }, function (error, response, body) {
-        if (error) {
-          done(error);
-        } else {
-          response.statusCode.should.be.equal(201);
-          tradeLineId = body.id;
-          done();
-        }
-      });
-    });
-
-    it('can list tradelines', function (done) {
+    it('can list all tradelines', function (done) {
       ownReq({
         'method': 'GET',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines'
@@ -1652,7 +1653,7 @@ describe('AmazingCreditResults', function () {
       });
     });
 
-    it('owner can update tradeline', function (done) {
+    it('can update tradeline', function (done) {
       ownReq({
         'method': 'PUT',
         'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + tradeLineId,
@@ -2153,7 +2154,7 @@ describe('AmazingCreditResults', function () {
 
 
 
-  describe('Buyer Cart Management', function () {
+  describe.only('Buyer Cart Management', function () {
       var cartBuyerHuntKey;
       // Login the buyer
       before(function(done) {
@@ -2493,7 +2494,7 @@ describe('AmazingCreditResults', function () {
             function () {
               request({
                 'method': 'GET',
-                'url': 'http://localhost:' + port + '/api/v1/account',
+                'url': 'http://localhost:' + port + '/api/v1/myself/transactions',
                 'headers': {'huntKey': cartBuyerHuntKey},
                 'json': true
               }, function(error, response, body) {

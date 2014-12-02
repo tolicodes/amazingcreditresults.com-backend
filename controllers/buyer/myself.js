@@ -3,7 +3,7 @@ var ensureRole = require('./../../lib/middleware.js').ensureRole;
 module.exports = exports = function (core) {
   //show current user balance
   //https://oselot.atlassian.net/browse/ACR-387#
-  core.app.get('/api/v1/account', ensureRole('buyer'), function(request, response) {
+  core.app.get('/api/v1/myself/transactions', ensureRole('buyer'), function(request, response) {
     request.model.Transaction.find({
       'client': request.user._id
     })
