@@ -50,6 +50,8 @@ module.exports = exports = function (core) {
       if (request.body.meta) {
         acct.meta = request.body.meta;
       }
+      console.log('TEST');
+      console.log(acct);
       // TODO implement with balanced
       // Add account number to buyer profile
       // Set verify to false
@@ -57,11 +59,14 @@ module.exports = exports = function (core) {
       balanced.marketplace.bank_accounts.create(acct).then(function (bank_account) {
         var acctId = bank_account.id;
         console.log('Bank account created: ' + acctId);
+        console.log(bank_account);
+        response.status(202).json({'Status': 'pending'});
         bank_account.verify().then(function (verification) {
           console.log('Verifying!');
           response.status(202).json({'Status': 'pending'});
         });
       }, function(err) {
+        console.log(err);
         response.status(500).json(err);
       });
     }
