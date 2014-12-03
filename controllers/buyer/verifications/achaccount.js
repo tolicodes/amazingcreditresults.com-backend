@@ -30,11 +30,52 @@ var ACH = {
       ));
     }
     return (errors.length === 0) ? false : errors;
+  },
+  verifyCheckRequest: function(body, user) {
+    errors = [];
+    if (!body.amount1) {
+      errors.push(createError(
+        'Amount1 is missing!',
+        'amount1'
+      ));
+    }
+    if (!body.amount2) {
+      errors.push(createError(
+        'Amount2 is missing!',
+        'amount2'
+      ));
+    }
+    if (!user.achAccount) {
+      errors.push(createError(
+        'Must add ACH account before verifying.',
+        'achAccount'
+      ));
+    } else if (user.achAccount.verified === true) {
+      errors.push(createError(
+        'ACH account already verified!',
+        'achAccount'
+      ));
+    }
+    return (errors.length === 0) ? false : errors;
   }
 }
 
 module.exports = exports = function (core) {
   balanced.configure(core.config.balancedApiKey);
+
+  var setBalanceAccount = function(userId, acctId, cb) {
+    core.model.User
+      .findOneAndUpdate({
+        _id: userId
+      }, {
+        'profile.achAccount' : {
+          'id': acctId,
+          'verified': false
+        }
+      }, function(err, user) {
+        cb(err, user);
+      });
+  };
 
   core.app.post('/api/v1/myself/billing/achAccount', ensureRole('buyer'), function (request, response) {
     var errors = ACH.verifyCreationRequest(request.body);
@@ -50,29 +91,46 @@ module.exports = exports = function (core) {
       if (request.body.meta) {
         acct.meta = request.body.meta;
       }
-      console.log('TEST');
-      console.log(acct);
       // TODO implement with balanced
       // Add account number to buyer profile
       // Set verify to false
 
       balanced.marketplace.bank_accounts.create(acct).then(function (bank_account) {
         var acctId = bank_account.id;
-        console.log('Bank account created: ' + acctId);
-        console.log(bank_account);
-        response.status(202).json({'Status': 'pending'});
-        bank_account.verify().then(function (verification) {
-          console.log('Verifying!');
-          response.status(202).json({'Status': 'pending'});
+        bank_account.verify().then(function () {
+          setBalanceAccount(request.user.id, bank_account.id, function(err) {
+            if (err) {
+              response.status(500).json({
+                'status': 'error',
+                'errors': [{
+                  'code': 500,
+                  'message': err
+                }]
+              });
+            } else {
+              response.status(202).json({
+                'status': 'ok',
+                'account': bank_account.id,
+                'verified': false
+              });
+            }
+          });
         });
       }, function(err) {
-        console.log(err);
         response.status(500).json(err);
       });
     }
   });
 
   core.app.post('/api/v1/myself/billing/achAccount/verify', ensureRole('buyer'), function (request, response) {
-    response.status(403).json('Endpoint in progress');
+    var errors = verifyCheckRequest(request.body, request.user);
+    if (errors) {
+      response.status(400).json({status: 'Error', errors: errors});
+    } else {
+      balanced.get('/verifications/'+request.user.achAccount.id).then(function (bank_account) {
+        // TODO implement
+      });
+      response.status(403).json('Endpoint in progress');
+    }
   });
 }

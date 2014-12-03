@@ -919,7 +919,7 @@ describe('AmazingCreditResults', function () {
           test: true
         }
       };
-      beforeEach(function(done){
+      before(function(done){
         helper.resetBuyer(function(err, user){
           buyerHuntKey = user.apiKey;
           done();
@@ -964,13 +964,38 @@ describe('AmazingCreditResults', function () {
         });
       });
 
-      it('can create verification', function(done){
-        helpers.verify.ach.create(buyerHuntKey, bank.acct, bank.route, bank.type, function(error, response, body) {
-          console.log(body);
-          response.statusCode.should.be.equal(202);
-          done();
+      describe('Valid Request', function() {
+        var achId;
+
+        it('can create verification', function(done){
+          this.timeout(30000);
+          helpers.verify.ach.create(buyerHuntKey, bank.acct, bank.route, bank.type, function(error, response, body) {
+            response.statusCode.should.be.equal(202);
+            body.status.should.equal('ok');
+            body.account.should.be.String;
+            body.verified.should.equal(false);
+
+            request({
+              'method': 'GET',
+              'url': 'http://localhost:' + port + '/api/v1/myself',
+              'headers': {'huntKey': buyerHuntKey},
+              'json': true
+            }, function (error, response, body) {
+              response.statusCode.should.be.equal(200);
+              body.achAccount.id.should.be.String;
+              body.achAccount.verified.should.equal(false);
+              achId = body.achAccount.id;
+              done();
+            });
+          });
         });
 
+        // Requires previous test run first
+        it('can verify account', function(done) {
+          helpers.verify.ach.check(buyerHuntKey, 10, 5, function(error, response, body){
+            done();
+          });
+        });
       });
     });
   });
@@ -3179,6 +3204,21 @@ var helpers = {
             'accountNumber': acct,
             'routingNumber': route,
             'accountType': type,
+            'meta': {
+              'test': true
+            }
+          },
+          'json': true
+        }, cb);
+      },
+      check: function(huntKey, amt1, amt2, cb) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/myself/billing/achAccount/verify',
+          'headers': {'huntKey': huntKey},
+          'form': {
+            'amount1': amt1,
+            'amount2': amt2,
             'meta': {
               'test': true
             }
