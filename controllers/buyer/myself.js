@@ -34,6 +34,34 @@ module.exports = exports = function (core) {
       });
   });
 
+  core.app.post('/api/v1/myself/creditReport', ensureRole('buyer'), function(request, response) {
+    var errors = [];
+    var form = {};
+    ['site', 'username', 'password'].forEach(function(key){
+      if (!request.body[key]) {
+        errors.push({
+          'code': 400,
+          'message': 'Missing required parameter!',
+          'field': key
+        });
+      } else {
+        form[key] = request.body[key];
+      }
+    });
+    if (errors.length > 0) {
+      response.status(400).json({status:'Error', errors: errors});
+    } else {
+      core.model.User
+        .update({
+          _id: request.user.id
+        }, {
+         'profile.creditReportLogin': form
+        }).exec().then(function() {
+          response.status(202).json({status: 'ok'});
+        });
+    }
+  });
+
   //https://oselot.atlassian.net/browse/ACR-145
   core.app.get('/api/v1/buyer/needToSetPassword/:welcomeLink', function(request, response) {
     request.model.User.findOneByKeychain('welcomeLink', request.params.welcomeLink,

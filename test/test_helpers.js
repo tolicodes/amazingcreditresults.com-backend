@@ -1,6 +1,8 @@
 var MongoClient = require('mongodb').MongoClient,
     async = require('async'),
     fs = require('fs'),
+    request = require('request'),
+    port = 3001,
     _ = require('underscore');
 
 // Connection URL - may need to change depending on your local config
@@ -149,7 +151,8 @@ exports.resetBuyer = function(callback, mods) {
       'city': 'Brooklyn',
       'state': 'NY',
       'zip': '11201',
-      'ssn': '333-555-1111'
+      'ssn': '333-555-1111',
+      'achAccount': mods.achAccount || undefined
     },
     'accountVerified' : true,
     'root' : false,
@@ -235,3 +238,193 @@ exports.resetProductsAndTradelines = function(callback) {
     );
   });
 };
+
+
+var api = {
+  login: function(username, password, cb) {
+    request({
+      'method': 'POST',
+      'url': 'http://localhost:' + port + '/api/v1/account/login',
+      'form': {
+        'username': username,
+        'password': password
+      },
+      'json': true
+    }, function (error, response, body) {
+      if (error) {
+        cb(error);
+      } else {
+        response.statusCode.should.be.equal(200);
+        body.huntKey.should.be.a.String;
+        cb(null, body);
+      }
+    });
+  },
+  clients: {
+    list: function (huntKey, cb) {
+      request({
+        'method': 'GET',
+        'url': 'http://localhost:' + port + '/api/v1/admin/clients',
+        'headers': {'huntKey': huntKey},
+        json: true
+      }, cb);
+    },
+
+    get: function (huntKey, id, cb) {
+      request({
+        'method': 'GET',
+        'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + id,
+        'headers': {'huntKey': huntKey},
+        json: true
+      }, cb);
+    },
+
+    del: function (huntKey, id, cb) {
+      request({
+        'method': 'DELETE',
+        'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + id,
+        'headers': {'huntKey': huntKey},
+        json: true
+      }, cb);
+    }
+  },
+  tradelines: {
+    list: function (huntKey, cb) {
+      request({
+        'method': 'GET',
+        'url': 'http://localhost:' + port + '/api/v1/tradelines',
+        'headers': {'huntKey': huntKey},
+        json: true
+      }, cb);
+    },
+
+    archive: function (huntKey, id, cb) {
+      request({
+        'method': 'DELETE',
+        'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + id,
+        'headers': { 'huntKey': huntKey },
+        'json': true
+      }, cb);
+    },
+
+    get: function (huntKey, id, cb) {
+      request({
+        'method': 'GET',
+        'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + id,
+        'headers': { 'huntKey': huntKey },
+        'json': true
+      }, cb);
+    }
+  },
+  cart: {
+    addTradeline: function (huntKey, id, cb) {
+      request({
+        'method': 'POST',
+        'url': 'http://localhost:' + port + '/api/v1/cart/tradelines',
+        'headers': {'huntKey': huntKey},
+        form: {id: id},
+        json: true
+      }, cb);
+    },
+
+    deleteTradeline: function (huntKey, id, cb) {
+      request({
+        'method': 'DELETE',
+        'url': 'http://localhost:' + port + '/api/v1/cart/tradelines/' + id,
+        'headers': {'huntKey': huntKey},
+        json: true
+      }, cb);
+    },
+
+    getTradelines: function (huntKey, cb) {
+      request({
+        'method': 'GET',
+        'url': 'http://localhost:' + port + '/api/v1/cart/tradelines',
+        'headers': {'huntKey': huntKey},
+        json: true
+      }, cb);
+    },
+
+    checkout: function (huntKey, cb) {
+      request({
+        'method': 'POST',
+        'url': 'http://localhost:' + port + '/api/v1/cart/checkout',
+        'headers': {'huntKey': huntKey},
+        'json': true
+      }, cb);
+    }
+  },
+  verify: {
+    ach: {
+      create: function(huntKey, options, cb) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/myself/billing/achAccount',
+          'headers': {'huntKey': huntKey},
+          'form': options,
+          'json': true
+        }, cb);
+      },
+      check: function(huntKey, options, cb) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/myself/billing/achAccount/verify',
+          'headers': {'huntKey': huntKey},
+          'form': options,
+          'json': true
+        }, cb);
+      },
+      defaults: {
+        bank: function() {
+          return {
+            accountNumber: '9900000000',
+            routingNumber: '021000021',
+            accountType: 'checking',
+            meta: {
+              test: true
+            }
+          };
+        },
+        payout: function() {
+          return {
+            'amount1': 1,
+            'amount2': 1,
+            'meta': {
+              'test': true
+            }
+          };
+        }
+      }
+    },
+    phone: {
+      send: function(huntKey, cb) {
+        request({
+          'method': 'GET',
+          'url': 'http://localhost:' + port + '/api/v1/verifyPhone',
+          'headers': {'huntKey': huntKey},
+          'json': true
+        }, cb);
+      },
+      checkPin: function(huntKey, pin, cb) {
+        request({
+          'method': 'POST',
+          'url': 'http://localhost:' + port + '/api/v1/verifyPhone',
+          'headers': {'huntKey': huntKey},
+          'form': {'pin' : pin},
+          'json': true
+        }, cb);
+      }
+    }
+  },
+  setCreditReport: function(huntKey, options, cb){
+    request({
+      'method': 'POST',
+      'url': 'http://localhost:' + port + '/api/v1/myself/creditReport',
+      'headers': {'huntKey': huntKey},
+      'form': options,
+      'json': true
+    }, cb);
+  }
+};
+
+_.extend(exports, api);

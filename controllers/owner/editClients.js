@@ -128,7 +128,6 @@ module.exports = exports = function (core) {
     };
 
     patch = utilities.createPatch(request.body, nameFields, fieldMap);
-    console.log(patch);
 
     if (patch !== {}) {
       // An EVS field was changed, so reset verification

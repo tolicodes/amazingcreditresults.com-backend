@@ -47,7 +47,7 @@ var request = require('request'),
 describe('AmazingCreditResults', function () {
   // ownerHuntKey used by many other tests
   function loginOwner(done) {
-    helpers.login('owner@example.org', 'test123', function(err, body) {
+    helper.login('owner@example.org', 'test123', function(err, body) {
       ownerHuntKey = body.huntKey;
       ownerId = body.id;
       ownReq = request.defaults({
@@ -57,11 +57,20 @@ describe('AmazingCreditResults', function () {
       done();
     });
   }
+  function loginBuyer(done) {
+    helper.resetBuyer(function(err, user){
+      buyerHuntKey = user.apiKey;
+      done(err);
+    });
+  }
   before(function (done) {
     backend.once('start', function (evnt) {
       if (evnt.type === 'webserver' || evnt.port === port) {
         backend.once('populated', function () {
-          loginOwner(done);
+          async.parallel([
+            function(cb) { loginBuyer(cb); },
+            function(cb) { loginOwner(cb); }
+          ], done);
         });
       } else {
         done(new Error('We are unable to start backend, sorry!'));
@@ -222,18 +231,18 @@ describe('AmazingCreditResults', function () {
         it('can delete a buyer', function (done) {
           async.series([
             /*function (cb) {
-             helpers.clients.list(ownerHuntKey, function (error, response, body) {
+             helper.clients.list(ownerHuntKey, function (error, response, body) {
              cb(error, helper.findWithRole('buyer', body))
              });
              },*/
             function (cb) {
-              helpers.clients.del(ownerHuntKey, userId, function (error, response) {
+              helper.clients.del(ownerHuntKey, userId, function (error, response) {
                 response.statusCode.should.be.equal(202);
                 cb(error);
               });
             },
             function (cb) {
-              helpers.clients.get(ownerHuntKey, userId, function (error, response, body) {
+              helper.clients.get(ownerHuntKey, userId, function (error, response, body) {
                 body.data.isBanned.should.be.true;
                 cb(error);
               });
@@ -337,7 +346,7 @@ describe('AmazingCreditResults', function () {
 
       it('can login as newly created owner', function (done) {
         var username = 'owner' + testId + '@example.org';
-        helpers.login(username, 'test123', function(err, body) {
+        helper.login(username, 'test123', function(err, body) {
             ownerHuntKey2 = body.huntKey;
             done();
         });
@@ -356,7 +365,6 @@ describe('AmazingCreditResults', function () {
           body.huntKey.should.be.equal(ownerHuntKey2);
           body.email.should.be.equal('owner' + testId + '@example.org');
           body.roles.owner.should.be.true;
-          body.profile.should.be.an.Object;
           body.name.givenName.should.be.equal('John');
           body.name.familyName.should.be.equal('Doe');
           done();
@@ -366,12 +374,12 @@ describe('AmazingCreditResults', function () {
       it('cannot delete an owner', function (done) {
         async.waterfall([
           function (cb) {
-            helpers.clients.list(ownerHuntKey, function (error, response, body) {
+            helper.clients.list(ownerHuntKey, function (error, response, body) {
               cb(error, helper.findWithRole('owner', body))
             });
           },
           function (owner, cb) {
-            helpers.clients.del(ownerHuntKey, owner.id, function (error, response) {
+            helper.clients.del(ownerHuntKey, owner.id, function (error, response) {
               cb(error, response);
             });
           }
@@ -572,7 +580,7 @@ describe('AmazingCreditResults', function () {
       });
 
       it('authorizes user if they log in with email and password', function (done) {
-        helpers.login(userInfo.email, 'fiflesAndFufles', function(err, body) {
+        helper.login(userInfo.email, 'fiflesAndFufles', function(err, body) {
           buyerHuntKey = body.huntKey;
           done();
         });
@@ -612,30 +620,14 @@ describe('AmazingCreditResults', function () {
     describe('Verify Phone', function() {
       var phoneNum = '3152727199';
       before(function(done) {
-        async.series([
-          function(cb) {
-            request({
-              'method': 'POST',
-              'url': 'http://localhost:' + port + '/api/v1/account/login',
-              'headers': { },
-              'form': {
-                'username': 'jamesdoe@example.org',
-                'password': 'test123'
-              },
-              'json': true
-            }, function (error, response, body) {
-              buyerHuntKey = body.huntKey;
-              cb();
-            });
-          },
-          function() {
-            helper.resetBuyer(done, { phoneVerified: false, phone: phoneNum});
-          }
-        ]);
+        helper.resetBuyer(function(err, user){
+          buyerHuntKey = user.apiKey;
+          done(err);
+        }, { phoneVerified: false, phone: phoneNum});
       });
 
       it('will send verification if phone is not verified', function(done) {
-        helpers.verify.phone.send(buyerHuntKey, function(error, response, body) {
+        helper.verify.phone.send(buyerHuntKey, function(error, response, body) {
           response.statusCode.should.be.equal(202);
           body.status.should.be.equal('Ok');
           body.phoneVerified.should.be.false;
@@ -645,7 +637,7 @@ describe('AmazingCreditResults', function () {
       });
 
       it('will error if no pin provided', function(done) {
-        helpers.verify.phone.checkPin(buyerHuntKey, undefined, function(error, response, body) {
+        helper.verify.phone.checkPin(buyerHuntKey, undefined, function(error, response, body) {
           response.statusCode.should.be.equal(400);
           body.status.should.be.equal('Error');
           body.errors[0].message.should.be.equal('Pin code is missing!');
@@ -655,7 +647,7 @@ describe('AmazingCreditResults', function () {
 
       it('will error on incorrect pin', function(done) {
         var badPin = '133700';
-        helpers.verify.phone.checkPin(buyerHuntKey, badPin, function(error, response, body) {
+        helper.verify.phone.checkPin(buyerHuntKey, badPin, function(error, response, body) {
           response.statusCode.should.be.equal(400);
           body.status.should.be.equal('Error');
           body.errors[0].message.should.be.equal('Invalid verification code, please try again');
@@ -665,7 +657,7 @@ describe('AmazingCreditResults', function () {
 
       it('can confirm correct pin', function(done) {
         var goodPin = '000000';
-        helpers.verify.phone.checkPin(buyerHuntKey, goodPin, function(error, response, body) {
+        helper.verify.phone.checkPin(buyerHuntKey, goodPin, function(error, response, body) {
           response.statusCode.should.be.equal(202);
           body.status.should.be.equal('Ok');
           body.phoneVerified.should.be.true;
@@ -680,7 +672,7 @@ describe('AmazingCreditResults', function () {
             helper.resetBuyer(cb, { phoneVerified: true, phone: phoneNum});
           },
           function() {
-            helpers.verify.phone.send(buyerHuntKey, function(error, response, body) {
+            helper.verify.phone.send(buyerHuntKey, function(error, response, body) {
               response.statusCode.should.be.equal(200);
               body.status.should.be.equal('Ok');
               body.phoneVerified.should.be.true;
@@ -761,7 +753,7 @@ describe('AmazingCreditResults', function () {
             });
           }
         ], function(err, email, newPass) {
-          helpers.login(email, newPass, function(err) {
+          helper.login(email, newPass, function(err) {
             done(err);
           });
         });
@@ -910,15 +902,9 @@ describe('AmazingCreditResults', function () {
 
     });
 
-    describe.only('Verify ACH Account', function() {
-      var bank = {
-        acct: '9900000000',
-        route: '021000021',
-        type: 'checking',
-        meta: {
-          test: true
-        }
-      };
+    describe('Verify ACH Account', function() {
+      var bankInfo = helper.verify.ach.defaults.bank();
+
       before(function(done){
         helper.resetBuyer(function(err, user){
           buyerHuntKey = user.apiKey;
@@ -926,50 +912,106 @@ describe('AmazingCreditResults', function () {
         });
       });
 
+
       describe('Invalid Requests', function() {
-        it('requires an account number', function(done){
-          helpers.verify.ach.create(buyerHuntKey, null, bank.route, bank.type, function(error, response, body){
-            response.statusCode.should.be.equal(400);
-            body.errors[0].message.should.equal('Account Number is not provided!');
-            body.errors[0].field.should.equal('accountNumber');
-            done();
+        describe('Creating Validation', function() {
+          // Reset Info
+          beforeEach(function(){
+            bankInfo = helper.verify.ach.defaults.bank();
+          });
+
+          it('requires an account number', function(done){
+            delete bankInfo.accountNumber;
+            helper.verify.ach.create(buyerHuntKey, bankInfo, function(error, response, body){
+              response.statusCode.should.be.equal(400);
+              body.errors[0].message.should.equal('Account Number is not provided!');
+              body.errors[0].field.should.equal('accountNumber');
+              done();
+            });
+          });
+
+          it('requires an account type', function(done){
+            delete bankInfo.accountType;
+            helper.verify.ach.create(buyerHuntKey, bankInfo, function(error, response, body){
+              response.statusCode.should.be.equal(400);
+              body.errors[0].message.should.equal('Account type must be `checking` or `savings`!');
+              body.errors[0].field.should.equal('accountType');
+              done();
+            });
+          });
+
+          it('requires a valid account type', function(done){
+            bankInfo.accountType = 'fakeType';
+            helper.verify.ach.create(buyerHuntKey, bankInfo, function(error, response, body){
+              response.statusCode.should.be.equal(400);
+              body.errors[0].message.should.equal('Account type must be `checking` or `savings`!');
+              body.errors[0].field.should.equal('accountType');
+              done();
+            });
+          });
+
+          it('requires a routing number', function(done){
+            delete bankInfo.routingNumber;
+            helper.verify.ach.create(buyerHuntKey, bankInfo, function(error, response, body){
+              response.statusCode.should.be.equal(400);
+              body.errors[0].message.should.equal('Routing Number is not provided!');
+              body.errors[0].field.should.equal('routingNumber');
+              done();
+            });
           });
         });
 
-        it('requires an account type', function(done){
-          helpers.verify.ach.create(buyerHuntKey, bank.acct, bank.route, null, function(error, response, body){
-            response.statusCode.should.be.equal(400);
-            //body.errors[0].message.should.equal('Account number is not provided!');
-            body.errors[0].field.should.equal('accountType');
-            done();
+        describe('Confirming Payouts', function() {
+          var payoutInfo;
+          beforeEach(function(){
+            payoutInfo = helper.verify.ach.defaults.payout();
+          });
+
+          it('requires amounts in API request', function(done) {
+            delete payoutInfo.amount1;
+            delete payoutInfo.amount2;
+            helper.verify.ach.check(buyerHuntKey, payoutInfo, function(error, response, body) {
+              response.statusCode.should.be.equal(400);
+              body.errors[0].message.should.equal('Amount1 is missing!');
+              body.errors[1].message.should.equal('Amount2 is missing!');
+              done();
+            });
+          });
+
+          it('requires user has already set up ACH account', function(done) {
+            helper.verify.ach.check(buyerHuntKey, payoutInfo, function(error, response, body) {
+              response.statusCode.should.be.equal(400);
+              body.errors[0].message.should.equal('Must add ACH account before verifying.');
+              done();
+            });
+          });
+
+          it('errors if user already validated ACH account', function(done) {
+            async.series([
+                function(cb) {
+                  helper.resetBuyer(cb, {achAccount: {id: '123b3c2x', 'verified': true}})
+                },
+                function() {
+                  helper.verify.ach.check(buyerHuntKey, payoutInfo, function(error, response, body) {
+                    response.statusCode.should.be.equal(400);
+                    body.errors[0].message.should.equal('ACH account already verified!');
+                    done();
+                  });
+                }
+            ]);
           });
         });
 
-        it('requires a valid account type', function(done){
-          helpers.verify.ach.create(buyerHuntKey, bank.acct, bank.route, 'fakeType', function(error, response, body) {
-            response.statusCode.should.be.equal(400);
-            //body.errors[0].message.should.equal('Account number is not provided!');
-            body.errors[0].field.should.equal('accountType');
-            done();
-          });
-        });
-
-        it('requires a routing number', function(done){
-          helpers.verify.ach.create(buyerHuntKey, bank.acct, null, bank.type, function(error, response, body) {
-            response.statusCode.should.be.equal(400);
-            body.errors[0].message.should.equal('Routing Number is not provided!');
-            body.errors[0].field.should.equal('routingNumber');
-            done();
-          });
-        });
       });
 
-      describe('Valid Request', function() {
-        var achId;
+      // This test is slow, but should be run for completeness
+      // TODO move into separate file
+      xdescribe('Valid Request', function() {
 
         it('can create verification', function(done){
-          this.timeout(30000);
-          helpers.verify.ach.create(buyerHuntKey, bank.acct, bank.route, bank.type, function(error, response, body) {
+          var bank = helper.verify.ach.defaults.bank();
+          this.timeout(60000);
+          helper.verify.ach.create(buyerHuntKey, bank, function(error, response, body) {
             response.statusCode.should.be.equal(202);
             body.status.should.equal('ok');
             body.account.should.be.String;
@@ -983,19 +1025,104 @@ describe('AmazingCreditResults', function () {
             }, function (error, response, body) {
               response.statusCode.should.be.equal(200);
               body.achAccount.id.should.be.String;
+              body.achAccount.verifyId.should.be.String;
               body.achAccount.verified.should.equal(false);
-              achId = body.achAccount.id;
               done();
             });
           });
         });
 
         // Requires previous test run first
-        it('can verify account', function(done) {
-          helpers.verify.ach.check(buyerHuntKey, 10, 5, function(error, response, body){
+        it('returns false if wrong amounts', function(done) {
+          var payout = helper.verify.ach.defaults.payout();
+          payout.amount2 = 25;
+          this.timeout(60000);
+          helper.verify.ach.check(buyerHuntKey, payout, function(error, response, body){
+            response.statusCode.should.be.equal(400);
+            body.verificationSuccess.should.equal(false);
             done();
           });
         });
+
+        // Requires previous test run first
+        it('can verify account', function(done) {
+          var payout = helper.verify.ach.defaults.payout();
+          this.timeout(60000);
+          helper.verify.ach.check(buyerHuntKey, payout, function(error, response, body){
+            console.log(body);
+            response.statusCode.should.be.equal(202);
+            body.verificationSuccess.should.equal(true);
+            request({
+              'method': 'GET',
+              'url': 'http://localhost:' + port + '/api/v1/myself',
+              'headers': {'huntKey': buyerHuntKey},
+              'json': true
+            }, function (error, response, body) {
+              response.statusCode.should.be.equal(200);
+              body.achAccount.verified.should.equal(true);
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    describe('Setting Credit Report Login', function(){
+      var login;
+      var defaultInfo = function() {
+        return {
+          'site': 'creditchecktotal.com',
+          'username': 'fastbuyer123',
+          'password': 'sup3rs3cure'
+        };
+      };
+      beforeEach(function(){
+        login = defaultInfo();
+      });
+      describe('Invalid Request', function(){
+        it('requires a site', function(done){
+          delete login.site;
+          helper.setCreditReport(buyerHuntKey, login, function(err, response, body){
+            response.statusCode.should.equal(400);
+            body.errors[0].field.should.equal('site');
+            done();
+          });
+        });
+        it('requires a username', function(done){
+          delete login.username;
+          helper.setCreditReport(buyerHuntKey, login, function(err, response, body){
+            response.statusCode.should.equal(400);
+            body.errors[0].field.should.equal('username');
+            done();
+          });
+        });
+        it('requires a password', function(done){
+          delete login.password;
+          helper.setCreditReport(buyerHuntKey, login, function(err, response, body){
+            response.statusCode.should.equal(400);
+            body.errors[0].field.should.equal('password');
+            done();
+          });
+        });
+      });
+      it('sets credit login', function(done){
+        helper.setCreditReport(buyerHuntKey, login, function(err, response) {
+          response.statusCode.should.equal(202);
+          request({
+            'method': 'GET',
+            'url': 'http://localhost:' + port + '/api/v1/myself',
+            'headers': {'huntKey': buyerHuntKey},
+            'json': true
+          }, function(error, response, body) {
+            response.statusCode.should.equal(200);
+            body.creditReportLogin.username.should.equal(login.username);
+            body.creditReportLogin.site.should.equal(login.site);
+            body.creditReportLogin.password.should.be.String;
+            body.creditReportLogin.password.should.not.equal(login.password);
+            done();
+          });
+        });
+
       });
     });
   });
@@ -1005,7 +1132,7 @@ describe('AmazingCreditResults', function () {
     //todo - with clustering this test behaves strange
     var ownerHuntKey1;
     before(function (done) {
-      helpers.login('owner@example.org', 'test123', function(err, body) {
+      helper.login('owner@example.org', 'test123', function(err, body) {
           ownerHuntKey1 = body.huntKey;
           done();
       });
@@ -1283,7 +1410,6 @@ describe('AmazingCreditResults', function () {
             'form' : newInfo,
             'json': true
           }, function (error, response, body) {
-            console.log(body);
             response.statusCode.should.be.equal(202);
             body.name.givenName.should.equal(newInfo.name.givenName);
             body.name.middleName.should.equal(newInfo.name.middleName);
@@ -1957,7 +2083,7 @@ describe('AmazingCreditResults', function () {
 
     describe('Archiving', function() {
       it('owner can archive active tradeline', function (done) {
-        helpers.tradelines.archive(ownerHuntKey, tradeLineId,
+        helper.tradelines.archive(ownerHuntKey, tradeLineId,
         function (error, response, body) {
           if (error) {
             done(error);
@@ -1965,7 +2091,7 @@ describe('AmazingCreditResults', function () {
             response.statusCode.should.be.equal(202);
             body.status.should.be.equal('Tradeline archived');
 
-            helpers.tradelines.get(ownerHuntKey, tradeLineId,
+            helper.tradelines.get(ownerHuntKey, tradeLineId,
             function (err, response1, body1) {
               if (err) {
                 done(err);
@@ -1982,7 +2108,7 @@ describe('AmazingCreditResults', function () {
 
       it('owner cannot archive invalid tradeline', function(done) {
         var invalidId = '547006878128698dbc0e2151'; // valid MongoId, but not in the DB
-        helpers.tradelines.archive(ownerHuntKey, invalidId,
+        helper.tradelines.archive(ownerHuntKey, invalidId,
         function (error, response, body) {
           if (error) {
             done(error);
@@ -2390,7 +2516,7 @@ describe('AmazingCreditResults', function () {
       before(function(done) {
         async.parallel([
           function(cb) {
-            helpers.login('jamesdoe@example.org', 'test123', function(err, body) {
+            helper.login('jamesdoe@example.org', 'test123', function(err, body) {
               cartBuyerHuntKey = body.huntKey;
               cb();
             });
@@ -2415,14 +2541,14 @@ describe('AmazingCreditResults', function () {
         it('can add a tradeline to a cart', function (done) {
           async.waterfall([
             function (cb) {
-              helpers.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
+              helper.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
                 body.data.should.be.instanceof(Array);
                 body.data.length.should.be.above(0);
                 cb(error, body.data[0]);
               });
             },
             function (tradeline, cb) {
-              helpers.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error, response, body) {
+              helper.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error, response, body) {
                 body.status.should.be.equal('Ok');
                 response.statusCode.should.be.equal(202);
                 cb(error, response);
@@ -2440,27 +2566,27 @@ describe('AmazingCreditResults', function () {
         it('cannot add the same tradeline twice', function (done) {
           async.waterfall([
             function (cb) {
-              helpers.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
+              helper.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
                 cb(error, body.data[0]);
               });
             },
             function (tradeline, cb) {
-              helpers.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error) {
+              helper.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error) {
                 cb(error, tradeline);
               });
             },
             function (tradeline, cb) {
-              helpers.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error) {
+              helper.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error) {
                 cb(error, tradeline);
               });
             },
             function (tradeline, cb) {
-              helpers.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error) {
+              helper.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error) {
                 cb(error);
               });
             },
             function (cb) {
-              helpers.cart.getTradelines(cartBuyerHuntKey, function (error, response, body) {
+              helper.cart.getTradelines(cartBuyerHuntKey, function (error, response, body) {
                 cb(error, body);
               });
             }
@@ -2471,7 +2597,7 @@ describe('AmazingCreditResults', function () {
         });
 
         it('fails if tradeline id not provided', function (done) {
-          helpers.cart.addTradeline(cartBuyerHuntKey, null, function (error, response) {
+          helper.cart.addTradeline(cartBuyerHuntKey, null, function (error, response) {
             response.statusCode.should.be.equal(400);
             done(error);
           });
@@ -2481,17 +2607,17 @@ describe('AmazingCreditResults', function () {
       it('should be able to list tradelines', function (done) {
           async.waterfall([
             function (cb) {
-              helpers.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
+              helper.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
                 cb(error, body.data[0]);
               });
             },
             function (tradeline, cb) {
-              helpers.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error) {
+              helper.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error) {
                 cb(error);
               });
             },
             function (cb) {
-              helpers.cart.getTradelines(cartBuyerHuntKey, function (error, response, body) {
+              helper.cart.getTradelines(cartBuyerHuntKey, function (error, response, body) {
                 response.statusCode.should.be.equal(200);
                 cb(error, body);
               });
@@ -2507,30 +2633,30 @@ describe('AmazingCreditResults', function () {
       it('can remove a tradeline from the cart', function (done) {
           async.waterfall([
             function (cb) {
-              helpers.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
+              helper.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
                 var tradeline = body.data[0];
                 cb(error, tradeline);
               });
             },
             function (tradeline, cb) {
-              helpers.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error) {
+              helper.cart.addTradeline(cartBuyerHuntKey, tradeline.id, function (error) {
                 cb(error, tradeline);
               });
             },
             function (tradeline, cb) {
-              helpers.cart.getTradelines(cartBuyerHuntKey, function (error, respoonse, body) {
+              helper.cart.getTradelines(cartBuyerHuntKey, function (error, respoonse, body) {
                 body.data.length.should.be.equal(1);
                 cb(error, tradeline);
               });
             },
             function (tradeline, cb) {
-              helpers.cart.deleteTradeline(cartBuyerHuntKey, tradeline.id, function (error, response) {
+              helper.cart.deleteTradeline(cartBuyerHuntKey, tradeline.id, function (error, response) {
                 response.statusCode.should.be.equal(202);
                 cb(error);
               });
             },
             function (cb) {
-              helpers.cart.getTradelines(cartBuyerHuntKey, function (error, response, body) {
+              helper.cart.getTradelines(cartBuyerHuntKey, function (error, response, body) {
                 cb(error, body);
               });
             }
@@ -2554,23 +2680,23 @@ describe('AmazingCreditResults', function () {
             async.waterfall([
               // Login as unverified user
               function (cb) {
-                helpers.login('janedoe@example.org', 'test123', function(error, body){
+                helper.login('janedoe@example.org', 'test123', function(error, body){
                   cb(error, body.huntKey);
                 });
               },
               function (buyerHuntKey, cb) {
-                helpers.tradelines.list(buyerHuntKey, function (error, response, body) {
+                helper.tradelines.list(buyerHuntKey, function (error, response, body) {
                   var tradeline = body.data[0];
                   cb(error, buyerHuntKey, tradeline);
                 });
               },
               function (buyerHuntKey, tradeline, cb) {
-                helpers.cart.addTradeline(buyerHuntKey, tradeline.id, function (error) {
+                helper.cart.addTradeline(buyerHuntKey, tradeline.id, function (error) {
                   cb(error, buyerHuntKey, tradeline);
                 });
               },
               function (buyerHuntKey) {
-                helpers.cart.checkout(buyerHuntKey, function (error, response, body) {
+                helper.cart.checkout(buyerHuntKey, function (error, response, body) {
                   if(error) {
                     done(error);
                   } else {
@@ -2588,7 +2714,7 @@ describe('AmazingCreditResults', function () {
         });
 
         it('should error if cart empty', function(done){
-          helpers.cart.checkout(cartBuyerHuntKey, function (error, response, body) {
+          helper.cart.checkout(cartBuyerHuntKey, function (error, response, body) {
             if(error) {
               done(error);
             }
@@ -2604,7 +2730,7 @@ describe('AmazingCreditResults', function () {
           async.waterfall([
             // Read in tradelines
             function (cb) {
-              helpers.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
+              helper.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
                 cb(error, body.data);
               });
             },
@@ -2612,12 +2738,12 @@ describe('AmazingCreditResults', function () {
             function (tradelines, cb) {
               async.parallel([
                 function (c) {
-                  helpers.cart.addTradeline(cartBuyerHuntKey, tradelines[0].id, function (error) {
+                  helper.cart.addTradeline(cartBuyerHuntKey, tradelines[0].id, function (error) {
                     c(error);
                   });
                 },
                 function (c) {
-                  helpers.cart.addTradeline(cartBuyerHuntKey, tradelines[2].id, function (error) {
+                  helper.cart.addTradeline(cartBuyerHuntKey, tradelines[2].id, function (error) {
                     c(error);
                   });
                 }
@@ -2628,7 +2754,7 @@ describe('AmazingCreditResults', function () {
             },
             // Try to checkout
             function(cb) {
-              helpers.cart.checkout(cartBuyerHuntKey, function (error, response, body) {
+              helper.cart.checkout(cartBuyerHuntKey, function (error, response, body) {
                 if(error) {
                   done(error);
                 } else {
@@ -2648,20 +2774,20 @@ describe('AmazingCreditResults', function () {
           var tradelineId;
           async.series([
             function (cb) {
-              helpers.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
+              helper.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
                 body.data.should.be.Array;
                 tradelineId = body.data[0].id;
                 cb(error);
               });
             },
             function (cb) {
-              helpers.cart.addTradeline(cartBuyerHuntKey, tradelineId, function (error, response) {
+              helper.cart.addTradeline(cartBuyerHuntKey, tradelineId, function (error, response) {
                 response.statusCode.should.be.equal(202);
                 cb(error);
               });
             }],
             function () {
-              helpers.cart.checkout(cartBuyerHuntKey, function (error, response, body) {
+              helper.cart.checkout(cartBuyerHuntKey, function (error, response, body) {
                 if(error) {
                   done(error);
                 } else {
@@ -2694,23 +2820,23 @@ describe('AmazingCreditResults', function () {
               });
             },
             function (cb) {
-              helpers.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
+              helper.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
                 tradelineId = body.data[0].id;
                 cb(error);
               });
             },
             function (cb) {
-              helpers.cart.addTradeline(cartBuyerHuntKey, tradelineId, function (error) {
+              helper.cart.addTradeline(cartBuyerHuntKey, tradelineId, function (error) {
                 cb(error);
               });
             },
             function (cb) {
-              helpers.cart.getTradelines(cartBuyerHuntKey, function (error) {
+              helper.cart.getTradelines(cartBuyerHuntKey, function (error) {
                 cb(error);
               });
             },
             function (cb) {
-              helpers.cart.checkout(cartBuyerHuntKey, function (error, response, body) {
+              helper.cart.checkout(cartBuyerHuntKey, function (error, response, body) {
                 if(error) {
                   done(error);
                 } else {
@@ -3077,174 +3203,3 @@ describe('AmazingCreditResults', function () {
   });
 
 });
-
-
-var helpers = {
-  login: function(username, password, cb) {
-    request({
-      'method': 'POST',
-      'url': 'http://localhost:' + port + '/api/v1/account/login',
-      'form': {
-        'username': username,
-        'password': password
-      },
-      'json': true
-    }, function (error, response, body) {
-      if (error) {
-        cb(error);
-      } else {
-        response.statusCode.should.be.equal(200);
-        body.huntKey.should.be.a.String;
-        cb(null, body);
-      }
-    });
-  },
-  clients: {
-    list: function (huntKey, cb) {
-      request({
-        'method': 'GET',
-        'url': 'http://localhost:' + port + '/api/v1/admin/clients',
-        'headers': {'huntKey': huntKey},
-        json: true
-      }, cb);
-    },
-
-    get: function (huntKey, id, cb) {
-      request({
-        'method': 'GET',
-        'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + id,
-        'headers': {'huntKey': huntKey},
-        json: true
-      }, cb);
-    },
-
-    del: function (huntKey, id, cb) {
-      request({
-        'method': 'DELETE',
-        'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + id,
-        'headers': {'huntKey': huntKey},
-        json: true
-      }, cb);
-    }
-  },
-  tradelines: {
-    list: function (huntKey, cb) {
-      request({
-        'method': 'GET',
-        'url': 'http://localhost:' + port + '/api/v1/tradelines',
-        'headers': {'huntKey': huntKey},
-        json: true
-      }, cb);
-    },
-
-    archive: function (huntKey, id, cb) {
-      request({
-          'method': 'DELETE',
-          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + id,
-          'headers': { 'huntKey': huntKey },
-          'json': true
-        }, cb);
-    },
-
-    get: function (huntKey, id, cb) {
-      request({
-          'method': 'GET',
-          'url': 'http://localhost:' + port + '/api/v1/owner/tradelines/' + id,
-          'headers': { 'huntKey': huntKey },
-          'json': true
-        }, cb);
-    }
-  },
-  cart: {
-    addTradeline: function (huntKey, id, cb) {
-      request({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/cart/tradelines',
-        'headers': {'huntKey': huntKey},
-        form: {id: id},
-        json: true
-      }, cb);
-    },
-
-    deleteTradeline: function (huntKey, id, cb) {
-      request({
-        'method': 'DELETE',
-        'url': 'http://localhost:' + port + '/api/v1/cart/tradelines/' + id,
-        'headers': {'huntKey': huntKey},
-        json: true
-      }, cb);
-    },
-
-    getTradelines: function (huntKey, cb) {
-      request({
-        'method': 'GET',
-        'url': 'http://localhost:' + port + '/api/v1/cart/tradelines',
-        'headers': {'huntKey': huntKey},
-        json: true
-      }, cb);
-    },
-
-    checkout: function (huntKey, cb) {
-      request({
-        'method': 'POST',
-        'url': 'http://localhost:' + port + '/api/v1/cart/checkout',
-        'headers': {'huntKey': huntKey},
-        'json': true
-      }, cb);
-    }
-  },
-  verify: {
-    ach: {
-      create: function(huntKey, acct, route, type, cb) {
-        request({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/myself/billing/achAccount',
-          'headers': {'huntKey': huntKey},
-          'form': {
-            'accountNumber': acct,
-            'routingNumber': route,
-            'accountType': type,
-            'meta': {
-              'test': true
-            }
-          },
-          'json': true
-        }, cb);
-      },
-      check: function(huntKey, amt1, amt2, cb) {
-        request({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/myself/billing/achAccount/verify',
-          'headers': {'huntKey': huntKey},
-          'form': {
-            'amount1': amt1,
-            'amount2': amt2,
-            'meta': {
-              'test': true
-            }
-          },
-          'json': true
-        }, cb);
-      }
-    },
-    phone: {
-      send: function(huntKey, cb) {
-        request({
-          'method': 'GET',
-          'url': 'http://localhost:' + port + '/api/v1/verifyPhone',
-          'headers': {'huntKey': huntKey},
-          'json': true
-        }, cb);
-      },
-      checkPin: function(huntKey, pin, cb) {
-        request({
-          'method': 'POST',
-          'url': 'http://localhost:' + port + '/api/v1/verifyPhone',
-          'headers': {'huntKey': huntKey},
-          'form': {'pin' : pin},
-          'json': true
-        }, cb);
-      }
-    }
-  }
-};
