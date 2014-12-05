@@ -697,7 +697,6 @@ describe('AmazingCreditResults', function () {
           'form': {},
           'json': true
         }, function (error, response, body) {
-          console.log(body);
           response.statusCode.should.be.equal(400);
           body.status.should.be.equal('Error');
           body.errors[0].message.should.be.equal('Username required to reset password!');
@@ -1049,7 +1048,6 @@ describe('AmazingCreditResults', function () {
           var payout = helper.verify.ach.defaults.payout();
           this.timeout(60000);
           helper.verify.ach.check(buyerHuntKey, payout, function(error, response, body){
-            console.log(body);
             response.statusCode.should.be.equal(202);
             body.verificationSuccess.should.equal(true);
             request({
