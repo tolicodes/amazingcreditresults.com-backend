@@ -179,16 +179,7 @@ describe('AmazingCreditResults', function () {
         });
 
         it('Owner can increase buyer funds', function (done) {
-          ownReq({
-            'method': 'POST',
-            'url': 'http://localhost:' + port + '/api/v1/admin/clients/balance/' + userId,
-            'form': {
-              'amount': 1,
-              'notes': 'Merry Christmas, fuck you!',
-              'date': '2014-05-03',
-              'paidBy': 'Credit Card'
-            }
-          }, function (error, response, body) {
+          helper.addBuyerFunds(ownerHuntKey, userId, null, function (error, response, body) {
             if (error) {
               done(error);
             } else {
@@ -1058,6 +1049,7 @@ describe('AmazingCreditResults', function () {
             }, function (error, response, body) {
               response.statusCode.should.be.equal(200);
               body.achAccount.verified.should.equal(true);
+              body.achAccount.customerId.should.be.String;
               done();
             });
           });
@@ -2665,6 +2657,25 @@ describe('AmazingCreditResults', function () {
         });
 
       describe('Checkout', function () {
+        function prepareCart(huntKey, cb) {
+          huntKey = huntKey || cartBuyerHuntKey;
+          var tradelineId;
+          async.series([
+            function (cb) {
+              helper.tradelines.list(huntKey, function (error, response, body) {
+                body.data.should.be.Array;
+                tradelineId = body.data[0].id;
+                cb(error);
+              });
+            },
+            function (cb) {
+              helper.cart.addTradeline(huntKey, tradelineId, function (error, response) {
+                response.statusCode.should.be.equal(202);
+                cb(error);
+              });
+            }
+          ], cb);
+        }
         var userId;
         // Give James Doe a clean slate
         beforeEach(function(done) {
@@ -2674,30 +2685,26 @@ describe('AmazingCreditResults', function () {
           });
         });
 
-        it('should error if user unverified', function(done){
-            async.waterfall([
+        describe('Invalid Request', function() {
+          it('should error if user unverified', function(done){
+            var buyerHuntKey;
+            async.series([
               // Login as unverified user
               function (cb) {
                 helper.login('janedoe@example.org', 'test123', function(error, body){
-                  cb(error, body.huntKey);
+                  buyerHuntKey = body.huntKey;
+                  cb(error);
                 });
               },
-              function (buyerHuntKey, cb) {
-                helper.tradelines.list(buyerHuntKey, function (error, response, body) {
-                  var tradeline = body.data[0];
-                  cb(error, buyerHuntKey, tradeline);
-                });
+              function (cb) {
+                prepareCart(buyerHuntKey, cb);
               },
-              function (buyerHuntKey, tradeline, cb) {
-                helper.cart.addTradeline(buyerHuntKey, tradeline.id, function (error) {
-                  cb(error, buyerHuntKey, tradeline);
-                });
-              },
-              function (buyerHuntKey) {
-                helper.cart.checkout(buyerHuntKey, function (error, response, body) {
+              function () {
+                helper.cart.checkout(buyerHuntKey, null, function (error, response, body) {
                   if(error) {
                     done(error);
                   } else {
+                    console.log(body);
                     response.statusCode.should.be.equal(400);
                     body.status.should.be.equal('Error');
                     body.errors[0].message.should.be.equal('SSN, First Name, Last Name, or DOB not verified');
@@ -2709,97 +2716,139 @@ describe('AmazingCreditResults', function () {
               response.statusCode.should.be.equal(400);
               done(error);
             });
-        });
-
-        it('should error if cart empty', function(done){
-          helper.cart.checkout(cartBuyerHuntKey, function (error, response, body) {
-            if(error) {
-              done(error);
-            }
-            response.statusCode.should.be.equal(400);
-            body.status.should.be.equal('Error');
-            body.errors[0].message.should.be.equal('Your cart is empty, please add at least one tradeline before checkout');
-            done();
           });
-        });
 
-        // TODO fix Flickering Test
-        it('should error if user adds tradeline with no available AUs', function(done) {
-          async.waterfall([
-            // Read in tradelines
-            function (cb) {
-              helper.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
-                cb(error, body.data);
-              });
-            },
-            // Add 2 tradelines, one with available AU, one with no avail AU
-            function (tradelines, cb) {
-              async.parallel([
-                function (c) {
-                  helper.cart.addTradeline(cartBuyerHuntKey, tradelines[0].id, function (error) {
-                    c(error);
-                  });
-                },
-                function (c) {
-                  helper.cart.addTradeline(cartBuyerHuntKey, tradelines[2].id, function (error) {
-                    c(error);
-                  });
-                }
-              ],
-              function(error){
-                cb(error);
-              });
-            },
-            // Try to checkout
-            function(cb) {
-              helper.cart.checkout(cartBuyerHuntKey, function (error, response, body) {
-                if(error) {
-                  done(error);
-                } else {
-                  cb(null, body);
-                }
-              });
-            }
-          ], function (error, body) {
-            body.status.should.be.equal('Error');
-            body.errors.length.should.be.equal(1);
-            body.errors[0].message.should.be.equal('Trade line in your cart "'+ body.errors[0].name +'" no longer available.');
-            done();
+          it('should error if cart empty', function(done){
+            helper.cart.checkout(cartBuyerHuntKey, null, function (error, response, body) {
+              if(error) {
+                done(error);
+              }
+              response.statusCode.should.be.equal(400);
+              body.status.should.be.equal('Error');
+              body.errors[0].message.should.be.equal('Your cart is empty, please add at least one tradeline before checkout');
+              done();
+            });
           });
-        });
 
-        it('should error if insufficient funds', function(done){
-          var tradelineId;
-          async.series([
-            function (cb) {
-              helper.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
-                body.data.should.be.Array;
-                tradelineId = body.data[0].id;
-                cb(error);
-              });
-            },
-            function (cb) {
-              helper.cart.addTradeline(cartBuyerHuntKey, tradelineId, function (error, response) {
-                response.statusCode.should.be.equal(202);
-                cb(error);
-              });
-            }],
-            function () {
-              helper.cart.checkout(cartBuyerHuntKey, function (error, response, body) {
-                if(error) {
-                  done(error);
-                } else {
-                  response.statusCode.should.be.equal(402);
-                  body.status.should.be.equal('Error');
-                  body.errors[0].message.should.be.equal('Insufficient balance for this transaction');
-                  done();
-                }
+          // TODO fix Flickering Test
+          it('should error if user adds tradeline with no available AUs', function(done) {
+            async.waterfall([
+              // Read in tradelines
+              function (cb) {
+                helper.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
+                  cb(error, body.data);
+                });
+              },
+              // Add 2 tradelines, one with available AU, one with no avail AU
+              function (tradelines, cb) {
+                async.parallel([
+                      function (c) {
+                        helper.cart.addTradeline(cartBuyerHuntKey, tradelines[0].id, function (error) {
+                          c(error);
+                        });
+                      },
+                      function (c) {
+                        helper.cart.addTradeline(cartBuyerHuntKey, tradelines[2].id, function (error) {
+                          c(error);
+                        });
+                      }
+                    ],
+                    function(error){
+                      cb(error);
+                    });
+              },
+              // Try to checkout
+              function(cb) {
+                helper.cart.checkout(cartBuyerHuntKey, null, function (error, response, body) {
+                  if(error) {
+                    done(error);
+                  } else {
+                    cb(null, body);
+                  }
+                });
+              }
+            ], function (error, body) {
+              body.status.should.be.equal('Error');
+              body.errors.length.should.be.equal(1);
+              body.errors[0].message.should.be.equal('Trade line in your cart "'+ body.errors[0].name +'" no longer available.');
+              done();
+            });
+          });
+
+          describe('Payment', function() {
+            it('should error if insufficient funds and no payment type specified', function(done){
+              prepareCart(cartBuyerHuntKey, function () {
+                helper.cart.checkout(cartBuyerHuntKey, null, function (error, response, body) {
+                  if(error) {
+                    done(error);
+                  } else {
+                    response.statusCode.should.be.equal(400);
+                    body.status.should.be.equal('Error');
+                    body.errors[0].message.should.be.equal('Please specify an ACH account or credit card for payment');
+                    done();
+                  }
+                });
               });
             });
+
+            it('should error if account credit specified for payment higher than in user`s account', function(done) {
+              prepareCart(cartBuyerHuntKey, function () {
+                async.series([
+                  function (cb) {
+                    helper.addBuyerFunds(ownerHuntKey, userId, {amount: 1000}, function (error, response, body) {
+                      response.statusCode.should.be.equal(202);
+                      body.status.should.be.equal('Ok');
+                      cb(error);
+                    });
+                  },
+                  function () {
+                    var req = {
+                      amtAccountCredit: 1001
+                    };
+                    helper.cart.checkout(cartBuyerHuntKey, req, function (error, response, body) {
+                      response.statusCode.should.equal(400);
+                      body.errors[0].message.should.be.equal('Account credit specified is higher than what is available to your account');
+                      done();
+                    });
+                  }
+                ]);
+              });
+            });
+
+            it('should error if both credit card and ACH specified', function(done) {
+              prepareCart(cartBuyerHuntKey, function () {
+                var req = {
+                  useAchAccount: true,
+                  creditCardToken: 'BQokikJOvBiI2HlWgH4olfQ2' // fake token
+                };
+                helper.cart.checkout(cartBuyerHuntKey, req, function (error, response, body) {
+                  response.statusCode.should.equal(400);
+                  body.errors[0].message.should.be.equal('Please only choose one payment method, credit card or ACH account');
+                  done();
+                });
+              });
+            });
+
+            it('should error if ACH specified for payment not verified', function(done) {
+              helper.resetBuyer(function () {
+                prepareCart(cartBuyerHuntKey, function () {
+                  var req = {
+                    useAchAccount: true
+                  };
+                  helper.cart.checkout(cartBuyerHuntKey, req, function (error, response, body) {
+                    response.statusCode.should.equal(400);
+                    body.errors[0].message.should.be.equal('ACH Account not verified');
+                    done();
+                  });
+                });
+                done();
+              }, {achAccount: {id: '213j1klj21312jkl', verified: false}});
+            });
+          });
         });
 
-        it('should complete successfully if all prerequisites fulfilled', function(done){
-          var tradelineId, newTransactionId; 
+        it('should be able to checkout using only account credit', function(done){
+          var newTransactionId;
           async.series([
             function (cb) {
               ownReq({
@@ -2818,15 +2867,7 @@ describe('AmazingCreditResults', function () {
               });
             },
             function (cb) {
-              helper.tradelines.list(cartBuyerHuntKey, function (error, response, body) {
-                tradelineId = body.data[0].id;
-                cb(error);
-              });
-            },
-            function (cb) {
-              helper.cart.addTradeline(cartBuyerHuntKey, tradelineId, function (error) {
-                cb(error);
-              });
+              prepareCart(cartBuyerHuntKey, cb);
             },
             function (cb) {
               helper.cart.getTradelines(cartBuyerHuntKey, function (error) {
@@ -2834,7 +2875,10 @@ describe('AmazingCreditResults', function () {
               });
             },
             function (cb) {
-              helper.cart.checkout(cartBuyerHuntKey, function (error, response, body) {
+              var req = {
+                'amtAccountCredit': 1000
+              };
+              helper.cart.checkout(cartBuyerHuntKey, req, function (error, response, body) {
                 if(error) {
                   done(error);
                 } else {
@@ -2868,6 +2912,12 @@ describe('AmazingCreditResults', function () {
                 }
             });
           });
+        });
+
+        // TODO complete
+        xit('should be able to checkout using ACH', function(done) {
+          false.should.equal(true);
+          done();
         });
       });
   });

@@ -21,13 +21,15 @@ module.exports = exports = function (core) {
                 }
               }, cb);
             },
-            /*function (obj, cb) {
-              Checkout.processCharge(request.user, cb);
-            },*/
             function (obj, cb) {
+              Checkout.processCharge(request.user, request.body, obj, cb);
+            },
+            function (obj, cb) {
+              console.log('issue transaction');
               Checkout.issueTransaction(request.user, request.model, obj, cb);
             },
             function (transactionId, cb) {
+              console.log('update tradelinebuyers');
               Checkout.updateTradelineBuyers(request.user, request.model, transactionId, cb);
             }
           ],
@@ -36,6 +38,7 @@ module.exports = exports = function (core) {
               var code = error.errors[0].code || 400;
               response.status(code).json(error);
             } else {
+              console.log('confirm checkout');
               Checkout.confirmCheckout(request.user);
               response.status(201).json({
                 'status': 'Ok',

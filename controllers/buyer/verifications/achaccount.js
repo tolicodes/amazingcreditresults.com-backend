@@ -72,13 +72,25 @@ module.exports = exports = function (core) {
       }, cb);
   };
 
-  var setVerified = function(userId, cb) {
-    core.model.User
-      .findOneAndUpdate({
-        _id: userId
-      }, {
-        'profile.achAccount.verified' : true
-      }, cb);
+  var setVerified = function(user, cb) {
+    console.log('CREATING NEW CUSTOMER');
+    balanced.marketplace.customers.create({
+      'name': user.name.givenName + user.name.familyName,
+      'meta': {
+        'acrId': user.id
+      }
+    }).then(function(customer) {
+      console.log('DONE..ASSOCIATING BANK WITH NEW CUSTOMER');
+      user.profile.achAccount.customerId = customer.id;
+      balanced.get('/bank_accounts/'+user.profile.achAccount.id)
+        .associate_to_customer(customer).then(function(){
+          console.log('DONE..UPDATING USER RECORD');
+          user.profile.achAccount.verified = true;
+          user.save(function(err){
+            cb(err);
+          });
+        });
+    });
   };
 
   core.app.post('/api/v1/myself/billing/achAccount', ensureRole('buyer'), function (request, response) {
@@ -148,7 +160,7 @@ module.exports = exports = function (core) {
 
         balanced.get(uri).confirm(request.body.amount1, request.body.amount2).then(function () {
           console.log('DONE..UPDATING USER PROFILE');
-          setVerified(request.user.id, function(){
+          setVerified(request.user, function(){
             response.status(202).json({verificationSuccess: true});
           })
         }, function() {

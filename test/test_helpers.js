@@ -345,11 +345,12 @@ var api = {
       }, cb);
     },
 
-    checkout: function (huntKey, cb) {
+    checkout: function (huntKey, options, cb) {
       request({
         'method': 'POST',
         'url': 'http://localhost:' + port + '/api/v1/cart/checkout',
         'headers': {'huntKey': huntKey},
+        'form': options,
         'json': true
       }, cb);
     }
@@ -422,6 +423,21 @@ var api = {
       'url': 'http://localhost:' + port + '/api/v1/myself/creditReport',
       'headers': {'huntKey': huntKey},
       'form': options,
+      'json': true
+    }, cb);
+  },
+  addBuyerFunds: function(huntKey, userId, options, cb) {
+    options = options || {};
+    request({
+      'method': 'POST',
+      'url': 'http://localhost:' + port + '/api/v1/admin/clients/balance/' + userId,
+      'headers': {'huntKey': huntKey},
+      'form': {
+        'amount': options.amount || 1,
+        'notes': options.notes || 'Have some cash!',
+        'date': options.date || '2014-05-03',
+        'paidBy': options.paidBy || 'Credit Card'
+      },
       'json': true
     }, cb);
   }
