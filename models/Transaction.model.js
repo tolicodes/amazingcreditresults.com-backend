@@ -1,14 +1,17 @@
+// TODO create a presave that errors out if user cannot afford (negative) transaction
 module.exports = exports = function (core) {
-  var types = ['ownerUpload', 'stripeUpload', 'checkout', 'withdraw'];
 
   var TransactionSchema = new core.mongoose.Schema({
       'client': { type: core.mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-      '_type': { type: Number, min: 0, max: 3, default: 0 },
       'amount': { type: Number, min: -100000, max: 100000, default: 0, required: true  },
       'notes': String,
       'date': Date,
-      'paidBy': String,
-      'timestamp': {type: Date, default: Date.now()}
+      'timestamp': {type: Date, default: Date.now() },
+      'type': String,
+      'fundingSource': String,
+      'reason': String,
+      'userCreated': { type: core.mongoose.Schema.Types.ObjectId, ref: 'User' },
+      'orderId': { type: core.mongoose.Schema.Types.ObjectId, ref: 'Order' }
     },
     {
       toObject: { getters: true, virtuals: true },
@@ -35,19 +38,6 @@ module.exports = exports = function (core) {
       ret.date = ret.date.toDateString();
     }
   };
-
-  TransactionSchema.virtual('type')
-    .get(function () {
-      return types[this._type];
-    })
-    .set(function (val) {
-      var i = types.indexOf(val);
-      if (i === -1) {
-        return;
-      } else {
-        this._type = i;
-      }
-    });
 
   TransactionSchema.post('save', function (doc) {
     core.model.Transaction.find({'client': doc.client}, function (error, transactionsFound) {

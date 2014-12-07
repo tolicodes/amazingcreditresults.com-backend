@@ -87,11 +87,10 @@ exports.resetNewClient = function(callback) {
       'suffix': 'III',
       'street1' : '123 Street',
       'street2' : 'Apt 1',
-      'phone' : '5551234567',
+      'phone' : '555-123-4567',
       'city': 'Brooklyn',
       'state': 'NY',
       'zip': '11201',
-      'needQuestionnaire': true,
       'telefone': '555-339' + testId
     }
   };

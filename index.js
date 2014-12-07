@@ -61,6 +61,7 @@ console.log('Env:' + hunt.config.env);
 
 //loading models
 hunt.extendModel('Product', require('./models/Product.model.js'));
+hunt.extendModel('Order', require('./models/Order.model.js'));
 hunt.extendModel('TradeLine', require('./models/TradeLine.model.js'));
 hunt.extendModel('TradeLineChange', require('./models/TradeLineChange.model.js'));
 hunt.extendModel('Transaction', require('./models/Transaction.model.js'));

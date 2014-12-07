@@ -1,19 +1,20 @@
 var _ = require('underscore');
 
 module.exports = exports = function(core) {
-  var OrderSchema = new core.mongoose.Schema({
+  var Schema = core.mongoose.Schema;
+  var OrderSchema = new Schema({
     'orderTotal': {
       type: Number, 
       required: true
     },
 
-    'transactionIds' : [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
+    'transactions' : [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
 
     'timestamp': { type : Date, default: Date.now },
 
     'buyerId': {
-      type: core.mongoose.Schema.Types.ObjectId,
-      required: true
+      type: Schema.Types.ObjectId,
+      required: true,
       ref: 'User'
     }
   }, {
@@ -42,7 +43,7 @@ module.exports = exports = function(core) {
 
     // TODO
   OrderSchema.statics.filterByBuyerId = function(user, callback) {
-    if (user & (user.roles && user.roles.owner) || user.root)) {
+    if (user && ((user.roles && user.roles.owner) || user.root)) {
       // TODO return buyer ID orders
     } else {
       callback(null, false); //non authorized user cannot list anything!
@@ -54,7 +55,7 @@ module.exports = exports = function(core) {
     if (user) {
       if ((user.roles && user.roles.owner) || user.root) {
         // return all orders
-      } else if if ((user.roles && user.roles.buyer)) {
+      } else if ((user.roles && user.roles.buyer)) {
         // return buyer's order
       }
     } else {

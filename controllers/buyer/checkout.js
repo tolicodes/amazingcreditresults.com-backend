@@ -21,19 +21,24 @@ module.exports = exports = function (core) {
                 }
               }, cb);
             },
-            function (obj, cb) {
-              Checkout.processCharge(request.user, request.body, obj, cb);
+            function (cartBalance, cb) {
+              console.log('processing charge');
+              Checkout.processCharge(request.user, request.body, request.model, cartBalance, cb);
             },
-            function (obj, cb) {
-              console.log('issue transaction');
-              Checkout.issueTransaction(request.user, request.model, obj, cb);
+            function (chargeInfo, cb) {
+              console.log('issue debit transaction');
+              Checkout.issueTransaction(request.user, request.model, chargeInfo, cb);
             },
-            function (transactionId, cb) {
+            function (paymentInfo, cb) {
+              console.log('create order');
+              Checkout.createOrder(request.user.id, request.model, paymentInfo, cb);
+            },
+            function (paymentInfo, cb) {
               console.log('update tradelinebuyers');
-              Checkout.updateTradelineBuyers(request.user, request.model, transactionId, cb);
+              Checkout.updateTradelineBuyers(request.user, request.model, paymentInfo, cb);
             }
           ],
-          function (error, paymentTransactionId) {
+          function (error, paymentInfo) {
             if (error) {
               var code = error.errors[0].code || 400;
               response.status(code).json(error);
@@ -42,7 +47,8 @@ module.exports = exports = function (core) {
               Checkout.confirmCheckout(request.user);
               response.status(201).json({
                 'status': 'Ok',
-                'transactionId': paymentTransactionId
+                'orderId': paymentInfo.orderId,
+                'orderTransactionId': paymentInfo.orderTransactionId
               });
             }
           }

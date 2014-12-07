@@ -36,12 +36,10 @@ var request = require('request'),
     },
     'street1' : '123 Street',
     'street2' : 'Apt 1',
-    'phone' : '5551234567',
     'city': 'Brooklyn',
     'state': 'NY',
     'zip': '11201',
-    'needQuestionnaire': true,
-    'telefone': '555-339' + testId
+    'phone': '555-339-' + testId
   };
 
 describe('AmazingCreditResults', function () {
@@ -207,7 +205,7 @@ describe('AmazingCreditResults', function () {
               body.transactions.length.should.be.above(0);
               var transactionFound = false;
               body.transactions.map(function (t) {
-                if (t.amount == 1 && t.type == 'ownerUpload' && t.date == 'Sat May 03 2014' && t.paidBy == 'Credit Card') {
+                if (t.amount == 1 && t.type == 'ownerUpload' && t.date == 'Sat May 03 2014') {
                   transactionFound = true;
                 }
               });
@@ -2836,89 +2834,116 @@ describe('AmazingCreditResults', function () {
                     useAchAccount: true
                   };
                   helper.cart.checkout(cartBuyerHuntKey, req, function (error, response, body) {
-                    response.statusCode.should.equal(400);
+                    response.statusCode.should.equal(402);
                     body.errors[0].message.should.be.equal('ACH Account not verified');
                     done();
                   });
                 });
-                done();
               }, {achAccount: {id: '213j1klj21312jkl', verified: false}});
             });
           });
         });
 
-        it('should be able to checkout using only account credit', function(done){
-          var newTransactionId;
-          async.series([
-            function (cb) {
-              ownReq({
-                'method': 'POST',
-                'url': 'http://localhost:' + port + '/api/v1/admin/clients/balance/' + userId,
-                'form': {
-                  amount: 1000,
-                  notes: 'Feeling Generous!',
-                  date: '2014-05-03',
-                  paidBy: 'Credit Card'
-                }
-              }, function (error, response, body) {
-                  response.statusCode.should.be.equal(202);
-                  body.status.should.be.equal('Ok');
-                  cb(error);
-              });
-            },
-            function (cb) {
-              prepareCart(cartBuyerHuntKey, cb);
-            },
-            function (cb) {
-              helper.cart.getTradelines(cartBuyerHuntKey, function (error) {
-                cb(error);
-              });
-            },
-            function (cb) {
-              var req = {
-                'amtAccountCredit': 1000
-              };
-              helper.cart.checkout(cartBuyerHuntKey, req, function (error, response, body) {
-                if(error) {
-                  done(error);
-                } else {
-                  response.statusCode.should.be.equal(201);
-                  body.status.should.be.equal('Ok');
-                  body.transactionId.should.be.a.String;
-                  newTransactionId = body.transactionId;
-                  cb();
-                }
-              });
-            }],
-            function () {
-              request({
-                'method': 'GET',
-                'url': 'http://localhost:' + port + '/api/v1/myself/transactions',
-                'headers': {'huntKey': cartBuyerHuntKey},
-                'json': true
-              }, function(error, response, body) {
-                if(error) {
-                  done(error);
-                } else {
-                  response.statusCode.should.be.equal(200);
-                  var transactionFound1 = false;
-                  body.data.transactions.map(function(tr){
-                    if (tr.id == newTransactionId) {
-                      transactionFound1 = true
+        describe('Valid Request', function() {
+          beforeEach(function(done) {
+            helper.resetProductsAndTradelines(function() {
+              done();
+            });
+          });
+
+          it('should be able to checkout using just account credit', function(done){
+            var newTransactionId;
+            async.series([
+                  function (cb) {
+                    helper.addBuyerFunds(ownerHuntKey, userId, {amount: 1000}, function (error, response, body) {
+                      response.statusCode.should.be.equal(202);
+                      body.status.should.be.equal('Ok');
+                      cb(error);
+                    });
+                  },
+                  function (cb) {
+                    prepareCart(cartBuyerHuntKey, cb);
+                  },
+                  function (cb) {
+                    var req = {
+                      'amtAccountCredit': 1000
+                    };
+                    helper.cart.checkout(cartBuyerHuntKey, req, function (error, response, body) {
+                      if(error) {
+                        done(error);
+                      } else {
+                        response.statusCode.should.be.equal(201);
+                        body.status.should.be.equal('Ok');
+                        body.orderId.should.be.a.String;
+                        body.orderTransactionId.should.be.a.String;
+                        newTransactionId = body.orderTransactionId;
+                        cb(error, body);
+                      }
+                    });
+                  }],
+                function () {
+                  // TODO check for order record
+                  request({
+                    'method': 'GET',
+                    'url': 'http://localhost:' + port + '/api/v1/myself/transactions',
+                    'headers': {'huntKey': cartBuyerHuntKey},
+                    'json': true
+                  }, function(error, response, body) {
+                    if(error) {
+                      done(error);
+                    } else {
+                      response.statusCode.should.be.equal(200);
+                      var transactionFound1 = false;
+                      body.data.transactions.map(function(tr) {
+                        if (tr.id == newTransactionId) {
+                          transactionFound1 = true
+                        }
+                      });
+                      transactionFound1.should.be.true;
+                      done();
                     }
                   });
-                  transactionFound1.should.be.true;
+                });
+          });
+
+          it('should be able to checkout using ACH', function(done) {
+            this.timeout(60000);
+            async.series([
+                function(cb) {
+                  // reset buyer with ACH account verified
+                  helper.resetBuyer(cb,
+                  // Balanced Test Account
+                  { 'achAccount': {
+                      'id': 'BA5AUJx0PRR6VqPVodgzY2Ri',
+                      'customerId': 'CU5AEYKzLp70b2MxBSHWUkrC',
+                      'verified': true
+                  }});
+                },
+                function(cb) {
+                  prepareCart(cartBuyerHuntKey, cb);
+                },
+                function(cb) {
+                  // do checkout
+                  var req = {
+                    'useAchAccount': true
+                  };
+                  helper.cart.checkout(cartBuyerHuntKey, req, function (error, response, body) {
+                    console.log(body);
+                    response.statusCode.should.be.equal(201);
+                    body.status.should.be.equal('Ok');
+                    body.orderId.should.be.a.String;
+                    body.orderTransactionId.should.be.a.String;
+                    done();
+                  });
+                }],
+              function() {
+                  // TODO check for transaction and order records
                   done();
-                }
-            });
+              });
           });
         });
 
-        // TODO complete
-        xit('should be able to checkout using ACH', function(done) {
-          false.should.equal(true);
-          done();
-        });
+
       });
   });
 
@@ -3232,9 +3257,9 @@ describe('AmazingCreditResults', function () {
   });
 
 
-  describe('Order Management', function () {
-    // TODO
-    xit('owner can see all orders', function(done) {
+  // TODO
+  xdescribe('Order Management', function () {
+    it('owner can see all orders', function(done) {
         ownReq({
           'method': 'GET',
           'url': 'http://localhost:' + port + '/api/v1/orders/'
