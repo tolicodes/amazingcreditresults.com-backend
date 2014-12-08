@@ -228,7 +228,7 @@ exports.resetProductsAndTradelines = function(callback) {
             }
             collection.insert(tradelines, function() {
               db.close();
-              console.log('Tradelines and Products reset');
+              console.log('Tradelines, Orders and Products reset');
               callback();
             });
           }
@@ -238,6 +238,10 @@ exports.resetProductsAndTradelines = function(callback) {
   });
 };
 
+exports.confirmOrder = function(request, body, cb) {
+  body.orderId.should.be.a.String;
+  body.orderTransactionId.should.be.a.String;
+};
 
 var api = {
   login: function(username, password, cb) {

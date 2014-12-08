@@ -27,6 +27,7 @@ var Hunt = require('hunt'),
       'scoringKey': e.ACR_AREYOUHUMAN_SCORING_KEY
     },
     'balancedApiKey': e.ACR_BALANCED_KEY || 'ak-test-80ghejLg4UXZ4F6Z1XacoFzf2vsXxAji', // Test key, don't use in production
+    'stripeApiKey': e.ACR_STRIPE_KEY || 'sk_test_SveuxIxYZC3Rtub749wuPLtx', // Test key, don't use in production
     'echoSign': {
       'auth': {
         'userCredentials': {
@@ -135,6 +136,7 @@ hunt.extendRoutes(require('./controllers/seller/editMyTradelines.js'));
 
 //loading controller shared by all users
 hunt.extendRoutes(require('./controllers/shared/myself.js'));
+hunt.extendRoutes(require('./controllers/shared/orders.js'));
 hunt.extendRoutes(require('./controllers/shared/account.js'));
 
 //processing payment notifications from stripe

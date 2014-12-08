@@ -2845,6 +2845,57 @@ describe('AmazingCreditResults', function () {
         });
 
         describe('Valid Request', function() {
+          function confirmCheckout(huntKey, buyerId, checkoutBody, cb) {
+            console.log(checkoutBody);
+            checkoutBody.status.should.be.equal('Ok');
+            checkoutBody.orderId.should.be.a.String;
+            checkoutBody.orderTransactionId.should.be.a.String;
+            var newTransactionId = checkoutBody.orderTransactionId;
+            async.parallel([
+              function (cc) {
+                request({
+                  'method': 'GET',
+                  'url': 'http://localhost:' + port + '/api/v1/myself/transactions',
+                  'headers': {'huntKey': huntKey},
+                  'json': true
+                }, function (error, response, body) {
+                  response.statusCode.should.be.equal(200);
+                  var orderTransactionFound = false,
+                      chargeTransactionFound = false;
+                  body.data.transactions.map(function (tr) {
+                    if (tr.id === checkoutBody.orderTransactionId) {
+                      orderTransactionFound = true;
+                    } else if (checkoutBody.chargeTransactionId && tr.id === checkoutBody.chargeTransactionId) {
+                      chargeTransactionFound = true;
+                    }
+                  });
+                  orderTransactionFound.should.be.true;
+                  if (checkoutBody.chargeTransactionId) {
+                    chargeTransactionFound.should.be.true;
+                  }
+                  cc(error);
+                });
+              },
+              function (cc) {
+                request({
+                  'method': 'GET',
+                  'url': 'http://localhost:' + port + '/api/v1/orders',
+                  'headers': {'huntKey': huntKey},
+                  'json': true
+                }, function (error, response, body) {
+                  console.log(body);
+                  response.statusCode.should.equal(200);
+                  var order = body.orders[0];
+                  order.orderTotal.should.equal(1000);
+                  order.id.should.equal(checkoutBody.orderId);
+                  cc(error);
+                });
+              }
+            ], function () {
+              cb();
+            });
+          }
+
           beforeEach(function(done) {
             helper.resetProductsAndTradelines(function() {
               done();
@@ -2852,97 +2903,62 @@ describe('AmazingCreditResults', function () {
           });
 
           it('should be able to checkout using just account credit', function(done){
-            var newTransactionId;
             async.series([
-                  function (cb) {
-                    helper.addBuyerFunds(ownerHuntKey, userId, {amount: 1000}, function (error, response, body) {
-                      response.statusCode.should.be.equal(202);
-                      body.status.should.be.equal('Ok');
-                      cb(error);
-                    });
-                  },
-                  function (cb) {
-                    prepareCart(cartBuyerHuntKey, cb);
-                  },
-                  function (cb) {
-                    var req = {
-                      'amtAccountCredit': 1000
-                    };
-                    helper.cart.checkout(cartBuyerHuntKey, req, function (error, response, body) {
-                      if(error) {
-                        done(error);
-                      } else {
-                        response.statusCode.should.be.equal(201);
-                        body.status.should.be.equal('Ok');
-                        body.orderId.should.be.a.String;
-                        body.orderTransactionId.should.be.a.String;
-                        newTransactionId = body.orderTransactionId;
-                        cb(error, body);
-                      }
-                    });
-                  }],
-                function () {
-                  // TODO check for order record
-                  request({
-                    'method': 'GET',
-                    'url': 'http://localhost:' + port + '/api/v1/myself/transactions',
-                    'headers': {'huntKey': cartBuyerHuntKey},
-                    'json': true
-                  }, function(error, response, body) {
-                    if(error) {
-                      done(error);
-                    } else {
-                      response.statusCode.should.be.equal(200);
-                      var transactionFound1 = false;
-                      body.data.transactions.map(function(tr) {
-                        if (tr.id == newTransactionId) {
-                          transactionFound1 = true
-                        }
-                      });
-                      transactionFound1.should.be.true;
-                      done();
-                    }
-                  });
+              function (cb) {
+                helper.addBuyerFunds(ownerHuntKey, userId, {amount: 1000}, function (error, response, body) {
+                  response.statusCode.should.be.equal(202);
+                  body.status.should.be.equal('Ok');
+                  cb(error);
                 });
+              },
+              function (cb) {
+                prepareCart(cartBuyerHuntKey, cb);
+              },
+              function () {
+                var req = {
+                  'amtAccountCredit': 1000
+                };
+                helper.cart.checkout(cartBuyerHuntKey, req, function (error, response, body) {
+                  if (error) {
+                    done(error);
+                  } else {
+                    response.statusCode.should.be.equal(201);
+                    confirmCheckout(cartBuyerHuntKey, userId, body, done);
+                  }
+                });
+              }
+            ]);
           });
 
           it('should be able to checkout using ACH', function(done) {
             this.timeout(60000);
             async.series([
-                function(cb) {
-                  // reset buyer with ACH account verified
-                  helper.resetBuyer(cb,
-                  // Balanced Test Account
-                  { 'achAccount': {
-                      'id': 'BA5AUJx0PRR6VqPVodgzY2Ri',
-                      'customerId': 'CU5AEYKzLp70b2MxBSHWUkrC',
-                      'verified': true
-                  }});
-                },
-                function(cb) {
-                  prepareCart(cartBuyerHuntKey, cb);
-                },
-                function(cb) {
-                  // do checkout
-                  var req = {
-                    'useAchAccount': true
-                  };
-                  helper.cart.checkout(cartBuyerHuntKey, req, function (error, response, body) {
-                    console.log(body);
-                    response.statusCode.should.be.equal(201);
-                    body.status.should.be.equal('Ok');
-                    body.orderId.should.be.a.String;
-                    body.orderTransactionId.should.be.a.String;
-                    done();
-                  });
-                }],
+              function(cb) {
+                // reset buyer with ACH account verified
+                helper.resetBuyer(cb,
+                // Balanced Test Account
+                { 'achAccount': {
+                    'id': 'BA5AUJx0PRR6VqPVodgzY2Ri',
+                    'customerId': 'CU5AEYKzLp70b2MxBSHWUkrC',
+                    'verified': true
+                }});
+              },
+              function(cb) {
+                prepareCart(cartBuyerHuntKey, cb);
+              },
               function() {
-                  // TODO check for transaction and order records
-                  done();
-              });
+                var req = {
+                  'useAchAccount': true
+                };
+                helper.cart.checkout(cartBuyerHuntKey, req, function (error, response, body) {
+                  response.statusCode.should.be.equal(201);
+                  body.chargeTransactionId.should.be.a.String;
+                  confirmCheckout(cartBuyerHuntKey, userId, body, done);
+                });
+              }]
+            );
           });
         });
-
 
       });
   });

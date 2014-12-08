@@ -48,6 +48,7 @@ module.exports = exports = function (core) {
               response.status(201).json({
                 'status': 'Ok',
                 'orderId': paymentInfo.orderId,
+                'chargeTransactionId': paymentInfo.chargeTransactionId,
                 'orderTransactionId': paymentInfo.orderTransactionId
               });
             }
