@@ -1,4 +1,5 @@
-var ensureRole = require('./../../lib/middleware.js').ensureRole;
+var ensureRole = require('./../../lib/middleware.js').ensureRole,
+    formatMoney = require('./../../lib/utilities.js').formatMoney;
 
 module.exports = exports = function (core) {
   //show current user balance
@@ -19,16 +20,15 @@ module.exports = exports = function (core) {
               'id': t.id,
               'timestamp': t.timestamp,
               'amount': t.amount,
-              'type': t.type
+              'type': t.type,
+              'reason': t.reason
             });
             balance = balance + t.amount;
           });
 
           response.json({
-            'data': {
-              'balance': balance,
-              'transactions': transactionsFormatted
-            }
+            'balance': balance,
+            'transactions': transactionsFormatted
           });
         }
       });

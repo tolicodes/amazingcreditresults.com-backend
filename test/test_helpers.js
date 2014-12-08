@@ -1,6 +1,7 @@
 var MongoClient = require('mongodb').MongoClient,
     async = require('async'),
     fs = require('fs'),
+    stripe = require('stripe')('sk_test_SveuxIxYZC3Rtub749wuPLtx'),
     request = require('request'),
     port = 3001,
     _ = require('underscore');
@@ -228,7 +229,7 @@ exports.resetProductsAndTradelines = function(callback) {
             }
             collection.insert(tradelines, function() {
               db.close();
-              console.log('Tradelines, Orders and Products reset');
+              console.log('Tradelines and Products reset');
               callback();
             });
           }
@@ -238,9 +239,17 @@ exports.resetProductsAndTradelines = function(callback) {
   });
 };
 
-exports.confirmOrder = function(request, body, cb) {
-  body.orderId.should.be.a.String;
-  body.orderTransactionId.should.be.a.String;
+exports.createStripeToken = function(cb) {
+  stripe.tokens.create({
+    card: {
+      number: '4242424242424242',
+      exp_month: 12,
+      exp_year: 2019,
+      cvc: '123'
+    }
+  }, function(err, token) {
+    cb(err, token);
+  });
 };
 
 var api = {

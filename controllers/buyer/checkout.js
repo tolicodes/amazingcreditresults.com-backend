@@ -1,7 +1,7 @@
-var ensureBuyerOrOwner = require('../../lib/middleware.js').ensureBuyerOrOwner,
-    Checkout = require('../../lib/checkoutUtil.js');
-
 module.exports = exports = function (core) {
+  var ensureBuyerOrOwner = require('../../lib/middleware.js').ensureBuyerOrOwner,
+      Checkout = require('../../lib/checkoutUtil.js')(core);
+
   core.app.post('/api/v1/cart/checkout', ensureBuyerOrOwner, function (request, response) {
       core.async.waterfall(
           [
@@ -12,30 +12,30 @@ module.exports = exports = function (core) {
               core.async.parallel({
                 //calculate the current user balance
                 'balance': function (c) {
-                  Checkout.calculateCurrentBalance(request.user, request.model, c);
+                  Checkout.calculateCurrentBalance(request.user, c);
                 },
                 //Calculate the cost of all tradelines Buyer want to purchase
                 //Also check that tradelines all available for purchase
                 'cost': function (c) {
-                  Checkout.checkTradelineAvailabilityAndSumCost(request.user, request.model, c);
+                  Checkout.checkTradelineAvailabilityAndSumCost(request.user, c);
                 }
               }, cb);
             },
             function (cartBalance, cb) {
               console.log('processing charge');
-              Checkout.processCharge(request.user, request.body, request.model, cartBalance, cb);
+              Checkout.processCharge(request.user, request.body, cartBalance, cb);
             },
             function (chargeInfo, cb) {
               console.log('issue debit transaction');
-              Checkout.issueTransaction(request.user, request.model, chargeInfo, cb);
+              Checkout.issueTransaction(request.user, chargeInfo, cb);
             },
             function (paymentInfo, cb) {
               console.log('create order');
-              Checkout.createOrder(request.user.id, request.model, paymentInfo, cb);
+              Checkout.createOrder(request.user.id, paymentInfo, cb);
             },
             function (paymentInfo, cb) {
               console.log('update tradelinebuyers');
-              Checkout.updateTradelineBuyers(request.user, request.model, paymentInfo, cb);
+              Checkout.updateTradelineBuyers(request.user, paymentInfo, cb);
             }
           ],
           function (error, paymentInfo) {

@@ -450,11 +450,11 @@ module.exports = exports = function (core) {
         if (userFound) {
           request.model.Transaction.create({
             'client': userFound._id,
-            'type': 'ownerUpload',
+            'type': 'balanceIncrease',
             'amount': request.body.amount,
-            'notes': request.body.notes.toString() + ' | Transaction issued by Owner ' + request.user.email,
+            'reason': request.body.notes.toString() + ' | Transaction issued by Owner ' + request.user.email,
             'date': moment(request.body.date).toDate(),
-            'paidBy': request.body.paidBy
+            'userCreated': request.user.id
           }, function (error) {
             if (error) {
               throw error;

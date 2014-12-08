@@ -194,7 +194,7 @@ describe('AmazingCreditResults', function () {
             'url': 'http://localhost:' + port + '/api/v1/admin/clients/' + userId,
             'form': {
               'amount': 1,
-              'notes': 'Merry Christmas, fuck you!'
+              'date': '2014-05-03'
             }
           }, function (error, response, body) {
             if (error) {
@@ -205,7 +205,7 @@ describe('AmazingCreditResults', function () {
               body.transactions.length.should.be.above(0);
               var transactionFound = false;
               body.transactions.map(function (t) {
-                if (t.amount == 1 && t.type == 'ownerUpload' && t.date == 'Sat May 03 2014') {
+                if (t.amount == 1 && t.type == 'balanceIncrease' && t.date == 'Sat May 03 2014') {
                   transactionFound = true;
                 }
               });
@@ -2702,7 +2702,7 @@ describe('AmazingCreditResults', function () {
                   if(error) {
                     done(error);
                   } else {
-                    console.log(body);
+                    //console.log(body);
                     response.statusCode.should.be.equal(400);
                     body.status.should.be.equal('Error');
                     body.errors[0].message.should.be.equal('SSN, First Name, Last Name, or DOB not verified');
@@ -2846,11 +2846,10 @@ describe('AmazingCreditResults', function () {
 
         describe('Valid Request', function() {
           function confirmCheckout(huntKey, buyerId, checkoutBody, cb) {
-            console.log(checkoutBody);
+            //console.log(checkoutBody);
             checkoutBody.status.should.be.equal('Ok');
             checkoutBody.orderId.should.be.a.String;
             checkoutBody.orderTransactionId.should.be.a.String;
-            var newTransactionId = checkoutBody.orderTransactionId;
             async.parallel([
               function (cc) {
                 request({
@@ -2859,10 +2858,11 @@ describe('AmazingCreditResults', function () {
                   'headers': {'huntKey': huntKey},
                   'json': true
                 }, function (error, response, body) {
+                  //console.log(body.transactions);
                   response.statusCode.should.be.equal(200);
                   var orderTransactionFound = false,
                       chargeTransactionFound = false;
-                  body.data.transactions.map(function (tr) {
+                  body.transactions.map(function (tr) {
                     if (tr.id === checkoutBody.orderTransactionId) {
                       orderTransactionFound = true;
                     } else if (checkoutBody.chargeTransactionId && tr.id === checkoutBody.chargeTransactionId) {
@@ -2883,11 +2883,15 @@ describe('AmazingCreditResults', function () {
                   'headers': {'huntKey': huntKey},
                   'json': true
                 }, function (error, response, body) {
-                  console.log(body);
                   response.statusCode.should.equal(200);
                   var order = body.orders[0];
                   order.orderTotal.should.equal(1000);
                   order.id.should.equal(checkoutBody.orderId);
+                  order.transactions.length.should.be.within(1, 2);
+                  order.transactions.should.containEql(checkoutBody.orderTransactionId);
+                  if (checkoutBody.chargeTransactionId) {
+                    order.transactions.should.containEql(checkoutBody.chargeTransactionId);
+                  }
                   cc(error);
                 });
               }
@@ -2925,6 +2929,26 @@ describe('AmazingCreditResults', function () {
                     response.statusCode.should.be.equal(201);
                     confirmCheckout(cartBuyerHuntKey, userId, body, done);
                   }
+                });
+              }
+            ]);
+          });
+
+          it('should be able to checkout using credit card', function(done) {
+            this.timeout(60000);
+            async.waterfall([
+              function(cb) {
+                prepareCart(cartBuyerHuntKey, cb);
+              }, function(emptyResults, cb) {
+                helper.createStripeToken(cb);
+              }, function(stripeToken, cb) {
+                var req = {
+                  'creditCardToken': stripeToken.id
+                };
+                helper.cart.checkout(cartBuyerHuntKey, req, function (error, response, body) {
+                  response.statusCode.should.be.equal(201);
+                  body.chargeTransactionId.should.be.a.String;
+                  confirmCheckout(cartBuyerHuntKey, userId, body, done);
                 });
               }
             ]);
