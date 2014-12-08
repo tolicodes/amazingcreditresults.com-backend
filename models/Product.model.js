@@ -59,6 +59,8 @@ module.exports = exports = function(core) {
       max: 15
     },
 
+    'maxAus': Number,
+
     'owner': {
       type: core.mongoose.Schema.Types.ObjectId,
       ref: 'User'

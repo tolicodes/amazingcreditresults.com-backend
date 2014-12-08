@@ -4,7 +4,7 @@ var utilities = require('../../lib/utilities');
 var fields = ['name', 'bank', 'type', 'notes', 
               'reportsToExperian', 'reportsToEquifax', 
               'reportsToTransunion', 'moRating',
-              'ncRating', 'bcRating', 'totalAus',
+              'ncRating', 'bcRating', 'totalAus', 'maxAus',
               'improvingShortCreditHistory',
               'improvingBadCreditScore',
               'improvingMaxedOutCredit'
