@@ -3001,6 +3001,71 @@ describe('AmazingCreditResults', function () {
               }]
             );
           });
+
+          it('should be able to modify auPurchase record as owner', function(done) {
+            async.series([
+              function (cb) {
+                helper.addBuyerFunds(ownerHuntKey, userId, {amount: 1000}, function (error, response, body) {
+                  response.statusCode.should.be.equal(202);
+                  body.status.should.be.equal('Ok');
+                  cb(error);
+                });
+              },
+              function (cb) {
+                prepareCart(cartBuyerHuntKey, cb);
+              },
+              function () {
+                var req = {
+                  'amtAccountCredit': 1000
+                };
+                helper.cart.checkout(cartBuyerHuntKey, req, function (error, response, checkoutBody) {
+                  if (error) {
+                    done(error);
+                  } else {
+                    response.statusCode.should.be.equal(201);
+                    var auPurchId;
+                    async.series([
+                        function(cc) {
+                          ownReq({
+                            'method': 'GET',
+                            'url': 'http://localhost:' + port + '/api/v1/auPurchases',
+                            'form': {
+                              'buyerId': userId.toString()
+                            }
+                          }, function (error, response, body) {
+                            var purch = body.auPurchases[0];
+                            response.statusCode.should.equal(200);
+                            purch.order.id.should.equal(checkoutBody.orderId);
+                            purch.buyer.id.should.equal(userId.toString());
+                            purch.status.should.equal('To Be Added');
+                            purch.should.not.have.properties('dateAdded', 'dateRemoved');
+                            auPurchId = purch.id;
+                            cc(error);
+                          });
+                        },
+                        function() {
+                          ownReq({
+                            'method': 'PUT',
+                            'url': 'http://localhost:' + port + '/api/v1/auPurchases/' + auPurchId,
+                            'form': {
+                              'status': 'Verified As Added',
+                              'dateAdded': '2014-12-09'
+                            }
+                          }, function (error, response, body) {
+                            console.log(body);
+                            response.statusCode.should.equal(200);
+                            body.status.should.equal('Verified As Added');
+                            body.dateAdded.should.equal('2014-12-09T00:00:00.000Z');
+                            body.id.should.equal(auPurchId);
+                            done(error);
+                          });
+                        }
+                    ]);
+                  }
+                });
+              }
+            ]);
+          })
         });
 
       });

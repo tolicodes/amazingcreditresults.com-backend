@@ -29,7 +29,27 @@ module.exports = exports = function(core) {
     }
   });
 
-  core.app.put('/api/v1/auPurchases/:id', ensureRole('owner'), function (req, res) {
-    // TODO
+  core.app.put('/api/v1/auPurchases/:id', ensureRole('owner'), function (request, response) {
+    try {
+      var update = {};
+      ['status', 'dateAdded', 'dateRemoved'].forEach(function(key){
+        if (request.body[key]) {
+          update[key] = request.body[key];
+        }
+      });
+      core.model.AuPurchase
+          .findOneAndUpdate({_id: request.params.id},
+          update,
+          function (error, purch) {
+            if (error) {
+              response.status(500).json({status: 'Error', errors: [error]});
+            } else {
+              response.status(200).json(purch);
+            }
+          }
+      );
+    } catch (err) {
+      console.error(err);
+    }
   });
 };
