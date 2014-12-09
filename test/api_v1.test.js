@@ -2889,9 +2889,25 @@ describe('AmazingCreditResults', function () {
                   order.id.should.equal(checkoutBody.orderId);
                   order.transactions.length.should.be.within(1, 2);
                   order.transactions.should.containEql(checkoutBody.orderTransactionId);
+                  order.auPurchases.length.should.be.above(0);
                   if (checkoutBody.chargeTransactionId) {
                     order.transactions.should.containEql(checkoutBody.chargeTransactionId);
                   }
+                  cc(error);
+                });
+              },
+              function (cc) {
+                ownReq({
+                  'method': 'GET',
+                  'url': 'http://localhost:' + port + '/api/v1/auPurchases',
+                  'form': {
+                    'buyerId': buyerId.toString()
+                  }
+                }, function (error, response, body) {
+                  var purch = body.auPurchases[0];
+                  response.statusCode.should.equal(200);
+                  purch.order.id.should.equal(checkoutBody.orderId);
+                  purch.buyer.id.should.equal(buyerId.toString());
                   cc(error);
                 });
               }
@@ -2959,7 +2975,10 @@ describe('AmazingCreditResults', function () {
             async.series([
               function(cb) {
                 // reset buyer with ACH account verified
-                helper.resetBuyer(cb,
+                helper.resetBuyer(function(err, user) {
+                  userId = user._id;
+                  cb();
+                },
                 // Balanced Test Account
                 { 'achAccount': {
                     'id': 'BA5AUJx0PRR6VqPVodgzY2Ri',

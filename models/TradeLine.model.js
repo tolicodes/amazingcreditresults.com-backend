@@ -1,26 +1,30 @@
 module.exports = exports = function (core) {
-  var ranks = ['None', 'Bronze', 'Silver', 'Gold'],
     TradeLineSchema = new core.mongoose.Schema(
       {
-        'product': { type: core.mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
         'seller': { type: core.mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-        'totalAus': { type: Number, min: 0, max: 9999 },
-        'usedAus': { type: Number, min: 0, max: 9999 },
-        'currentBalance': { type: Number, min: 0, max: 9999 },
-        'currentAus': { type: Number, min: 0, max: 9999 },
+        'price': { type: Number, min: 0, max: 10000000},
+        'creditLimit': { type: Number, min: 0, max: 999999 },
+        'balance': { type: Number, min: 0, max: 10000000},
         'statementDate': { type: Number, min: 0, max: 10 },
         'dateOpen': {type: Date, default: Date.now()},
+        'usedAus': { type: Number, min: 0, max: 9999 },
+        'totalAus': { type: Number, min: 0, max: 9999 },
+        'active': {type: Boolean, default: false},
+        'product': { type: core.mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+        'tier': Number,
+
+
+        // These Attributes are not in the latest version of the data architecture doc
+        // The may be deprecated
+        'currentBalance': { type: Number, min: 0, max: 9999 },
+        'currentAus': { type: Number, min: 0, max: 9999 },
         'cashLimit': { type: Number, min: 0, max: 999999 },
-        'creditLimit': { type: Number, min: 0, max: 999999 },
         'cost': { type: Number, min: 0, max: 10000000},
-        'price': { type: Number, min: 0, max: 10000000},
-        'balance': { type: Number, min: 0, max: 10000000},
         'ncRating': { type: String, default: 'None' },
         'bcRating': { type: String, default: 'None' },
         'moRating': { type: String, default: 'None' },
         'notes': String,
-        'tier': Number,
-        'active': {type: Boolean, default: false},
+        // Probably not necessary since we have the auPurchases docs
         'buyers': [
           { type: core.mongoose.Schema.Types.ObjectId, ref: 'User', required: false}
         ]

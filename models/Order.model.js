@@ -10,6 +10,8 @@ module.exports = exports = function(core) {
 
     'transactions' : [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
 
+    'auPurchases': [{ type: Schema.Types.ObjectId, ref: 'AuPurchase' }],
+
     'timestamp': { type : Date, default: Date.now },
 
     'buyerId': {
@@ -17,6 +19,7 @@ module.exports = exports = function(core) {
       required: true,
       ref: 'User'
     }
+
   }, {
     toObject: {
       getters: true,
@@ -31,15 +34,6 @@ module.exports = exports = function(core) {
   OrderSchema.index({
     buyerId: 1
   });
-
-  // TODO
-  OrderSchema.virtual('auPurchases')
-    .get(function() {
-      var auPurch = [];
-      return auPurch;
-    })
-    .set(function(vals) {
-    });
 
     // TODO
   OrderSchema.statics.filterByBuyerId = function(user, callback) {

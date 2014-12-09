@@ -44,7 +44,7 @@ module.exports = exports = function (core) {
               response.status(code).json(error);
             } else {
               console.log('confirm checkout');
-              Checkout.confirmCheckout(request.user);
+              Checkout.confirmCheckout(request.user, paymentInfo);
               response.status(201).json({
                 'status': 'Ok',
                 'orderId': paymentInfo.orderId,

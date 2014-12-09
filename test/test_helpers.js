@@ -26,12 +26,12 @@ exports.dropCollection = function(collName, callback) {
 
     if (!collection) {
       db.close();
-      throw Error('Collection '+ collName + 'not found!');
+      console.error('Collection '+ collName + 'not found!');
     } else {
       collection.drop(function(err) {
         db.close();
         if (err) {
-          throw new Error(err);
+          console.error(err);
         }
         // You made it!
         //console.log('Dropped collection: ' + collName);
@@ -197,6 +197,12 @@ exports.resetProductsAndTradelines = function(callback) {
         },
         function(cb) {
           exports.dropCollection('tradelines', cb);
+        },
+        function(cb) {
+          exports.dropCollection('orders', cb);
+        },
+        function(cb) {
+          exports.dropCollection('aupurchases', cb);
         },
         function(cb) {
           exports.dropCollection('products', cb);

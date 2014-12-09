@@ -5,7 +5,7 @@ module.exports = exports = function(core) {
 
   var AuPurchaseSchema = new Schema({
 
-    'tradeline': { type: Schema.Types.ObjectId, ref: 'Tradeline', required: true },
+    'tradeline': { type: Schema.Types.ObjectId, ref: 'TradeLine', required: true },
 
     'buyer': { type: Schema.Types.ObjectId, ref: 'User', required: true },
     'seller': { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -19,10 +19,11 @@ module.exports = exports = function(core) {
     'sellerPayout': Number,
 
     //dateAuAdded: Date the AU was added to buyer Credit Profile or null
-    'dateAdded': { type : Date, default: Date.now },
+    'dateAdded': Date,
     //dateAuRemoved: Date the AU was removed from Buyer Credit Profile or null
-    'dateRemoted': { type : Date, default: Date.now },
+    'dateRemoved': Date,
 
+    // TODO store status as an ENUM
     /*
      == Status ==
      To Be Added
@@ -33,6 +34,19 @@ module.exports = exports = function(core) {
      Refund Complete
      */
     'status': { type: String, default: 'To Be Added' }
+  }, {
+    toObject: {
+      getters: true,
+      virtuals: true
+    },
+    toJSON: {
+      getters: true,
+      virtuals: true
+    }
+  });
+
+  AuPurchaseSchema.index({
+    tradeline: 1
   });
 
   return core.mongoConnection.model('AuPurchase', AuPurchaseSchema);

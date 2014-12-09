@@ -60,13 +60,13 @@ var Hunt = require('hunt'),
 
 console.log('Env:' + hunt.config.env);
 
-//loading models
-hunt.extendModel('Product', require('./models/Product.model.js'));
+//loading models - User is created by default in HuntJS
+hunt.extendModel('AuPurchase', require('./models/AuPurchase.model.js'));
 hunt.extendModel('Order', require('./models/Order.model.js'));
+hunt.extendModel('Product', require('./models/Product.model.js'));
 hunt.extendModel('TradeLine', require('./models/TradeLine.model.js'));
 hunt.extendModel('TradeLineChange', require('./models/TradeLineChange.model.js'));
 hunt.extendModel('Transaction', require('./models/Transaction.model.js'));
-hunt.extendModel('Facade', require('./models/Facade.model.js'));
 
 hunt.extendApp(function(core) {
   //*/
@@ -124,6 +124,7 @@ hunt.extendRoutes(require('./controllers/buyer/cart.js'));
 hunt.extendRoutes(require('./controllers/buyer/checkout.js'));
 
 //loading different controllers for owners
+hunt.extendRoutes(require('./controllers/owner/aupurchases.js'));
 hunt.extendRoutes(require('./controllers/owner/editOwners.js'));
 hunt.extendRoutes(require('./controllers/owner/editClients.js'));
 hunt.extendRoutes(require('./controllers/owner/editProducts.js'));
@@ -166,7 +167,7 @@ hunt.extendRoutes(function(core) {
       'status': 'Error',
       'errors': [{
         'code': 404,
-        'message': 'This API endpoint do not exists!'
+        'message': 'API endpoint not found!'
       }]
     });
   });
