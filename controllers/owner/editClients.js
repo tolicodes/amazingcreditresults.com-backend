@@ -221,8 +221,8 @@ module.exports = exports = function (core) {
           'birthday': request.body.birthday
         },
         'roles': {
-          'buyer': request.body.roles ? utilities.stringToBoolean(request.body.roles.buyer) : true,
-          'seller': request.body.roles ? utilities.stringToBoolean(request.body.roles.seller) : false
+          'buyer': request.body.roles ? request.body.roles.buyer : true,
+          'seller': request.body.roles ? request.body.roles.seller : false
         },
         'root': false
       }, function (error, userCreated) {

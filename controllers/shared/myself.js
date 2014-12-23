@@ -9,7 +9,7 @@ module.exports = exports = function(core) {
 
   //Seller, Buyer, Owner can update their names, birthday, ssn
   //https://oselot.atlassian.net/browse/ACR-51
-  core.app.put('/api/v1/myself', ensureRole(['buyer', 'owner']), function(request, response) {
+  core.app.put('/api/v1/myself', ensureRole(['buyer', 'owner', 'seller']), function(request, response) {
     // fixing a strange bug in the tests
     request.user.profile = request.user.profile || {};
     if (request.user.profile.evsVerified && !util.canEditAfterEVS(request.body)) {
@@ -33,7 +33,7 @@ module.exports = exports = function(core) {
     }
   });
 
-  core.app.get('/api/v1/myself', ensureRole(['buyer', 'owner']), function(request, response) {
+  core.app.get('/api/v1/myself', ensureRole(['buyer', 'owner', 'seller']), function(request, response) {
     if (request.user) {
       response.json(formatUser(request.user));
     } else {
