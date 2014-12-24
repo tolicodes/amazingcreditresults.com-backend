@@ -59,7 +59,8 @@ module.exports = exports = function (core) {
                 throw err;
               } else {
                 var json = {
-                  'message': 'Reset email sent'
+                  'message': 'Reset email sent',
+                  'url': welcomeLink
                 };
                 if (request.body.debug === 'true') {
                   json.welcomeLink = welcomeLink; // Is it too unsafe to return this? Am using it for testing
@@ -178,7 +179,8 @@ module.exports = exports = function (core) {
               'Code': 200,
               'id': userFound.id,
               'huntKey': userFound.apiKey,
-              'name': userFound.name
+              'name': userFound.name,
+              'roles': userFound.roles
             });
           } else {
             response.status(403);
