@@ -2,6 +2,14 @@ module.exports = exports = function (core) {
   var ensureBuyerOrOwner = require('../../lib/middleware.js').ensureBuyerOrOwner,
       Checkout = require('../../lib/checkoutUtil.js')(core);
 
+  core.app.get('/api/v1/account/balance', ensureBuyerOrOwner, function (request, response) {
+      Checkout.calculateCurrentBalance(request.user, function(notHere, balance) {
+          response.status(201).json({
+              balance: balance
+          });
+      });
+
+  });
   core.app.post('/api/v1/cart/checkout', ensureBuyerOrOwner, function (request, response) {
       core.async.waterfall(
           [
