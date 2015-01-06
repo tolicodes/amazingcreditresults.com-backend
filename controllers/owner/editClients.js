@@ -208,6 +208,8 @@ module.exports = exports = function (core) {
         'accountVerified': request.body.accountVerified ? true : false,
         'isBanned': request.body.isBanned ? true : false,
         'profile': {
+          'evsVerified': request.body.evsVerified,
+          'phoneVerified': request.body.phoneVerified,
           'phone': request.body.phone,
           'altPhone': request.body.altPhone,
           'state': request.body.state,
@@ -452,7 +454,7 @@ module.exports = exports = function (core) {
             'client': userFound._id,
             'type': 'balanceIncrease',
             'amount': request.body.amount,
-            'reason': request.body.notes.toString() + ' | Transaction issued by Owner ' + request.user.email,
+            'reason': (request.body.notes ? request.body.notes.toString() : '') + ' | Transaction issued by Owner ' + request.user.email,
             'date': moment(request.body.date).toDate(),
             'userCreated': request.user.id
           }, function (error) {
