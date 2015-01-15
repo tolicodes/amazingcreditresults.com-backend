@@ -68,8 +68,8 @@ module.exports = exports = function(core) {
     var body = {
       PlatformRequest: {
         Credentials: {
-          Username: core.config.evs.username,
-          Password: core.config.evs.password
+          Username: core.config.evs.username || 'user',
+          Password: core.config.evs.password || 'pw'
         },
         CustomerReference: req.user.id,
         Identity: identity
@@ -79,7 +79,7 @@ module.exports = exports = function(core) {
     curl({
       method: 'GET',
       //url: 'https://identiflo.everification.net/WebServices/Integrated/Main/V200/Consumer',
-      url: 'http://localhost:8081/evsresponse.xml',
+      url: 'http://localhost/evsresponse.xml',
       body: builder.buildObject(body)
     }, function(error, data, body) {
       if (error) {
@@ -96,7 +96,7 @@ module.exports = exports = function(core) {
       var errors = [];
 
       _(verifications).each(function(verification){
-        var code = $(verification[0]).attr('code');
+        var code = verification[0];
 
         if (_(verification[1]).indexOf(code.toString()) === -1) {
           errors.push(verification[2]);
